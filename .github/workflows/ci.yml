@@ -62,6 +62,30 @@ jobs:
       - name: Build
         run: go build ./...
 
+  test-rollup:
+    name: Test
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "Test matrix failed"
+            exit 1
+          fi
+
+  build-rollup:
+    name: Build
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build matrix failed"
+            exit 1
+          fi
+
   security:
     name: Security
     runs-on: ubuntu-latest
