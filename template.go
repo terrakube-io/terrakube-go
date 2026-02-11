@@ -1,10 +1,6 @@
 package terrakube
 
-import (
-	"context"
-	"net/http"
-	"net/url"
-)
+import "context"
 
 // Template represents a Terrakube template resource.
 type Template struct {
@@ -13,11 +9,15 @@ type Template struct {
 	Description *string `jsonapi:"attr,description"`
 	Version     *string `jsonapi:"attr,version"`
 	Content     string  `jsonapi:"attr,tcl"`
+	CreatedBy   *string `jsonapi:"attr,createdBy"`
+	CreatedDate *string `jsonapi:"attr,createdDate"`
+	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
+	UpdatedDate *string `jsonapi:"attr,updatedDate"`
 }
 
 // TemplateService handles communication with the template-related endpoints.
 type TemplateService struct {
-	client *Client
+	crudService[Template]
 }
 
 // List returns all templates for the given organization.
@@ -26,23 +26,8 @@ func (s *TemplateService) List(ctx context.Context, orgID string, opts *ListOpti
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "template")
-
-	var params url.Values
-	if opts != nil && opts.Filter != "" {
-		params = url.Values{"filter[template]": {opts.Filter}}
-	}
-
-	req, err := s.client.requestWithQuery(ctx, http.MethodGet, p, params, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var templates []*Template
-	if _, err := s.client.do(ctx, req, &templates); err != nil {
-		return nil, err
-	}
-	return templates, nil
+	path := s.client.apiPath("organization", orgID, "template")
+	return s.list(ctx, path, opts)
 }
 
 // Get returns a single template by ID within the given organization.
@@ -54,18 +39,8 @@ func (s *TemplateService) Get(ctx context.Context, orgID, id string) (*Template,
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "template", id)
-
-	req, err := s.client.request(ctx, http.MethodGet, p, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl := &Template{}
-	if _, err := s.client.do(ctx, req, tmpl); err != nil {
-		return nil, err
-	}
-	return tmpl, nil
+	path := s.client.apiPath("organization", orgID, "template", id)
+	return s.get(ctx, path)
 }
 
 // Create creates a new template in the given organization.
@@ -74,18 +49,8 @@ func (s *TemplateService) Create(ctx context.Context, orgID string, tmpl *Templa
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "template")
-
-	req, err := s.client.request(ctx, http.MethodPost, p, tmpl)
-	if err != nil {
-		return nil, err
-	}
-
-	created := &Template{}
-	if _, err := s.client.do(ctx, req, created); err != nil {
-		return nil, err
-	}
-	return created, nil
+	path := s.client.apiPath("organization", orgID, "template")
+	return s.create(ctx, path, tmpl)
 }
 
 // Update modifies an existing template in the given organization.
@@ -97,18 +62,8 @@ func (s *TemplateService) Update(ctx context.Context, orgID string, tmpl *Templa
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "template", tmpl.ID)
-
-	req, err := s.client.request(ctx, http.MethodPatch, p, tmpl)
-	if err != nil {
-		return nil, err
-	}
-
-	updated := &Template{}
-	if _, err := s.client.do(ctx, req, updated); err != nil {
-		return nil, err
-	}
-	return updated, nil
+	path := s.client.apiPath("organization", orgID, "template", tmpl.ID)
+	return s.update(ctx, path, tmpl)
 }
 
 // Delete removes a template from the given organization.
@@ -120,15 +75,6 @@ func (s *TemplateService) Delete(ctx context.Context, orgID, id string) error {
 		return err
 	}
 
-	p := s.client.apiPath("organization", orgID, "template", id)
-
-	req, err := s.client.request(ctx, http.MethodDelete, p, nil)
-	if err != nil {
-		return err
-	}
-
-	if _, err := s.client.do(ctx, req, nil); err != nil {
-		return err
-	}
-	return nil
+	path := s.client.apiPath("organization", orgID, "template", id)
+	return s.del(ctx, path)
 }

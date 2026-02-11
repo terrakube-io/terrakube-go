@@ -1,10 +1,6 @@
 package terrakube
 
-import (
-	"context"
-	"net/http"
-	"net/url"
-)
+import "context"
 
 // Workspace represents a Terrakube workspace resource.
 type Workspace struct {
@@ -19,14 +15,23 @@ type Workspace struct {
 	IaCVersion       string  `jsonapi:"attr,terraformVersion"`
 	ExecutionMode    string  `jsonapi:"attr,executionMode"`
 	Deleted          bool    `jsonapi:"attr,deleted"`
-	Vcs              *VCS    `jsonapi:"relation,vcs,omitempty"`
+	Locked           bool    `jsonapi:"attr,locked"`
 	AllowRemoteApply bool    `jsonapi:"attr,allowRemoteApply"`
+	LockDescription  *string `jsonapi:"attr,lockDescription"`
+	ModuleSSHKey     *string `jsonapi:"attr,moduleSshKey"`
+	LastJobStatus    *string `jsonapi:"attr,lastJobStatus"`
+	LastJobDate      *string `jsonapi:"attr,lastJobDate"`
+	CreatedBy        *string `jsonapi:"attr,createdBy"`
+	CreatedDate      *string `jsonapi:"attr,createdDate"`
+	UpdatedBy        *string `jsonapi:"attr,updatedBy"`
+	UpdatedDate      *string `jsonapi:"attr,updatedDate"`
+	Vcs              *VCS    `jsonapi:"relation,vcs,omitempty"`
 }
 
 // WorkspaceService handles communication with the workspace related
 // methods of the Terrakube API.
 type WorkspaceService struct {
-	client *Client
+	crudService[Workspace]
 }
 
 // List returns all workspaces for an organization, optionally filtered.
@@ -36,27 +41,7 @@ func (s *WorkspaceService) List(ctx context.Context, orgID string, opts *ListOpt
 	}
 
 	path := s.client.apiPath("organization", orgID, "workspace")
-
-	var req *http.Request
-	var err error
-
-	if opts != nil && opts.Filter != "" {
-		params := url.Values{"filter": {opts.Filter}}
-		req, err = s.client.requestWithQuery(ctx, http.MethodGet, path, params, nil)
-	} else {
-		req, err = s.client.request(ctx, http.MethodGet, path, nil)
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	var workspaces []*Workspace
-	_, err = s.client.do(ctx, req, &workspaces)
-	if err != nil {
-		return nil, err
-	}
-
-	return workspaces, nil
+	return s.list(ctx, path, opts)
 }
 
 // Get retrieves a workspace by ID within an organization.
@@ -69,18 +54,7 @@ func (s *WorkspaceService) Get(ctx context.Context, orgID, id string) (*Workspac
 	}
 
 	path := s.client.apiPath("organization", orgID, "workspace", id)
-	req, err := s.client.request(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	ws := &Workspace{}
-	_, err = s.client.do(ctx, req, ws)
-	if err != nil {
-		return nil, err
-	}
-
-	return ws, nil
+	return s.get(ctx, path)
 }
 
 // Create creates a new workspace within an organization.
@@ -90,18 +64,7 @@ func (s *WorkspaceService) Create(ctx context.Context, orgID string, ws *Workspa
 	}
 
 	path := s.client.apiPath("organization", orgID, "workspace")
-	req, err := s.client.request(ctx, http.MethodPost, path, ws)
-	if err != nil {
-		return nil, err
-	}
-
-	created := &Workspace{}
-	_, err = s.client.do(ctx, req, created)
-	if err != nil {
-		return nil, err
-	}
-
-	return created, nil
+	return s.create(ctx, path, ws)
 }
 
 // Update modifies an existing workspace within an organization.
@@ -114,18 +77,7 @@ func (s *WorkspaceService) Update(ctx context.Context, orgID string, ws *Workspa
 	}
 
 	path := s.client.apiPath("organization", orgID, "workspace", ws.ID)
-	req, err := s.client.request(ctx, http.MethodPatch, path, ws)
-	if err != nil {
-		return nil, err
-	}
-
-	updated := &Workspace{}
-	_, err = s.client.do(ctx, req, updated)
-	if err != nil {
-		return nil, err
-	}
-
-	return updated, nil
+	return s.update(ctx, path, ws)
 }
 
 // Delete removes a workspace by ID within an organization.
@@ -138,11 +90,5 @@ func (s *WorkspaceService) Delete(ctx context.Context, orgID, id string) error {
 	}
 
 	path := s.client.apiPath("organization", orgID, "workspace", id)
-	req, err := s.client.request(ctx, http.MethodDelete, path, nil)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.client.do(ctx, req, nil)
-	return err
+	return s.del(ctx, path)
 }

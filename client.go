@@ -57,6 +57,14 @@ type Client struct {
 	WebhookEvents         *WebhookEventService
 	History               *HistoryService
 	Jobs                  *JobService
+	Actions               *ActionService
+	Steps                 *StepService
+	Providers             *ProviderService
+	ProviderVersions      *ProviderVersionService
+	Implementations       *ImplementationService
+	ModuleVersions        *ModuleVersionService
+	GithubAppTokens       *GithubAppTokenService
+	Addresses             *AddressService
 }
 
 // Option configures a Client.
@@ -137,28 +145,36 @@ func NewClient(opts ...Option) (*Client, error) {
 		return nil, fmt.Errorf("token is required: use WithToken()")
 	}
 
-	c.Organizations = &OrganizationService{client: c}
-	c.Workspaces = &WorkspaceService{client: c}
-	c.Modules = &ModuleService{client: c}
-	c.Teams = &TeamService{client: c}
+	c.Organizations = &OrganizationService{crudService[Organization]{client: c}}
+	c.Workspaces = &WorkspaceService{crudService[Workspace]{client: c}}
+	c.Modules = &ModuleService{crudService[Module]{client: c}}
+	c.Teams = &TeamService{crudService[Team]{client: c, filterKey: "filter[team]"}}
 	c.TeamTokens = &TeamTokenService{client: c}
-	c.Variables = &VariableService{client: c}
-	c.OrganizationVariables = &OrganizationVariableService{client: c}
-	c.Templates = &TemplateService{client: c}
-	c.Tags = &TagService{client: c}
-	c.VCS = &VCSService{client: c}
-	c.SSH = &SSHService{client: c}
-	c.Agents = &AgentService{client: c}
-	c.Collections = &CollectionService{client: c}
-	c.CollectionItems = &CollectionItemService{client: c}
-	c.CollectionReferences = &CollectionReferenceService{client: c}
-	c.WorkspaceTags = &WorkspaceTagService{client: c}
-	c.WorkspaceAccess = &WorkspaceAccessService{client: c}
-	c.WorkspaceSchedules = &WorkspaceScheduleService{client: c}
-	c.Webhooks = &WebhookService{client: c}
-	c.WebhookEvents = &WebhookEventService{client: c}
-	c.History = &HistoryService{client: c}
-	c.Jobs = &JobService{client: c}
+	c.Variables = &VariableService{crudService[Variable]{client: c, filterKey: "filter[variable]"}}
+	c.OrganizationVariables = &OrganizationVariableService{crudService[OrganizationVariable]{client: c, filterKey: "filter[globalvar]"}}
+	c.Templates = &TemplateService{crudService[Template]{client: c, filterKey: "filter[template]"}}
+	c.Tags = &TagService{crudService[Tag]{client: c, filterKey: "filter[tag]"}}
+	c.VCS = &VCSService{crudService[VCS]{client: c, filterKey: "filter[vcs]"}}
+	c.SSH = &SSHService{crudService[SSH]{client: c, filterKey: "filter[ssh]"}}
+	c.Agents = &AgentService{crudService[Agent]{client: c, filterKey: "filter[agent]"}}
+	c.Collections = &CollectionService{crudService[Collection]{client: c, filterKey: "filter[collection]"}}
+	c.CollectionItems = &CollectionItemService{crudService[CollectionItem]{client: c, filterKey: "filter[item]"}}
+	c.CollectionReferences = &CollectionReferenceService{crudService[CollectionReference]{client: c, filterKey: "filter[reference]"}}
+	c.WorkspaceTags = &WorkspaceTagService{crudService[WorkspaceTag]{client: c, filterKey: "filter[workspacetag]"}}
+	c.WorkspaceAccess = &WorkspaceAccessService{crudService[WorkspaceAccess]{client: c, filterKey: "filter[access]"}}
+	c.WorkspaceSchedules = &WorkspaceScheduleService{crudService[WorkspaceSchedule]{client: c, filterKey: "filter[schedule]"}}
+	c.Webhooks = &WebhookService{crudService[Webhook]{client: c, filterKey: "filter[webhook]"}}
+	c.WebhookEvents = &WebhookEventService{crudService[WebhookEvent]{client: c, filterKey: "filter[webhook_event]"}}
+	c.History = &HistoryService{crudService[History]{client: c, filterKey: "filter[history]"}}
+	c.Jobs = &JobService{crudService[Job]{client: c, filterKey: "filter[job]"}}
+	c.Actions = &ActionService{crudService[Action]{client: c}}
+	c.Steps = &StepService{crudService[Step]{client: c}}
+	c.Providers = &ProviderService{crudService[Provider]{client: c}}
+	c.ProviderVersions = &ProviderVersionService{crudService[ProviderVersion]{client: c}}
+	c.Implementations = &ImplementationService{crudService[Implementation]{client: c}}
+	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c}}
+	c.GithubAppTokens = &GithubAppTokenService{crudService[GithubAppToken]{client: c}}
+	c.Addresses = &AddressService{crudService[Address]{client: c}}
 
 	return c, nil
 }

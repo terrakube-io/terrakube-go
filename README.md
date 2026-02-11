@@ -48,6 +48,7 @@ func main() {
 | Organization | `Organizations` | Top-level |
 | Workspace | `Workspaces` | Organization |
 | Module | `Modules` | Organization |
+| Module Version | `ModuleVersions` | Module |
 | Team | `Teams` | Organization |
 | Team Token | `TeamTokens` | Organization |
 | Template | `Templates` | Organization |
@@ -67,6 +68,13 @@ func main() {
 | Webhook Event | `WebhookEvents` | Webhook |
 | History | `History` | Workspace |
 | Job | `Jobs` | Organization |
+| Action | `Actions` | Top-level |
+| Step | `Steps` | Job |
+| Address | `Addresses` | Job |
+| Provider | `Providers` | Organization |
+| Provider Version | `ProviderVersions` | Provider |
+| Implementation | `Implementations` | Provider Version |
+| GitHub App Token | `GithubAppTokens` | Top-level |
 
 ## Configuration
 

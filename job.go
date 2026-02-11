@@ -1,23 +1,34 @@
 package terrakube
 
-import (
-	"context"
-	"net/http"
-	"net/url"
-)
+import "context"
 
 // Job represents a Terrakube job resource.
 type Job struct {
-	ID      string `jsonapi:"primary,job"`
-	Command string `jsonapi:"attr,command"`
-	Output  string `jsonapi:"attr,output"`
-	Status  string `jsonapi:"attr,status"`
+	ID                string  `jsonapi:"primary,job"`
+	Command           string  `jsonapi:"attr,command"`
+	Output            string  `jsonapi:"attr,output"`
+	Status            string  `jsonapi:"attr,status"`
+	ApprovalTeam      *string `jsonapi:"attr,approvalTeam"`
+	Comments          *string `jsonapi:"attr,comments"`
+	CommitID          *string `jsonapi:"attr,commitId"`
+	OverrideBranch    *string `jsonapi:"attr,overrideBranch"`
+	PlanChanges       bool    `jsonapi:"attr,planChanges"`
+	Refresh           bool    `jsonapi:"attr,refresh"`
+	RefreshOnly       bool    `jsonapi:"attr,refreshOnly"`
+	Tcl               *string `jsonapi:"attr,tcl"`
+	TemplateReference *string `jsonapi:"attr,templateReference"`
+	TerraformPlan     *string `jsonapi:"attr,terraformPlan"`
+	Via               *string `jsonapi:"attr,via"`
+	CreatedBy         *string `jsonapi:"attr,createdBy"`
+	CreatedDate       *string `jsonapi:"attr,createdDate"`
+	UpdatedBy         *string `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *string `jsonapi:"attr,updatedDate"`
 }
 
 // JobService handles communication with the job related methods of the
 // Terrakube API.
 type JobService struct {
-	client *Client
+	crudService[Job]
 }
 
 // List returns all jobs for the given organization.
@@ -26,25 +37,8 @@ func (s *JobService) List(ctx context.Context, orgID string, opts *ListOptions) 
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "job")
-
-	var params url.Values
-	if opts != nil && opts.Filter != "" {
-		params = url.Values{"filter[job]": {opts.Filter}}
-	}
-
-	req, err := s.client.requestWithQuery(ctx, http.MethodGet, p, params, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var jobs []*Job
-	_, err = s.client.do(ctx, req, &jobs)
-	if err != nil {
-		return nil, err
-	}
-
-	return jobs, nil
+	path := s.client.apiPath("organization", orgID, "job")
+	return s.list(ctx, path, opts)
 }
 
 // Get returns a single job by ID.
@@ -56,20 +50,8 @@ func (s *JobService) Get(ctx context.Context, orgID, id string) (*Job, error) {
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "job", id)
-
-	req, err := s.client.request(ctx, http.MethodGet, p, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	job := &Job{}
-	_, err = s.client.do(ctx, req, job)
-	if err != nil {
-		return nil, err
-	}
-
-	return job, nil
+	path := s.client.apiPath("organization", orgID, "job", id)
+	return s.get(ctx, path)
 }
 
 // Create creates a new job in the given organization.
@@ -78,20 +60,8 @@ func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, 
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "job")
-
-	req, err := s.client.request(ctx, http.MethodPost, p, job)
-	if err != nil {
-		return nil, err
-	}
-
-	created := &Job{}
-	_, err = s.client.do(ctx, req, created)
-	if err != nil {
-		return nil, err
-	}
-
-	return created, nil
+	path := s.client.apiPath("organization", orgID, "job")
+	return s.create(ctx, path, job)
 }
 
 // Update modifies an existing job. The job's ID field must be set.
@@ -103,20 +73,8 @@ func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, 
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "job", job.ID)
-
-	req, err := s.client.request(ctx, http.MethodPatch, p, job)
-	if err != nil {
-		return nil, err
-	}
-
-	updated := &Job{}
-	_, err = s.client.do(ctx, req, updated)
-	if err != nil {
-		return nil, err
-	}
-
-	return updated, nil
+	path := s.client.apiPath("organization", orgID, "job", job.ID)
+	return s.update(ctx, path, job)
 }
 
 // Delete removes a job by ID.
@@ -128,13 +86,6 @@ func (s *JobService) Delete(ctx context.Context, orgID, id string) error {
 		return err
 	}
 
-	p := s.client.apiPath("organization", orgID, "job", id)
-
-	req, err := s.client.request(ctx, http.MethodDelete, p, nil)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.client.do(ctx, req, nil)
-	return err
+	path := s.client.apiPath("organization", orgID, "job", id)
+	return s.del(ctx, path)
 }
