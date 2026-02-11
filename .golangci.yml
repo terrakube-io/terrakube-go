@@ -1,0 +1,59 @@
+version: "2"
+
+linters:
+  enable:
+    - errcheck
+    - errorlint
+    - gocritic
+    - gosec
+    - govet
+    - noctx
+    - revive
+    - staticcheck
+    - unused
+    # bodyclose disabled: do()/doRaw() always close resp.Body internally;
+    # the linter cannot track cross-function closure and produces false positives.
+    - nilerr
+    - prealloc
+    - unconvert
+    - unparam
+
+linters-settings:
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+      - name: blank-imports
+      - name: context-as-argument
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: increment-decrement
+      - name: var-naming
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+  gocritic:
+    enabled-checks:
+      - appendAssign
+      - argOrder
+      - badCall
+      - badCond
+      - badLock
+      - badRegexp
+      - dupArg
+      - dupBranchBody
+      - dupCase
+      - dupSubExpr
+      - flagDeref
+      - nilValReturn
+      - sloppyLen
+      - truncateCmp
+  gosec:
+    excludes:
+      - G104 # duplicate of errcheck
+      - G304 # file path from variable - expected in library code
