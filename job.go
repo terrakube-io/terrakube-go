@@ -4,10 +4,11 @@ import "context"
 
 // Job represents a Terrakube job resource.
 type Job struct {
-	ID                string  `jsonapi:"primary,job"`
-	Command           string  `jsonapi:"attr,command"`
-	Output            string  `jsonapi:"attr,output"`
-	Status            string  `jsonapi:"attr,status"`
+	ID                string     `jsonapi:"primary,job"`
+	Command           string     `jsonapi:"attr,command"`
+	Output            string     `jsonapi:"attr,output"`
+	Status            string     `jsonapi:"attr,status"`
+	Workspace         *Workspace `jsonapi:"relation,workspace,omitempty"`
 	ApprovalTeam      *string `jsonapi:"attr,approvalTeam"`
 	Comments          *string `jsonapi:"attr,comments"`
 	CommitID          *string `jsonapi:"attr,commitId"`
