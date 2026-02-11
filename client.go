@@ -147,8 +147,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 
 	c.Organizations = &OrganizationService{crudService[Organization]{client: c}}
-	c.Workspaces = &WorkspaceService{crudService[Workspace]{client: c}}
-	c.Modules = &ModuleService{crudService[Module]{client: c}}
+	c.Workspaces = &WorkspaceService{crudService[Workspace]{client: c, filterKey: "filter[workspace]"}}
+	c.Modules = &ModuleService{crudService[Module]{client: c, filterKey: "filter[module]"}}
 	c.Teams = &TeamService{crudService[Team]{client: c, filterKey: "filter[team]"}}
 	c.TeamTokens = &TeamTokenService{client: c}
 	c.Variables = &VariableService{crudService[Variable]{client: c, filterKey: "filter[variable]"}}
@@ -169,13 +169,13 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.History = &HistoryService{crudService[History]{client: c, filterKey: "filter[history]"}}
 	c.Jobs = &JobService{crudService[Job]{client: c, filterKey: "filter[job]"}}
 	c.Actions = &ActionService{crudService[Action]{client: c}}
-	c.Steps = &StepService{crudService[Step]{client: c}}
-	c.Providers = &ProviderService{crudService[Provider]{client: c}}
-	c.ProviderVersions = &ProviderVersionService{crudService[ProviderVersion]{client: c}}
-	c.Implementations = &ImplementationService{crudService[Implementation]{client: c}}
-	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c}}
+	c.Steps = &StepService{crudService[Step]{client: c, filterKey: "filter[step]"}}
+	c.Providers = &ProviderService{crudService[Provider]{client: c, filterKey: "filter[provider]"}}
+	c.ProviderVersions = &ProviderVersionService{crudService[ProviderVersion]{client: c, filterKey: "filter[version]"}}
+	c.Implementations = &ImplementationService{crudService[Implementation]{client: c, filterKey: "filter[implementation]"}}
+	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c, filterKey: "filter[version]"}}
 	c.GithubAppTokens = &GithubAppTokenService{crudService[GithubAppToken]{client: c}}
-	c.Addresses = &AddressService{crudService[Address]{client: c}}
+	c.Addresses = &AddressService{crudService[Address]{client: c, filterKey: "filter[address]"}}
 	c.Operations = &OperationsService{client: c}
 
 	return c, nil

@@ -39,7 +39,7 @@ func TestProviderVersionService_List_WithFilter(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version", func(w http.ResponseWriter, r *http.Request) {
-		filter := r.URL.Query().Get("filter")
+		filter := r.URL.Query().Get("filter[version]")
 		if filter == "" {
 			t.Error("expected filter query parameter")
 		}
