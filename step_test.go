@@ -39,7 +39,7 @@ func TestStepService_List_WithFilter(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/step", func(w http.ResponseWriter, r *http.Request) {
-		filter := r.URL.Query().Get("filter")
+		filter := r.URL.Query().Get("filter[step]")
 		if filter == "" {
 			t.Error("expected filter query parameter")
 		}
