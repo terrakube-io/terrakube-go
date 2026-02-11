@@ -344,7 +344,7 @@ func TestWebhookEventService_List(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.WebhookEvent{
 			{ID: "evt1", Branch: "main", Event: "push", Priority: 1},
 			{ID: "evt2", Branch: "dev", Event: "tag", Priority: 2},
@@ -371,7 +371,7 @@ func TestWebhookEventService_List_WithFilter(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, r *http.Request) {
 		filter := r.URL.Query().Get("filter[webhook_event]")
 		if filter == "" {
 			t.Error("expected filter query parameter")

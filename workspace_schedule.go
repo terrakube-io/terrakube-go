@@ -20,15 +20,12 @@ type WorkspaceScheduleService struct {
 }
 
 // List returns all schedules for the given workspace.
-func (s *WorkspaceScheduleService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*WorkspaceSchedule, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
+func (s *WorkspaceScheduleService) List(ctx context.Context, workspaceID string, opts *ListOptions) ([]*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "schedule")
+	p := s.client.apiPath("workspace", workspaceID, "schedule")
 
 	var params url.Values
 	if opts != nil && opts.Filter != "" {
@@ -50,10 +47,7 @@ func (s *WorkspaceScheduleService) List(ctx context.Context, orgID, workspaceID 
 }
 
 // Get returns a single workspace schedule by ID.
-func (s *WorkspaceScheduleService) Get(ctx context.Context, orgID, workspaceID, id string) (*WorkspaceSchedule, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
+func (s *WorkspaceScheduleService) Get(ctx context.Context, workspaceID, id string) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
 	}
@@ -61,7 +55,7 @@ func (s *WorkspaceScheduleService) Get(ctx context.Context, orgID, workspaceID, 
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "schedule", id)
+	p := s.client.apiPath("workspace", workspaceID, "schedule", id)
 
 	req, err := s.client.request(ctx, http.MethodGet, p, nil)
 	if err != nil {
@@ -78,15 +72,12 @@ func (s *WorkspaceScheduleService) Get(ctx context.Context, orgID, workspaceID, 
 }
 
 // Create creates a new schedule for the given workspace.
-func (s *WorkspaceScheduleService) Create(ctx context.Context, orgID, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
+func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "schedule")
+	p := s.client.apiPath("workspace", workspaceID, "schedule")
 
 	req, err := s.client.request(ctx, http.MethodPost, p, schedule)
 	if err != nil {
@@ -103,10 +94,7 @@ func (s *WorkspaceScheduleService) Create(ctx context.Context, orgID, workspaceI
 }
 
 // Update modifies an existing workspace schedule. The schedule's ID field must be set.
-func (s *WorkspaceScheduleService) Update(ctx context.Context, orgID, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
+func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
 	}
@@ -114,7 +102,7 @@ func (s *WorkspaceScheduleService) Update(ctx context.Context, orgID, workspaceI
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "schedule", schedule.ID)
+	p := s.client.apiPath("workspace", workspaceID, "schedule", schedule.ID)
 
 	req, err := s.client.request(ctx, http.MethodPatch, p, schedule)
 	if err != nil {
@@ -131,10 +119,7 @@ func (s *WorkspaceScheduleService) Update(ctx context.Context, orgID, workspaceI
 }
 
 // Delete removes a workspace schedule by ID.
-func (s *WorkspaceScheduleService) Delete(ctx context.Context, orgID, workspaceID, id string) error {
-	if err := validateID("organizationID", orgID); err != nil {
-		return err
-	}
+func (s *WorkspaceScheduleService) Delete(ctx context.Context, workspaceID, id string) error {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return err
 	}
@@ -142,7 +127,7 @@ func (s *WorkspaceScheduleService) Delete(ctx context.Context, orgID, workspaceI
 		return err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "schedule", id)
+	p := s.client.apiPath("workspace", workspaceID, "schedule", id)
 
 	req, err := s.client.request(ctx, http.MethodDelete, p, nil)
 	if err != nil {

@@ -19,6 +19,7 @@ type Workspace struct {
 	IaCVersion       string  `jsonapi:"attr,terraformVersion"`
 	ExecutionMode    string  `jsonapi:"attr,executionMode"`
 	Deleted          bool    `jsonapi:"attr,deleted"`
+	Vcs              *VCS    `jsonapi:"relation,vcs,omitempty"`
 	AllowRemoteApply bool    `jsonapi:"attr,allowRemoteApply"`
 }
 

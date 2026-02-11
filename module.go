@@ -13,6 +13,8 @@ type Module struct {
 	Description string  `jsonapi:"attr,description"`
 	Provider    string  `jsonapi:"attr,provider"`
 	Source      string  `jsonapi:"attr,source"`
+	Vcs         *VCS    `jsonapi:"relation,vcs,omitempty"`
+	Ssh         *SSH    `jsonapi:"relation,ssh,omitempty"`
 	Folder      *string `jsonapi:"attr,folder"`
 	TagPrefix   *string `jsonapi:"attr,tagPrefix"`
 }

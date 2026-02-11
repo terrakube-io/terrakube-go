@@ -12,6 +12,8 @@ import (
 	"github.com/denniswebb/terrakube-go/testutil"
 )
 
+func boolPtr(b bool) *bool { return &b }
+
 func newTestOrganizationVariable() *terrakube.OrganizationVariable {
 	return &terrakube.OrganizationVariable{
 		ID:          "gv-1",
@@ -19,7 +21,7 @@ func newTestOrganizationVariable() *terrakube.OrganizationVariable {
 		Value:       "DEBUG",
 		Description: "Terraform log level",
 		Category:    "ENV",
-		Sensitive:   false,
+		Sensitive:   boolPtr(false),
 		Hcl:         false,
 	}
 }
@@ -159,7 +161,7 @@ func TestOrganizationVariableService_Create(t *testing.T) {
 		Key:       "TF_LOG",
 		Value:     "DEBUG",
 		Category:  "ENV",
-		Sensitive: false,
+		Sensitive: boolPtr(false),
 		Hcl:       false,
 	}
 	v, err := client.OrganizationVariables.Create(context.Background(), "org-1", input)
@@ -288,7 +290,7 @@ func TestOrganizationVariable_BooleanFalseNotDropped(t *testing.T) {
 		Key:       "MY_VAR",
 		Value:     "val",
 		Category:  "ENV",
-		Sensitive: false,
+		Sensitive: boolPtr(false),
 		Hcl:       false,
 	}
 
@@ -300,10 +302,34 @@ func TestOrganizationVariable_BooleanFalseNotDropped(t *testing.T) {
 	payload := buf.Bytes()
 
 	if !bytes.Contains(payload, []byte(`"sensitive"`)) {
-		t.Error("Sensitive=false was dropped from JSON:API payload; omitempty must not be used on boolean fields")
+		t.Error("Sensitive=*false was dropped from JSON:API payload; non-nil *bool should be serialized even with omitempty")
 	}
 	if !bytes.Contains(payload, []byte(`"hcl"`)) {
 		t.Error("Hcl=false was dropped from JSON:API payload; omitempty must not be used on boolean fields")
+	}
+}
+
+func TestOrganizationVariable_SensitiveNilOmitted(t *testing.T) {
+	t.Parallel()
+
+	v := &terrakube.OrganizationVariable{
+		ID:        "gv-1",
+		Key:       "MY_VAR",
+		Value:     "val",
+		Category:  "ENV",
+		Sensitive: nil,
+		Hcl:       false,
+	}
+
+	var buf bytes.Buffer
+	if err := jsonapi.MarshalPayload(&buf, v); err != nil {
+		t.Fatalf("failed to marshal: %v", err)
+	}
+
+	payload := buf.Bytes()
+
+	if bytes.Contains(payload, []byte(`"sensitive"`)) {
+		t.Error("Sensitive=nil should be omitted from JSON:API payload with *bool + omitempty")
 	}
 }
 
@@ -315,7 +341,7 @@ func TestOrganizationVariable_BooleanTruePreserved(t *testing.T) {
 		Key:       "MY_VAR",
 		Value:     "val",
 		Category:  "ENV",
-		Sensitive: true,
+		Sensitive: boolPtr(true),
 		Hcl:       true,
 	}
 

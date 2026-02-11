@@ -20,7 +20,7 @@ func TestWorkspaceTagService_List(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/tag", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/workspaceTag", func(w http.ResponseWriter, _ *http.Request) {
 		tags := []*terrakube.WorkspaceTag{newTestWorkspaceTag()}
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, tags)
 	})
@@ -43,7 +43,7 @@ func TestWorkspaceTagService_List_WithFilter(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/tag", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/workspaceTag", func(w http.ResponseWriter, r *http.Request) {
 		filter := r.URL.Query().Get("filter[workspacetag]")
 		if filter == "" {
 			t.Error("expected filter query parameter")
@@ -81,7 +81,7 @@ func TestWorkspaceTagService_Get(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/tag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/workspaceTag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, newTestWorkspaceTag())
 	})
 
@@ -103,7 +103,7 @@ func TestWorkspaceTagService_Get_NotFound(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/tag/missing", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/workspaceTag/missing", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusNotFound, "tag not found")
 	})
 
@@ -148,7 +148,7 @@ func TestWorkspaceTagService_Create(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("POST /api/v1/organization/org-1/workspace/ws-1/tag", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org-1/workspace/ws-1/workspaceTag", func(w http.ResponseWriter, r *http.Request) {
 		ct := r.Header.Get("Content-Type")
 		if ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
@@ -192,7 +192,7 @@ func TestWorkspaceTagService_Update(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1/tag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1/workspaceTag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
 		tag := newTestWorkspaceTag()
 		tag.TagID = "tag-99"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, tag)
@@ -244,7 +244,7 @@ func TestWorkspaceTagService_Delete(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("DELETE /api/v1/organization/org-1/workspace/ws-1/tag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org-1/workspace/ws-1/workspaceTag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
@@ -286,7 +286,7 @@ func TestWorkspaceTagService_Delete_ServerError(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("DELETE /api/v1/organization/org-1/workspace/ws-1/tag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org-1/workspace/ws-1/workspaceTag/wstag-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusInternalServerError, "server error")
 	})
 
@@ -302,7 +302,7 @@ func TestWorkspaceTagService_AuthHeader(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/tag/wstag-1", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/workspaceTag/wstag-1", func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth != "Bearer test-token" {
 			t.Errorf("Authorization = %q, want %q", auth, "Bearer test-token")

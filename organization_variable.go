@@ -13,7 +13,7 @@ type OrganizationVariable struct {
 	Value       string `jsonapi:"attr,value"`
 	Description string `jsonapi:"attr,description"`
 	Category    string `jsonapi:"attr,category"`
-	Sensitive   bool   `jsonapi:"attr,sensitive"`
+	Sensitive   *bool  `jsonapi:"attr,sensitive,omitempty"`
 	Hcl         bool   `jsonapi:"attr,hcl"`
 }
 

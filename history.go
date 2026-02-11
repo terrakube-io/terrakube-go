@@ -9,8 +9,8 @@ import (
 // History represents a Terrakube workspace history resource.
 type History struct {
 	ID           string `jsonapi:"primary,history"`
-	JobReference string `jsonapi:"attr,jobReference"`
-	Output       string `jsonapi:"attr,output"`
+	JobReference string `jsonapi:"attr,jobReference,omitempty"`
+	Output       string `jsonapi:"attr,output,omitempty"`
 }
 
 // HistoryService handles communication with the history-related endpoints.

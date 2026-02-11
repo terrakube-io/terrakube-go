@@ -28,6 +28,7 @@ type WebhookEvent struct {
 	TemplateID  string `jsonapi:"attr,templateId"`
 	UpdatedBy   string `jsonapi:"attr,updatedBy"`
 	UpdatedDate string `jsonapi:"attr,updatedDate"`
+	Webhook     *Webhook `jsonapi:"relation,webhook,omitempty"`
 }
 
 // WebhookService handles communication with the webhook related methods
@@ -188,7 +189,7 @@ func (s *WebhookEventService) List(ctx context.Context, orgID, workspaceID, webh
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event")
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events")
 
 	var params url.Values
 	if opts != nil && opts.Filter != "" {

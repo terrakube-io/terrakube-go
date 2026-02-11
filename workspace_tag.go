@@ -27,7 +27,7 @@ func (s *WorkspaceTagService) List(ctx context.Context, orgID, workspaceID strin
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "tag")
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "workspaceTag")
 
 	var params url.Values
 	if opts != nil && opts.Filter != "" {
@@ -60,7 +60,7 @@ func (s *WorkspaceTagService) Get(ctx context.Context, orgID, workspaceID, tagID
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "tag", tagID)
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "workspaceTag", tagID)
 
 	req, err := s.client.request(ctx, http.MethodGet, p, nil)
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *WorkspaceTagService) Create(ctx context.Context, orgID, workspaceID str
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "tag")
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "workspaceTag")
 
 	req, err := s.client.request(ctx, http.MethodPost, p, tag)
 	if err != nil {
@@ -113,7 +113,7 @@ func (s *WorkspaceTagService) Update(ctx context.Context, orgID, workspaceID str
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "tag", tag.ID)
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "workspaceTag", tag.ID)
 
 	req, err := s.client.request(ctx, http.MethodPatch, p, tag)
 	if err != nil {
@@ -141,7 +141,7 @@ func (s *WorkspaceTagService) Delete(ctx context.Context, orgID, workspaceID, ta
 		return err
 	}
 
-	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "tag", tagID)
+	p := s.client.apiPath("organization", orgID, "workspace", workspaceID, "workspaceTag", tagID)
 
 	req, err := s.client.request(ctx, http.MethodDelete, p, nil)
 	if err != nil {

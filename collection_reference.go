@@ -8,8 +8,10 @@ import (
 
 // CollectionReference represents a reference within a Terrakube collection.
 type CollectionReference struct {
-	ID          string  `jsonapi:"primary,reference"`
-	Description *string `jsonapi:"attr,description"`
+	ID          string      `jsonapi:"primary,reference"`
+	Description *string     `jsonapi:"attr,description"`
+	Workspace   *Workspace  `jsonapi:"relation,workspace,omitempty"`
+	Collection  *Collection `jsonapi:"relation,collection,omitempty"`
 }
 
 // CollectionReferenceService handles communication with the collection reference
@@ -48,19 +50,13 @@ func (s *CollectionReferenceService) List(ctx context.Context, orgID, collection
 	return refs, nil
 }
 
-// Get returns a single collection reference by ID.
-func (s *CollectionReferenceService) Get(ctx context.Context, orgID, collectionID, id string) (*CollectionReference, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
-	if err := validateID("collectionID", collectionID); err != nil {
-		return nil, err
-	}
+// Get returns a single collection reference by ID using the flat endpoint.
+func (s *CollectionReferenceService) Get(ctx context.Context, id string) (*CollectionReference, error) {
 	if err := validateID("referenceID", id); err != nil {
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "collection", collectionID, "reference", id)
+	p := s.client.apiPath("reference", id)
 
 	req, err := s.client.request(ctx, http.MethodGet, p, nil)
 	if err != nil {
@@ -101,19 +97,14 @@ func (s *CollectionReferenceService) Create(ctx context.Context, orgID, collecti
 	return created, nil
 }
 
-// Update modifies an existing collection reference. The reference's ID field must be set.
-func (s *CollectionReferenceService) Update(ctx context.Context, orgID, collectionID string, ref *CollectionReference) (*CollectionReference, error) {
-	if err := validateID("organizationID", orgID); err != nil {
-		return nil, err
-	}
-	if err := validateID("collectionID", collectionID); err != nil {
-		return nil, err
-	}
+// Update modifies an existing collection reference using the flat endpoint.
+// The reference's ID field must be set.
+func (s *CollectionReferenceService) Update(ctx context.Context, ref *CollectionReference) (*CollectionReference, error) {
 	if err := validateID("referenceID", ref.ID); err != nil {
 		return nil, err
 	}
 
-	p := s.client.apiPath("organization", orgID, "collection", collectionID, "reference", ref.ID)
+	p := s.client.apiPath("reference", ref.ID)
 
 	req, err := s.client.request(ctx, http.MethodPatch, p, ref)
 	if err != nil {
@@ -129,19 +120,13 @@ func (s *CollectionReferenceService) Update(ctx context.Context, orgID, collecti
 	return updated, nil
 }
 
-// Delete removes a collection reference by ID.
-func (s *CollectionReferenceService) Delete(ctx context.Context, orgID, collectionID, id string) error {
-	if err := validateID("organizationID", orgID); err != nil {
-		return err
-	}
-	if err := validateID("collectionID", collectionID); err != nil {
-		return err
-	}
+// Delete removes a collection reference by ID using the flat endpoint.
+func (s *CollectionReferenceService) Delete(ctx context.Context, id string) error {
 	if err := validateID("referenceID", id); err != nil {
 		return err
 	}
 
-	p := s.client.apiPath("organization", orgID, "collection", collectionID, "reference", id)
+	p := s.client.apiPath("reference", id)
 
 	req, err := s.client.request(ctx, http.MethodDelete, p, nil)
 	if err != nil {
