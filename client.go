@@ -65,6 +65,7 @@ type Client struct {
 	ModuleVersions        *ModuleVersionService
 	GithubAppTokens       *GithubAppTokenService
 	Addresses             *AddressService
+	Operations            *OperationsService
 }
 
 // Option configures a Client.
@@ -175,6 +176,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c}}
 	c.GithubAppTokens = &GithubAppTokenService{crudService[GithubAppToken]{client: c}}
 	c.Addresses = &AddressService{crudService[Address]{client: c}}
+	c.Operations = &OperationsService{client: c}
 
 	return c, nil
 }

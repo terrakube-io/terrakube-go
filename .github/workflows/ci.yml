@@ -18,19 +18,28 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "1.24"
+      - name: Check go.mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+      - name: Run go vet
+        run: go vet ./...
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.9
           args: --timeout=5m
 
   test:
-    name: Test
+    name: Test (Go ${{ matrix.go-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.24", "1.25"]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.24"
+          go-version: ${{ matrix.go-version }}
       - name: Run tests
         run: go test -race -count=1 -coverprofile=coverage.out ./...
       - name: Upload coverage
@@ -40,12 +49,68 @@ jobs:
           files: coverage.out
 
   build:
+    name: Build (Go ${{ matrix.go-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.24", "1.25"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Build
+        run: go build ./...
+
+  test-rollup:
+    name: Test
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "Test matrix failed"
+            exit 1
+          fi
+
+  build-rollup:
     name: Build
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build matrix failed"
+            exit 1
+          fi
+
+  security:
+    name: Security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
+          go-version: "1.25.7"
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - name: Run govulncheck
+        run: govulncheck ./...
+
+  api-compat:
+    name: API Compatibility
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
           go-version: "1.24"
-      - name: Build
-        run: go build ./...
+      - name: Install gorelease
+        run: go install golang.org/x/exp/cmd/gorelease@latest
+      - name: Check API compatibility
+        run: gorelease || true
