@@ -8,6 +8,7 @@ import (
 // OperationAction represents the type of atomic operation.
 type OperationAction string
 
+// Supported atomic operation actions.
 const (
 	OperationAdd    OperationAction = "add"
 	OperationUpdate OperationAction = "update"

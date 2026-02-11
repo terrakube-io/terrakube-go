@@ -51,12 +51,11 @@ func ExampleNewClient() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Write(jsonapiList([]map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]interface{}{
 			jsonapiItem("organization", "org-1", map[string]interface{}{"name": "my-org"}),
 		}))
 	})
 	srv := httptest.NewServer(mux)
-	defer srv.Close()
 
 	client, err := terrakube.NewClient(
 		terrakube.WithEndpoint(srv.URL),
@@ -71,6 +70,7 @@ func ExampleNewClient() {
 		log.Fatal(err)
 	}
 	fmt.Println(orgs[0].Name)
+	srv.Close()
 	// Output: my-org
 }
 
@@ -78,7 +78,7 @@ func ExampleOrganizationService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Write(jsonapiList([]map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]interface{}{
 			jsonapiItem("organization", "org-1", map[string]interface{}{
 				"name":          "Alpha",
 				"executionMode": "remote",
@@ -90,7 +90,6 @@ func ExampleOrganizationService_List() {
 		}))
 	})
 	srv := httptest.NewServer(mux)
-	defer srv.Close()
 
 	client, err := terrakube.NewClient(
 		terrakube.WithEndpoint(srv.URL),
@@ -107,6 +106,7 @@ func ExampleOrganizationService_List() {
 	for _, org := range orgs {
 		fmt.Printf("%s (%s)\n", org.Name, org.ExecutionMode)
 	}
+	srv.Close()
 	// Output:
 	// Alpha (remote)
 	// Beta (local)
@@ -116,14 +116,13 @@ func ExampleOrganizationService_Get() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Write(jsonapiOne("organization", "org-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("organization", "org-1", map[string]interface{}{
 			"name":          "Alpha",
 			"description":   "Primary organization",
 			"executionMode": "remote",
 		}))
 	})
 	srv := httptest.NewServer(mux)
-	defer srv.Close()
 
 	client, err := terrakube.NewClient(
 		terrakube.WithEndpoint(srv.URL),
@@ -138,6 +137,7 @@ func ExampleOrganizationService_Get() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s: %s\n", org.Name, *org.Description)
+	srv.Close()
 	// Output: Alpha: Primary organization
 }
 
@@ -146,13 +146,12 @@ func ExampleOrganizationService_Create() {
 	mux.HandleFunc("POST /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write(jsonapiOne("organization", "org-new", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("organization", "org-new", map[string]interface{}{
 			"name":          "NewOrg",
 			"executionMode": "remote",
 		}))
 	})
 	srv := httptest.NewServer(mux)
-	defer srv.Close()
 
 	client, err := terrakube.NewClient(
 		terrakube.WithEndpoint(srv.URL),
@@ -170,6 +169,7 @@ func ExampleOrganizationService_Create() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s (id=%s)\n", created.Name, created.ID)
+	srv.Close()
 	// Output: NewOrg (id=org-new)
 }
 
@@ -177,7 +177,7 @@ func ExampleWorkspaceService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/workspace", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		w.Write(jsonapiList([]map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]interface{}{
 			jsonapiItem("workspace", "ws-1", map[string]interface{}{
 				"name":             "production",
 				"source":           "https://github.com/example/infra",
@@ -199,7 +199,6 @@ func ExampleWorkspaceService_List() {
 		}))
 	})
 	srv := httptest.NewServer(mux)
-	defer srv.Close()
 
 	client, err := terrakube.NewClient(
 		terrakube.WithEndpoint(srv.URL),
@@ -216,6 +215,7 @@ func ExampleWorkspaceService_List() {
 	for _, ws := range workspaces {
 		fmt.Printf("%s (branch=%s, mode=%s)\n", ws.Name, ws.Branch, ws.ExecutionMode)
 	}
+	srv.Close()
 	// Output:
 	// production (branch=main, mode=remote)
 	// staging (branch=develop, mode=local)
