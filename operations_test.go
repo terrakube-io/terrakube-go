@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	terrakube "github.com/denniswebb/terrakube-go"
-	"github.com/denniswebb/terrakube-go/testutil"
+	terrakube "github.com/terrakube-io/terrakube-go"
+	"github.com/terrakube-io/terrakube-go/testutil"
 )
 
 func TestOperationsService_Submit(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	terrakube "github.com/denniswebb/terrakube-go"
+	terrakube "github.com/terrakube-io/terrakube-go"
 )
 
 func TestAPIError_Error(t *testing.T) {
