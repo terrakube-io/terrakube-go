@@ -21,6 +21,7 @@ type ErrorDetail struct {
 	Status string `json:"status,omitempty"`
 }
 
+// Error returns a string representation including the HTTP method, path, and status code.
 func (e *APIError) Error() string {
 	if len(e.Errors) > 0 {
 		return fmt.Sprintf("%s %s: %d %s", e.Method, e.Path, e.StatusCode, e.Errors[0].Detail)
@@ -34,6 +35,7 @@ type ValidationError struct {
 	Message string
 }
 
+// Error returns a string representation of the validation failure.
 func (e *ValidationError) Error() string {
 	return fmt.Sprintf("validation error: %s %s", e.Field, e.Message)
 }

@@ -20,6 +20,7 @@ type AddressService struct {
 }
 
 // List returns all addresses for a job.
+// It returns a *ValidationError if orgID or jobID is empty and a *APIError on server errors.
 func (s *AddressService) List(ctx context.Context, orgID, jobID string, opts *ListOptions) ([]*Address, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -33,6 +34,7 @@ func (s *AddressService) List(ctx context.Context, orgID, jobID string, opts *Li
 }
 
 // Get returns a single address by ID.
+// It returns a *ValidationError if orgID, jobID, or id is empty and a *APIError on server errors.
 func (s *AddressService) Get(ctx context.Context, orgID, jobID, id string) (*Address, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -49,6 +51,7 @@ func (s *AddressService) Get(ctx context.Context, orgID, jobID, id string) (*Add
 }
 
 // Create creates a new address for a job.
+// It returns a *ValidationError if orgID or jobID is empty and a *APIError on server errors.
 func (s *AddressService) Create(ctx context.Context, orgID, jobID string, address *Address) (*Address, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -62,6 +65,7 @@ func (s *AddressService) Create(ctx context.Context, orgID, jobID string, addres
 }
 
 // Update modifies an existing address. The address's ID field must be set.
+// It returns a *ValidationError if orgID, jobID, or the ID is empty and a *APIError on server errors.
 func (s *AddressService) Update(ctx context.Context, orgID, jobID string, address *Address) (*Address, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -78,6 +82,7 @@ func (s *AddressService) Update(ctx context.Context, orgID, jobID string, addres
 }
 
 // Delete removes an address by ID.
+// It returns a *ValidationError if orgID, jobID, or id is empty and a *APIError on server errors.
 func (s *AddressService) Delete(ctx context.Context, orgID, jobID, id string) error {
 	if err := validateID("organization ID", orgID); err != nil {
 		return err

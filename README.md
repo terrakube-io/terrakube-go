@@ -1,5 +1,7 @@
 # terrakube-go
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/terrakube-io/terrakube-go.svg)](https://pkg.go.dev/github.com/terrakube-io/terrakube-go)
+
 Go client library for the [Terrakube](https://terrakube.io) API.
 
 ## Installation
@@ -120,6 +122,10 @@ mise run lint         # run linter
 mise run check        # vet + lint + test
 mise run coverage     # test with coverage report
 ```
+
+## Documentation
+
+Full API reference is available on [pkg.go.dev](https://pkg.go.dev/github.com/terrakube-io/terrakube-go). This README covers quickstart and configuration basics.
 
 ## License
 

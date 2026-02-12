@@ -26,6 +26,7 @@ type TeamService struct {
 }
 
 // List returns all teams for an organization, with optional filtering.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *TeamService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Team, error) {
 	if err := validateID("orgID", orgID); err != nil {
 		return nil, err
@@ -36,6 +37,7 @@ func (s *TeamService) List(ctx context.Context, orgID string, opts *ListOptions)
 }
 
 // Get retrieves a single team by ID within an organization.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *TeamService) Get(ctx context.Context, orgID, id string) (*Team, error) {
 	if err := validateID("orgID", orgID); err != nil {
 		return nil, err
@@ -49,6 +51,7 @@ func (s *TeamService) Get(ctx context.Context, orgID, id string) (*Team, error) 
 }
 
 // Create creates a new team within an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *TeamService) Create(ctx context.Context, orgID string, team *Team) (*Team, error) {
 	if err := validateID("orgID", orgID); err != nil {
 		return nil, err
@@ -58,7 +61,8 @@ func (s *TeamService) Create(ctx context.Context, orgID string, team *Team) (*Te
 	return s.create(ctx, path, team)
 }
 
-// Update modifies an existing team within an organization.
+// Update modifies an existing team within an organization. The team's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *TeamService) Update(ctx context.Context, orgID string, team *Team) (*Team, error) {
 	if err := validateID("orgID", orgID); err != nil {
 		return nil, err
@@ -72,6 +76,7 @@ func (s *TeamService) Update(ctx context.Context, orgID string, team *Team) (*Te
 }
 
 // Delete removes a team from an organization.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *TeamService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("orgID", orgID); err != nil {
 		return err

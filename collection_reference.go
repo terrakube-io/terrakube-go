@@ -21,6 +21,7 @@ type CollectionReferenceService struct {
 }
 
 // List returns all references for the given collection.
+// It returns a *ValidationError if orgID or collectionID is empty and a *APIError on server errors.
 func (s *CollectionReferenceService) List(ctx context.Context, orgID, collectionID string, opts *ListOptions) ([]*CollectionReference, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -34,6 +35,7 @@ func (s *CollectionReferenceService) List(ctx context.Context, orgID, collection
 }
 
 // Get returns a single collection reference by ID using the flat endpoint.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *CollectionReferenceService) Get(ctx context.Context, id string) (*CollectionReference, error) {
 	if err := validateID("referenceID", id); err != nil {
 		return nil, err
@@ -44,6 +46,7 @@ func (s *CollectionReferenceService) Get(ctx context.Context, id string) (*Colle
 }
 
 // Create creates a new reference in the given collection.
+// It returns a *ValidationError if orgID or collectionID is empty and a *APIError on server errors.
 func (s *CollectionReferenceService) Create(ctx context.Context, orgID, collectionID string, ref *CollectionReference) (*CollectionReference, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -58,6 +61,7 @@ func (s *CollectionReferenceService) Create(ctx context.Context, orgID, collecti
 
 // Update modifies an existing collection reference using the flat endpoint.
 // The reference's ID field must be set.
+// It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *CollectionReferenceService) Update(ctx context.Context, ref *CollectionReference) (*CollectionReference, error) {
 	if err := validateID("referenceID", ref.ID); err != nil {
 		return nil, err
@@ -68,6 +72,7 @@ func (s *CollectionReferenceService) Update(ctx context.Context, ref *Collection
 }
 
 // Delete removes a collection reference by ID using the flat endpoint.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *CollectionReferenceService) Delete(ctx context.Context, id string) error {
 	if err := validateID("referenceID", id); err != nil {
 		return err

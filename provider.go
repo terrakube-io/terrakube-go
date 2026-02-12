@@ -20,6 +20,7 @@ type ProviderService struct {
 }
 
 // List returns all providers for the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProviderService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Provider, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -30,6 +31,7 @@ func (s *ProviderService) List(ctx context.Context, orgID string, opts *ListOpti
 }
 
 // Get returns a single provider by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProviderService) Get(ctx context.Context, orgID, id string) (*Provider, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -43,6 +45,7 @@ func (s *ProviderService) Get(ctx context.Context, orgID, id string) (*Provider,
 }
 
 // Create creates a new provider in the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProviderService) Create(ctx context.Context, orgID string, provider *Provider) (*Provider, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -53,6 +56,7 @@ func (s *ProviderService) Create(ctx context.Context, orgID string, provider *Pr
 }
 
 // Update modifies an existing provider. The provider's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *ProviderService) Update(ctx context.Context, orgID string, provider *Provider) (*Provider, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -66,6 +70,7 @@ func (s *ProviderService) Update(ctx context.Context, orgID string, provider *Pr
 }
 
 // Delete removes a provider by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProviderService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organization ID", orgID); err != nil {
 		return err

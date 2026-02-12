@@ -129,7 +129,7 @@ func WithUserAgent(ua string) Option {
 	}
 }
 
-// NewClient creates a new Terrakube API client.
+// NewClient creates a new Terrakube API client. It returns an error if WithEndpoint or WithToken are not provided.
 func NewClient(opts ...Option) (*Client, error) {
 	c := &Client{
 		httpClient: http.DefaultClient,

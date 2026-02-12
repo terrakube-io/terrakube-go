@@ -5,8 +5,10 @@ import "context"
 // WorkspaceSchedule represents a scheduled job for a workspace.
 type WorkspaceSchedule struct {
 	ID          string  `jsonapi:"primary,schedule"`
-	Schedule    string  `jsonapi:"attr,cron"`
-	TemplateID  string  `jsonapi:"attr,templateReference"`
+	// Schedule is the cron expression for the schedule (JSON:API attr: "cron").
+	Schedule string `jsonapi:"attr,cron"`
+	// TemplateID is the template reference (JSON:API attr: "templateReference").
+	TemplateID string `jsonapi:"attr,templateReference"`
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
@@ -20,6 +22,7 @@ type WorkspaceScheduleService struct {
 }
 
 // List returns all schedules for the given workspace.
+// It returns a *ValidationError if workspaceID is empty and a *APIError on server errors.
 func (s *WorkspaceScheduleService) List(ctx context.Context, workspaceID string, opts *ListOptions) ([]*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
@@ -30,6 +33,7 @@ func (s *WorkspaceScheduleService) List(ctx context.Context, workspaceID string,
 }
 
 // Get returns a single workspace schedule by ID.
+// It returns a *ValidationError if workspaceID or id is empty and a *APIError on server errors.
 func (s *WorkspaceScheduleService) Get(ctx context.Context, workspaceID, id string) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
@@ -43,6 +47,7 @@ func (s *WorkspaceScheduleService) Get(ctx context.Context, workspaceID, id stri
 }
 
 // Create creates a new schedule for the given workspace.
+// It returns a *ValidationError if workspaceID is empty and a *APIError on server errors.
 func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
@@ -53,6 +58,7 @@ func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID strin
 }
 
 // Update modifies an existing workspace schedule. The schedule's ID field must be set.
+// It returns a *ValidationError if workspaceID or the ID is empty and a *APIError on server errors.
 func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err
@@ -66,6 +72,7 @@ func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID strin
 }
 
 // Delete removes a workspace schedule by ID.
+// It returns a *ValidationError if workspaceID or id is empty and a *APIError on server errors.
 func (s *WorkspaceScheduleService) Delete(ctx context.Context, workspaceID, id string) error {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return err

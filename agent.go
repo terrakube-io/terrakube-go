@@ -20,6 +20,7 @@ type AgentService struct {
 }
 
 // List returns all agents for an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *AgentService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Agent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -30,6 +31,7 @@ func (s *AgentService) List(ctx context.Context, orgID string, opts *ListOptions
 }
 
 // Get returns a single agent by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *AgentService) Get(ctx context.Context, orgID, id string) (*Agent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -43,6 +45,7 @@ func (s *AgentService) Get(ctx context.Context, orgID, id string) (*Agent, error
 }
 
 // Create creates a new agent in an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *AgentService) Create(ctx context.Context, orgID string, agent *Agent) (*Agent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -52,7 +55,8 @@ func (s *AgentService) Create(ctx context.Context, orgID string, agent *Agent) (
 	return s.create(ctx, path, agent)
 }
 
-// Update modifies an existing agent.
+// Update modifies an existing agent. The agent's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *AgentService) Update(ctx context.Context, orgID string, agent *Agent) (*Agent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -66,6 +70,7 @@ func (s *AgentService) Update(ctx context.Context, orgID string, agent *Agent) (
 }
 
 // Delete removes an agent by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *AgentService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

@@ -22,6 +22,7 @@ type WorkspaceAccessService struct {
 }
 
 // List returns all access entries for the given workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WorkspaceAccessService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -35,6 +36,7 @@ func (s *WorkspaceAccessService) List(ctx context.Context, orgID, workspaceID st
 }
 
 // Get returns a single workspace access entry by ID.
+// It returns a *ValidationError if orgID, workspaceID, or id is empty and a *APIError on server errors.
 func (s *WorkspaceAccessService) Get(ctx context.Context, orgID, workspaceID, id string) (*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -51,6 +53,7 @@ func (s *WorkspaceAccessService) Get(ctx context.Context, orgID, workspaceID, id
 }
 
 // Create creates a new access entry for the given workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WorkspaceAccessService) Create(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -64,6 +67,7 @@ func (s *WorkspaceAccessService) Create(ctx context.Context, orgID, workspaceID 
 }
 
 // Update modifies an existing workspace access entry. The access entry's ID field must be set.
+// It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 func (s *WorkspaceAccessService) Update(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -80,6 +84,7 @@ func (s *WorkspaceAccessService) Update(ctx context.Context, orgID, workspaceID 
 }
 
 // Delete removes a workspace access entry by ID.
+// It returns a *ValidationError if orgID, workspaceID, or id is empty and a *APIError on server errors.
 func (s *WorkspaceAccessService) Delete(ctx context.Context, orgID, workspaceID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err
