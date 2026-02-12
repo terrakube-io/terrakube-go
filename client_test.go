@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	terrakube "github.com/denniswebb/terrakube-go"
+	terrakube "github.com/terrakube-io/terrakube-go"
 )
 
 func TestAPIVersion(t *testing.T) {

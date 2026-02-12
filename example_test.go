@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	terrakube "github.com/denniswebb/terrakube-go"
+	terrakube "github.com/terrakube-io/terrakube-go"
 )
 
 // jsonapiOne builds a single-resource JSON:API response body.

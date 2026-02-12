@@ -1,4 +1,4 @@
-module github.com/denniswebb/terrakube-go
+module github.com/terrakube-io/terrakube-go
 
 go 1.24
 

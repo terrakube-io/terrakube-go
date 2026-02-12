@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/denniswebb/terrakube-go/testutil"
+	"github.com/terrakube-io/terrakube-go/testutil"
 )
 
 // newCrudTestClient creates a Client for use in internal (package terrakube) tests.
