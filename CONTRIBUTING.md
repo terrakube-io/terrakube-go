@@ -7,7 +7,7 @@
 3. Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/denniswebb/terrakube-go.git
+git clone https://github.com/terrakube-io/terrakube-go.git
 cd terrakube-go
 mise install
 go mod download

@@ -5,7 +5,7 @@ Go client library for the [Terrakube](https://terrakube.io) API.
 ## Installation
 
 ```bash
-go get github.com/denniswebb/terrakube-go
+go get github.com/terrakube-io/terrakube-go
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ import (
     "fmt"
     "log"
 
-    terrakube "github.com/denniswebb/terrakube-go"
+    terrakube "github.com/terrakube-io/terrakube-go"
 )
 
 func main() {

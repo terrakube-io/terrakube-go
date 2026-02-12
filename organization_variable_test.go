@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/jsonapi"
 
-	terrakube "github.com/denniswebb/terrakube-go"
-	"github.com/denniswebb/terrakube-go/testutil"
+	terrakube "github.com/terrakube-io/terrakube-go"
+	"github.com/terrakube-io/terrakube-go/testutil"
 )
 
 func boolPtr(b bool) *bool { return &b }
