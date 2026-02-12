@@ -54,6 +54,7 @@ type OperationsService struct {
 }
 
 // Submit sends an atomic operations batch request.
+// It returns a *APIError on server errors.
 func (s *OperationsService) Submit(ctx context.Context, ops *AtomicRequest) (*AtomicResponse, error) {
 	path := s.client.apiPath("operations")
 

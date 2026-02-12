@@ -21,6 +21,7 @@ type SSHService struct {
 }
 
 // List returns all SSH keys for an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *SSHService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -31,6 +32,7 @@ func (s *SSHService) List(ctx context.Context, orgID string, opts *ListOptions) 
 }
 
 // Get returns a single SSH key by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *SSHService) Get(ctx context.Context, orgID, id string) (*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -44,6 +46,7 @@ func (s *SSHService) Get(ctx context.Context, orgID, id string) (*SSH, error) {
 }
 
 // Create creates a new SSH key in an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *SSHService) Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -53,7 +56,8 @@ func (s *SSHService) Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 	return s.create(ctx, path, ssh)
 }
 
-// Update modifies an existing SSH key.
+// Update modifies an existing SSH key. The SSH key's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *SSHService) Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -67,6 +71,7 @@ func (s *SSHService) Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 }
 
 // Delete removes an SSH key by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *SSHService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

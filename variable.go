@@ -23,6 +23,7 @@ type VariableService struct {
 }
 
 // List returns all variables for a workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *VariableService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*Variable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -36,6 +37,7 @@ func (s *VariableService) List(ctx context.Context, orgID, workspaceID string, o
 }
 
 // Get returns a single variable by ID.
+// It returns a *ValidationError if orgID, workspaceID, or id is empty and a *APIError on server errors.
 func (s *VariableService) Get(ctx context.Context, orgID, workspaceID, id string) (*Variable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -52,6 +54,7 @@ func (s *VariableService) Get(ctx context.Context, orgID, workspaceID, id string
 }
 
 // Create creates a new variable in the workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *VariableService) Create(ctx context.Context, orgID, workspaceID string, variable *Variable) (*Variable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -65,6 +68,7 @@ func (s *VariableService) Create(ctx context.Context, orgID, workspaceID string,
 }
 
 // Update modifies an existing variable. The variable's ID field must be set.
+// It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 func (s *VariableService) Update(ctx context.Context, orgID, workspaceID string, variable *Variable) (*Variable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -81,6 +85,7 @@ func (s *VariableService) Update(ctx context.Context, orgID, workspaceID string,
 }
 
 // Delete removes a variable by ID.
+// It returns a *ValidationError if orgID, workspaceID, or id is empty and a *APIError on server errors.
 func (s *VariableService) Delete(ctx context.Context, orgID, workspaceID, id string) error {
 	if err := validateID("organization ID", orgID); err != nil {
 		return err

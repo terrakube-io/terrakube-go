@@ -21,12 +21,14 @@ type GithubAppTokenService struct {
 }
 
 // List returns all GitHub App tokens.
+// It returns a *APIError on server errors.
 func (s *GithubAppTokenService) List(ctx context.Context, opts *ListOptions) ([]*GithubAppToken, error) {
 	path := s.client.apiPath("github_app_token")
 	return s.list(ctx, path, opts)
 }
 
 // Get returns a single GitHub App token by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *GithubAppTokenService) Get(ctx context.Context, id string) (*GithubAppToken, error) {
 	if err := validateID("id", id); err != nil {
 		return nil, err
@@ -37,12 +39,14 @@ func (s *GithubAppTokenService) Get(ctx context.Context, id string) (*GithubAppT
 }
 
 // Create creates a new GitHub App token.
+// It returns a *APIError on server errors.
 func (s *GithubAppTokenService) Create(ctx context.Context, token *GithubAppToken) (*GithubAppToken, error) {
 	path := s.client.apiPath("github_app_token")
 	return s.create(ctx, path, token)
 }
 
 // Update modifies an existing GitHub App token. The token's ID field must be set.
+// It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *GithubAppTokenService) Update(ctx context.Context, token *GithubAppToken) (*GithubAppToken, error) {
 	if err := validateID("github app token ID", token.ID); err != nil {
 		return nil, err
@@ -53,6 +57,7 @@ func (s *GithubAppTokenService) Update(ctx context.Context, token *GithubAppToke
 }
 
 // Delete removes a GitHub App token by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *GithubAppTokenService) Delete(ctx context.Context, id string) error {
 	if err := validateID("id", id); err != nil {
 		return err

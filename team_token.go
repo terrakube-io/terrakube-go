@@ -15,7 +15,8 @@ type TeamToken struct {
 	Hours       int32  `json:"hours"`
 	Minutes     int32  `json:"minutes"`
 	Group       string `json:"group"`
-	Value       string `json:"token"`
+	// Value is the token string returned by the server (JSON key: "token").
+	Value string `json:"token"`
 }
 
 // TeamTokenService handles communication with the team token endpoints.
@@ -24,6 +25,7 @@ type TeamTokenService struct {
 }
 
 // Create generates a new team token.
+// It returns a *APIError on server errors.
 func (s *TeamTokenService) Create(ctx context.Context, token *TeamToken) (*TeamToken, error) {
 	req, err := s.client.requestRaw(ctx, http.MethodPost, teamTokenBasePath, token)
 	if err != nil {
@@ -40,6 +42,7 @@ func (s *TeamTokenService) Create(ctx context.Context, token *TeamToken) (*TeamT
 }
 
 // List returns all team tokens.
+// It returns a *APIError on server errors.
 func (s *TeamTokenService) List(ctx context.Context) ([]TeamToken, error) {
 	req, err := s.client.requestRaw(ctx, http.MethodGet, teamTokenBasePath, nil)
 	if err != nil {
@@ -56,6 +59,7 @@ func (s *TeamTokenService) List(ctx context.Context) ([]TeamToken, error) {
 }
 
 // Delete removes a team token by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *TeamTokenService) Delete(ctx context.Context, id string) error {
 	if err := validateID("id", id); err != nil {
 		return err

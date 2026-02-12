@@ -21,6 +21,7 @@ type CollectionService struct {
 }
 
 // List returns all collections for the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *CollectionService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Collection, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -31,6 +32,7 @@ func (s *CollectionService) List(ctx context.Context, orgID string, opts *ListOp
 }
 
 // Get returns a single collection by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *CollectionService) Get(ctx context.Context, orgID, id string) (*Collection, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -44,6 +46,7 @@ func (s *CollectionService) Get(ctx context.Context, orgID, id string) (*Collect
 }
 
 // Create creates a new collection in the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *CollectionService) Create(ctx context.Context, orgID string, collection *Collection) (*Collection, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -54,6 +57,7 @@ func (s *CollectionService) Create(ctx context.Context, orgID string, collection
 }
 
 // Update modifies an existing collection. The collection's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *CollectionService) Update(ctx context.Context, orgID string, collection *Collection) (*Collection, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -67,6 +71,7 @@ func (s *CollectionService) Update(ctx context.Context, orgID string, collection
 }
 
 // Delete removes a collection by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *CollectionService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

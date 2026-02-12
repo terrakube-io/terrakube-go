@@ -44,6 +44,7 @@ type WebhookEventService struct {
 }
 
 // List returns all webhooks for a workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WebhookService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -57,6 +58,7 @@ func (s *WebhookService) List(ctx context.Context, orgID, workspaceID string, op
 }
 
 // Get retrieves a single webhook by ID.
+// It returns a *ValidationError if orgID, workspaceID, or webhookID is empty and a *APIError on server errors.
 func (s *WebhookService) Get(ctx context.Context, orgID, workspaceID, webhookID string) (*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -73,6 +75,7 @@ func (s *WebhookService) Get(ctx context.Context, orgID, workspaceID, webhookID 
 }
 
 // Create creates a new webhook for a workspace.
+// It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WebhookService) Create(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -85,7 +88,8 @@ func (s *WebhookService) Create(ctx context.Context, orgID, workspaceID string, 
 	return s.create(ctx, path, webhook)
 }
 
-// Update modifies an existing webhook.
+// Update modifies an existing webhook. The webhook's ID field must be set.
+// It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 func (s *WebhookService) Update(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -102,6 +106,7 @@ func (s *WebhookService) Update(ctx context.Context, orgID, workspaceID string, 
 }
 
 // Delete removes a webhook.
+// It returns a *ValidationError if orgID, workspaceID, or webhookID is empty and a *APIError on server errors.
 func (s *WebhookService) Delete(ctx context.Context, orgID, workspaceID, webhookID string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err
@@ -118,6 +123,7 @@ func (s *WebhookService) Delete(ctx context.Context, orgID, workspaceID, webhook
 }
 
 // List returns all events for a webhook.
+// It returns a *ValidationError if orgID, workspaceID, or webhookID is empty and a *APIError on server errors.
 func (s *WebhookEventService) List(ctx context.Context, orgID, workspaceID, webhookID string, opts *ListOptions) ([]*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -134,6 +140,7 @@ func (s *WebhookEventService) List(ctx context.Context, orgID, workspaceID, webh
 }
 
 // Get retrieves a single webhook event by ID.
+// It returns a *ValidationError if orgID, workspaceID, webhookID, or eventID is empty and a *APIError on server errors.
 func (s *WebhookEventService) Get(ctx context.Context, orgID, workspaceID, webhookID, eventID string) (*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -153,6 +160,7 @@ func (s *WebhookEventService) Get(ctx context.Context, orgID, workspaceID, webho
 }
 
 // Create creates a new webhook event.
+// It returns a *ValidationError if orgID, workspaceID, or webhookID is empty and a *APIError on server errors.
 func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -168,7 +176,8 @@ func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, we
 	return s.create(ctx, path, event)
 }
 
-// Update modifies an existing webhook event.
+// Update modifies an existing webhook event. The webhook event's ID field must be set.
+// It returns a *ValidationError if orgID, workspaceID, webhookID, or the ID is empty and a *APIError on server errors.
 func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -188,6 +197,7 @@ func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, we
 }
 
 // Delete removes a webhook event.
+// It returns a *ValidationError if orgID, workspaceID, webhookID, or eventID is empty and a *APIError on server errors.
 func (s *WebhookEventService) Delete(ctx context.Context, orgID, workspaceID, webhookID, eventID string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

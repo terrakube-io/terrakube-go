@@ -16,7 +16,8 @@ type Job struct {
 	PlanChanges       bool    `jsonapi:"attr,planChanges"`
 	Refresh           bool    `jsonapi:"attr,refresh"`
 	RefreshOnly       bool    `jsonapi:"attr,refreshOnly"`
-	Tcl               *string `jsonapi:"attr,tcl"`
+	// Tcl is the Terrakube Configuration Language content for this job.
+	Tcl *string `jsonapi:"attr,tcl"`
 	TemplateReference *string `jsonapi:"attr,templateReference"`
 	TerraformPlan     *string `jsonapi:"attr,terraformPlan"`
 	Via               *string `jsonapi:"attr,via"`
@@ -33,6 +34,7 @@ type JobService struct {
 }
 
 // List returns all jobs for the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *JobService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -43,6 +45,7 @@ func (s *JobService) List(ctx context.Context, orgID string, opts *ListOptions) 
 }
 
 // Get returns a single job by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *JobService) Get(ctx context.Context, orgID, id string) (*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -56,6 +59,7 @@ func (s *JobService) Get(ctx context.Context, orgID, id string) (*Job, error) {
 }
 
 // Create creates a new job in the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -66,6 +70,7 @@ func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, 
 }
 
 // Update modifies an existing job. The job's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -79,6 +84,7 @@ func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, 
 }
 
 // Delete removes a job by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *JobService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

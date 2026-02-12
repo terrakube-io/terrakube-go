@@ -23,12 +23,14 @@ type OrganizationService struct {
 }
 
 // List returns all organizations, optionally filtered.
+// It returns a *APIError on server errors.
 func (s *OrganizationService) List(ctx context.Context, opts *ListOptions) ([]*Organization, error) {
 	path := s.client.apiPath("organization")
 	return s.list(ctx, path, opts)
 }
 
 // Get retrieves an organization by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *OrganizationService) Get(ctx context.Context, id string) (*Organization, error) {
 	if err := validateID("id", id); err != nil {
 		return nil, err
@@ -39,12 +41,14 @@ func (s *OrganizationService) Get(ctx context.Context, id string) (*Organization
 }
 
 // Create creates a new organization.
+// It returns a *APIError on server errors.
 func (s *OrganizationService) Create(ctx context.Context, org *Organization) (*Organization, error) {
 	path := s.client.apiPath("organization")
 	return s.create(ctx, path, org)
 }
 
-// Update modifies an existing organization.
+// Update modifies an existing organization. The organization's ID field must be set.
+// It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *OrganizationService) Update(ctx context.Context, org *Organization) (*Organization, error) {
 	if err := validateID("organization ID", org.ID); err != nil {
 		return nil, err
@@ -55,6 +59,7 @@ func (s *OrganizationService) Update(ctx context.Context, org *Organization) (*O
 }
 
 // Delete removes an organization by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *OrganizationService) Delete(ctx context.Context, id string) error {
 	if err := validateID("id", id); err != nil {
 		return err

@@ -18,6 +18,7 @@ type TagService struct {
 }
 
 // List returns all tags for the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *TagService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Tag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -28,6 +29,7 @@ func (s *TagService) List(ctx context.Context, orgID string, opts *ListOptions) 
 }
 
 // Get returns a single tag by ID within the given organization.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *TagService) Get(ctx context.Context, orgID, id string) (*Tag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -41,6 +43,7 @@ func (s *TagService) Get(ctx context.Context, orgID, id string) (*Tag, error) {
 }
 
 // Create creates a new tag in the given organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *TagService) Create(ctx context.Context, orgID string, tag *Tag) (*Tag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -50,7 +53,8 @@ func (s *TagService) Create(ctx context.Context, orgID string, tag *Tag) (*Tag, 
 	return s.create(ctx, path, tag)
 }
 
-// Update modifies an existing tag in the given organization.
+// Update modifies an existing tag in the given organization. The tag's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *TagService) Update(ctx context.Context, orgID string, tag *Tag) (*Tag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -64,6 +68,7 @@ func (s *TagService) Update(ctx context.Context, orgID string, tag *Tag) (*Tag, 
 }
 
 // Delete removes a tag from the given organization.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *TagService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

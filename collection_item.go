@@ -24,6 +24,7 @@ type CollectionItemService struct {
 }
 
 // List returns all items for the given collection.
+// It returns a *ValidationError if orgID or collectionID is empty and a *APIError on server errors.
 func (s *CollectionItemService) List(ctx context.Context, orgID, collectionID string, opts *ListOptions) ([]*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -37,6 +38,7 @@ func (s *CollectionItemService) List(ctx context.Context, orgID, collectionID st
 }
 
 // Get returns a single collection item by ID.
+// It returns a *ValidationError if orgID, collectionID, or id is empty and a *APIError on server errors.
 func (s *CollectionItemService) Get(ctx context.Context, orgID, collectionID, id string) (*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -53,6 +55,7 @@ func (s *CollectionItemService) Get(ctx context.Context, orgID, collectionID, id
 }
 
 // Create creates a new item in the given collection.
+// It returns a *ValidationError if orgID or collectionID is empty and a *APIError on server errors.
 func (s *CollectionItemService) Create(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -66,6 +69,7 @@ func (s *CollectionItemService) Create(ctx context.Context, orgID, collectionID 
 }
 
 // Update modifies an existing collection item. The item's ID field must be set.
+// It returns a *ValidationError if orgID, collectionID, or the ID is empty and a *APIError on server errors.
 func (s *CollectionItemService) Update(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -82,6 +86,7 @@ func (s *CollectionItemService) Update(ctx context.Context, orgID, collectionID 
 }
 
 // Delete removes a collection item by ID.
+// It returns a *ValidationError if orgID, collectionID, or id is empty and a *APIError on server errors.
 func (s *CollectionItemService) Delete(ctx context.Context, orgID, collectionID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err

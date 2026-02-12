@@ -27,12 +27,14 @@ type ActionService struct {
 }
 
 // List returns all actions, optionally filtered.
+// It returns a *APIError on server errors.
 func (s *ActionService) List(ctx context.Context, opts *ListOptions) ([]*Action, error) {
 	path := s.client.apiPath("action")
 	return s.list(ctx, path, opts)
 }
 
 // Get retrieves an action by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *ActionService) Get(ctx context.Context, id string) (*Action, error) {
 	if err := validateID("id", id); err != nil {
 		return nil, err
@@ -43,12 +45,14 @@ func (s *ActionService) Get(ctx context.Context, id string) (*Action, error) {
 }
 
 // Create creates a new action.
+// It returns a *APIError on server errors.
 func (s *ActionService) Create(ctx context.Context, action *Action) (*Action, error) {
 	path := s.client.apiPath("action")
 	return s.create(ctx, path, action)
 }
 
 // Update modifies an existing action. The action's ID field must be set.
+// It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, error) {
 	if err := validateID("action ID", action.ID); err != nil {
 		return nil, err
@@ -59,6 +63,7 @@ func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, er
 }
 
 // Delete removes an action by ID.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
 func (s *ActionService) Delete(ctx context.Context, id string) error {
 	if err := validateID("id", id); err != nil {
 		return err

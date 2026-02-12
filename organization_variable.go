@@ -23,6 +23,7 @@ type OrganizationVariableService struct {
 }
 
 // List returns all global variables for an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *OrganizationVariableService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*OrganizationVariable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -33,6 +34,7 @@ func (s *OrganizationVariableService) List(ctx context.Context, orgID string, op
 }
 
 // Get returns a single organization variable by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *OrganizationVariableService) Get(ctx context.Context, orgID, id string) (*OrganizationVariable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -46,6 +48,7 @@ func (s *OrganizationVariableService) Get(ctx context.Context, orgID, id string)
 }
 
 // Create creates a new global variable in the organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *OrganizationVariableService) Create(ctx context.Context, orgID string, variable *OrganizationVariable) (*OrganizationVariable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -56,6 +59,7 @@ func (s *OrganizationVariableService) Create(ctx context.Context, orgID string, 
 }
 
 // Update modifies an existing organization variable. The variable's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *OrganizationVariableService) Update(ctx context.Context, orgID string, variable *OrganizationVariable) (*OrganizationVariable, error) {
 	if err := validateID("organization ID", orgID); err != nil {
 		return nil, err
@@ -69,6 +73,7 @@ func (s *OrganizationVariableService) Update(ctx context.Context, orgID string, 
 }
 
 // Delete removes an organization variable by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *OrganizationVariableService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organization ID", orgID); err != nil {
 		return err

@@ -30,6 +30,7 @@ type VCSService struct {
 }
 
 // List returns all VCS connections for an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *VCSService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*VCS, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -40,6 +41,7 @@ func (s *VCSService) List(ctx context.Context, orgID string, opts *ListOptions) 
 }
 
 // Get returns a single VCS connection by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *VCSService) Get(ctx context.Context, orgID, id string) (*VCS, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -53,6 +55,7 @@ func (s *VCSService) Get(ctx context.Context, orgID, id string) (*VCS, error) {
 }
 
 // Create creates a new VCS connection in an organization.
+// It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *VCSService) Create(ctx context.Context, orgID string, vcs *VCS) (*VCS, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -62,7 +65,8 @@ func (s *VCSService) Create(ctx context.Context, orgID string, vcs *VCS) (*VCS, 
 	return s.create(ctx, path, vcs)
 }
 
-// Update modifies an existing VCS connection.
+// Update modifies an existing VCS connection. The VCS connection's ID field must be set.
+// It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *VCSService) Update(ctx context.Context, orgID string, vcs *VCS) (*VCS, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -76,6 +80,7 @@ func (s *VCSService) Update(ctx context.Context, orgID string, vcs *VCS) (*VCS, 
 }
 
 // Delete removes a VCS connection by ID.
+// It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *VCSService) Delete(ctx context.Context, orgID, id string) error {
 	if err := validateID("organizationID", orgID); err != nil {
 		return err
