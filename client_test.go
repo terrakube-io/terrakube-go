@@ -10,6 +10,13 @@ import (
 	terrakube "github.com/denniswebb/terrakube-go"
 )
 
+func TestAPIVersion(t *testing.T) {
+	t.Parallel()
+	if terrakube.APIVersion == "" {
+		t.Fatal("APIVersion must not be empty")
+	}
+}
+
 func TestNewClient_RequiresEndpoint(t *testing.T) {
 	t.Parallel()
 	_, err := terrakube.NewClient(terrakube.WithToken("tok"))

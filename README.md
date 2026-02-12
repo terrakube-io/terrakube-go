@@ -76,6 +76,14 @@ func main() {
 | Implementation | `Implementations` | Provider Version |
 | GitHub App Token | `GithubAppTokens` | Top-level |
 
+## API Version
+
+The `APIVersion` constant tracks which Terrakube OpenAPI specification version this library targets.
+
+```go
+fmt.Println(terrakube.APIVersion) // "2.27.0"
+```
+
 ## Configuration
 
 | Option | Description | Required |

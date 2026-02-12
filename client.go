@@ -16,6 +16,9 @@ import (
 	"github.com/google/jsonapi"
 )
 
+// APIVersion is the Terrakube OpenAPI specification version this library targets.
+const APIVersion = "2.27.0"
+
 const (
 	apiBasePath  = "/api/v1/"
 	mediaType    = "application/vnd.api+json"
