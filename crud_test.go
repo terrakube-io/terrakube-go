@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/denniswebb/terrakube-go/testutil"
@@ -563,5 +564,126 @@ func TestCrudService_Del_MethodVerification(t *testing.T) {
 	err := svc.del(context.Background(), client.apiPath("organization", "org-1"))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestNewClient_FilterKeys(t *testing.T) {
+	t.Parallel()
+
+	// Expected filterKey for every crudService field on Client.
+	// Empty string means the service uses the default "filter" key (top-level resources).
+	// Non-empty means the service must use that exact "filter[type]" key (nested resources).
+	expected := map[string]string{
+		"Organizations":         "",
+		"Workspaces":            "filter[workspace]",
+		"Modules":               "filter[module]",
+		"Teams":                 "filter[team]",
+		"Variables":             "filter[variable]",
+		"OrganizationVariables": "filter[globalvar]",
+		"Templates":             "filter[template]",
+		"Tags":                  "filter[tag]",
+		"VCS":                   "filter[vcs]",
+		"SSH":                   "filter[ssh]",
+		"Agents":                "filter[agent]",
+		"Collections":           "filter[collection]",
+		"CollectionItems":       "filter[item]",
+		"CollectionReferences":  "filter[reference]",
+		"WorkspaceTags":         "filter[workspacetag]",
+		"WorkspaceAccess":       "filter[access]",
+		"WorkspaceSchedules":    "filter[schedule]",
+		"Webhooks":              "filter[webhook]",
+		"WebhookEvents":         "filter[webhook_event]",
+		"History":               "filter[history]",
+		"Jobs":                  "filter[job]",
+		"Actions":               "",
+		"Steps":                 "filter[step]",
+		"Providers":             "filter[provider]",
+		"ProviderVersions":      "filter[version]",
+		"Implementations":       "filter[implementation]",
+		"ModuleVersions":        "filter[version]",
+		"GithubAppTokens":       "",
+		"Addresses":             "filter[address]",
+	}
+
+	// Services that don't embed crudService (non-JSON:API).
+	skipFields := map[string]bool{
+		"TeamTokens": true,
+		"Operations": true,
+	}
+
+	// Private fields on Client that aren't services.
+	privateFields := map[string]bool{
+		"baseURL":    true,
+		"token":      true,
+		"httpClient": true,
+		"userAgent":  true,
+	}
+
+	client, err := NewClient(WithEndpoint("https://example.com"), WithToken("test"))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	v := reflect.ValueOf(client).Elem()
+	typ := v.Type()
+
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+
+		if privateFields[field.Name] || skipFields[field.Name] {
+			continue
+		}
+
+		wantKey, ok := expected[field.Name]
+		if !ok {
+			t.Errorf("Client.%s: not in expected filterKey map — add it to TestNewClient_FilterKeys", field.Name)
+			continue
+		}
+
+		svc := v.Field(i).Elem()
+		fk := svc.FieldByName("filterKey")
+		if !fk.IsValid() {
+			t.Errorf("Client.%s: no filterKey field found (missing crudService embed?)", field.Name)
+			continue
+		}
+
+		if got := fk.String(); got != wantKey {
+			t.Errorf("Client.%s filterKey = %q, want %q", field.Name, got, wantKey)
+		}
+	}
+
+	// Detect stale entries in expected that no longer exist on Client.
+	for name := range expected {
+		if _, ok := typ.FieldByName(name); !ok {
+			t.Errorf("expected map has %q but Client has no such field — remove it from TestNewClient_FilterKeys", name)
+		}
+	}
+}
+
+func TestCrudService_List_CustomFilterKey(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.URL.Query().Get("filter[workspace]"); got != "name==Test" {
+			t.Errorf("filter[workspace] = %q, want %q", got, "name==Test")
+		}
+		if got := r.URL.Query().Get("filter"); got != "" {
+			t.Errorf("unexpected plain 'filter' param = %q", got)
+		}
+		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*Organization{
+			{ID: "org-1", Name: "Test"},
+		})
+	})
+
+	client := newCrudTestClient(t, srv)
+	svc := &crudService[Organization]{client: client, filterKey: "filter[workspace]"}
+
+	items, err := svc.list(context.Background(), client.apiPath("organization"), &ListOptions{Filter: "name==Test"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("got %d items, want 1", len(items))
 	}
 }
