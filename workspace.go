@@ -20,6 +20,8 @@ type Workspace struct {
 	Deleted          bool    `jsonapi:"attr,deleted"`
 	Locked           bool    `jsonapi:"attr,locked"`
 	AllowRemoteApply bool    `jsonapi:"attr,allowRemoteApply"`
+	GlobalRemoteState bool    `jsonapi:"attr,globalRemoteState"`
+	SharedIDs        *string `jsonapi:"attr,sharedIds"`
 	LockDescription  *string `jsonapi:"attr,lockDescription"`
 	ModuleSSHKey     *string `jsonapi:"attr,moduleSshKey"`
 	LastJobStatus    *string `jsonapi:"attr,lastJobStatus"`
@@ -28,7 +30,11 @@ type Workspace struct {
 	CreatedDate      *string `jsonapi:"attr,createdDate"`
 	UpdatedBy        *string `jsonapi:"attr,updatedBy"`
 	UpdatedDate      *string `jsonapi:"attr,updatedDate"`
-	Vcs              *VCS    `jsonapi:"relation,vcs,omitempty"`
+	Vcs              *VCS      `jsonapi:"relation,vcs,omitempty"`
+	Project          *Project  `jsonapi:"relation,project,omitempty"`
+	SSH              *SSH      `jsonapi:"relation,ssh,omitempty"`
+	Agent            *Agent    `jsonapi:"relation,agent,omitempty"`
+	Webhook          *Webhook  `jsonapi:"relation,webhook,omitempty"`
 }
 
 // WorkspaceService handles communication with the workspace related
