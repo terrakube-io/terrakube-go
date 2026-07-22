@@ -78,10 +78,11 @@ func TestWorkspaceService_Get(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
 		desc := "Test workspace"
+		sharedIDs := "id1,id2"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Workspace{
 			ID: "ws-1", Name: "Dev", Description: &desc, Source: "https://github.com/ex/repo",
 			Branch: "main", Folder: "/", IaCType: "terraform", IaCVersion: "1.5.0",
-			ExecutionMode: "remote",
+			ExecutionMode: "remote", GlobalRemoteState: true, SharedIDs: &sharedIDs,
 		})
 	})
 
@@ -95,6 +96,12 @@ func TestWorkspaceService_Get(t *testing.T) {
 	}
 	if ws.Name != "Dev" {
 		t.Errorf("Name = %q, want %q", ws.Name, "Dev")
+	}
+	if !ws.GlobalRemoteState {
+		t.Errorf("GlobalRemoteState = false, want true")
+	}
+	if ws.SharedIDs == nil || *ws.SharedIDs != "id1,id2" {
+		t.Errorf("SharedIDs = %v, want %q", ws.SharedIDs, "id1,id2")
 	}
 	if ws.Source != "https://github.com/ex/repo" {
 		t.Errorf("Source = %q, want %q", ws.Source, "https://github.com/ex/repo")

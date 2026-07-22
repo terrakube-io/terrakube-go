@@ -68,6 +68,10 @@ type Client struct {
 	ModuleVersions        *ModuleVersionService
 	GithubAppTokens       *GithubAppTokenService
 	Addresses             *AddressService
+	Projects              *ProjectService
+	ProjectAccess         *ProjectAccessService
+	Federated             *FederatedService
+	FederatedClaims       *FederatedClaimService
 	Operations            *OperationsService
 }
 
@@ -179,6 +183,10 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c, filterKey: "filter[version]"}}
 	c.GithubAppTokens = &GithubAppTokenService{crudService[GithubAppToken]{client: c}}
 	c.Addresses = &AddressService{crudService[Address]{client: c, filterKey: "filter[address]"}}
+	c.Projects = &ProjectService{crudService[Project]{client: c, filterKey: "filter[project]"}}
+	c.ProjectAccess = &ProjectAccessService{crudService[ProjectAccess]{client: c, filterKey: "filter[projectAccess]"}}
+	c.Federated = &FederatedService{crudService[Federated]{client: c, filterKey: "filter[federated]"}}
+	c.FederatedClaims = &FederatedClaimService{crudService[FederatedClaim]{client: c, filterKey: "filter[claims]"}}
 	c.Operations = &OperationsService{client: c}
 
 	return c, nil

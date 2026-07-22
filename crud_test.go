@@ -603,6 +603,10 @@ func TestNewClient_FilterKeys(t *testing.T) {
 		"ModuleVersions":        "filter[version]",
 		"GithubAppTokens":       "",
 		"Addresses":             "filter[address]",
+		"Projects":              "filter[project]",
+		"ProjectAccess":         "filter[projectAccess]",
+		"Federated":             "filter[federated]",
+		"FederatedClaims":       "filter[claims]",
 	}
 
 	// Services that don't embed crudService (non-JSON:API).
