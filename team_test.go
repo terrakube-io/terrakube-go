@@ -136,6 +136,9 @@ func TestTeamService_Get(t *testing.T) {
 			Name:            "admins",
 			ManageState:     true,
 			ManageWorkspace: true,
+			PlanJob:         true,
+			ApproveJob:      true,
+			Role:            "admin",
 		})
 	})
 
@@ -157,6 +160,15 @@ func TestTeamService_Get(t *testing.T) {
 	}
 	if !team.ManageState {
 		t.Error("ManageState should be true")
+	}
+	if !team.PlanJob {
+		t.Error("PlanJob should be true")
+	}
+	if !team.ApproveJob {
+		t.Error("ApproveJob should be true")
+	}
+	if team.Role != "admin" {
+		t.Errorf("Role = %q, want %q", team.Role, "admin")
 	}
 	if !team.ManageWorkspace {
 		t.Error("ManageWorkspace should be true")

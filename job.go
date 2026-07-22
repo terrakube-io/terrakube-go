@@ -12,19 +12,22 @@ type Job struct {
 	ApprovalTeam      *string `jsonapi:"attr,approvalTeam"`
 	Comments          *string `jsonapi:"attr,comments"`
 	CommitID          *string `jsonapi:"attr,commitId"`
-	OverrideBranch    *string `jsonapi:"attr,overrideBranch"`
-	PlanChanges       bool    `jsonapi:"attr,planChanges"`
-	Refresh           bool    `jsonapi:"attr,refresh"`
-	RefreshOnly       bool    `jsonapi:"attr,refreshOnly"`
+	OverrideBranch    *string   `jsonapi:"attr,overrideBranch"`
+	OverrideSource    *string   `jsonapi:"attr,overrideSource"`
+	PlanChanges       bool      `jsonapi:"attr,planChanges"`
+	Refresh           bool      `jsonapi:"attr,refresh"`
+	RefreshOnly       bool      `jsonapi:"attr,refreshOnly"`
 	// Tcl is the Terrakube Configuration Language content for this job.
-	Tcl *string `jsonapi:"attr,tcl"`
-	TemplateReference *string `jsonapi:"attr,templateReference"`
-	TerraformPlan     *string `jsonapi:"attr,terraformPlan"`
-	Via               *string `jsonapi:"attr,via"`
-	CreatedBy         *string `jsonapi:"attr,createdBy"`
-	CreatedDate       *string `jsonapi:"attr,createdDate"`
-	UpdatedBy         *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate       *string `jsonapi:"attr,updatedDate"`
+	Tcl               *string   `jsonapi:"attr,tcl"`
+	TemplateReference *string   `jsonapi:"attr,templateReference"`
+	TerraformPlan     *string   `jsonapi:"attr,terraformPlan"`
+	Via               *string   `jsonapi:"attr,via"`
+	CreatedBy         *string   `jsonapi:"attr,createdBy"`
+	CreatedDate       *string   `jsonapi:"attr,createdDate"`
+	UpdatedBy         *string   `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *string   `jsonapi:"attr,updatedDate"`
+	Steps             []*Step    `jsonapi:"relation,step,omitempty"`
+	Addresses         []*Address `jsonapi:"relation,address,omitempty"`
 }
 
 // JobService handles communication with the job related methods of the

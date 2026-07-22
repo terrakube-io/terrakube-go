@@ -10,10 +10,11 @@ type Organization struct {
 	ExecutionMode string  `jsonapi:"attr,executionMode"`
 	Disabled      bool    `jsonapi:"attr,disabled"`
 	Icon          *string `jsonapi:"attr,icon"`
-	CreatedBy     *string `jsonapi:"attr,createdBy"`
-	CreatedDate   *string `jsonapi:"attr,createdDate"`
-	UpdatedBy     *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate   *string `jsonapi:"attr,updatedDate"`
+	CreatedBy     *string    `jsonapi:"attr,createdBy"`
+	CreatedDate   *string    `jsonapi:"attr,createdDate"`
+	UpdatedBy     *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate   *string    `jsonapi:"attr,updatedDate"`
+	Projects      []*Project `jsonapi:"relation,project,omitempty"`
 }
 
 // OrganizationService handles communication with the organization related
