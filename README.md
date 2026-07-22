@@ -73,6 +73,10 @@ func main() {
 | Action | `Actions` | Top-level |
 | Step | `Steps` | Job |
 | Address | `Addresses` | Job |
+| Project | `Projects` | Organization |
+| Project Access | `ProjectAccess` | Project |
+| Federated | `Federated` | Top-level |
+| Federated Claim | `FederatedClaims` | Federated |
 | Provider | `Providers` | Organization |
 | Provider Version | `ProviderVersions` | Provider |
 | Implementation | `Implementations` | Provider Version |
@@ -113,7 +117,7 @@ if err != nil {
 
 ## Development
 
-Requires Go 1.24+ and [mise](https://mise.jdx.dev/).
+Requires Go 1.26+ and [mise](https://mise.jdx.dev/).
 
 ```bash
 mise install          # install tools
