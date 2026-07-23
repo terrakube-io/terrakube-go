@@ -11,6 +11,7 @@ type Variable struct {
 	Category    string  `jsonapi:"attr,category"`
 	Sensitive   bool    `jsonapi:"attr,sensitive"`
 	Hcl         bool    `jsonapi:"attr,hcl"`
+	Incomplete  bool    `jsonapi:"attr,incomplete"`
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`

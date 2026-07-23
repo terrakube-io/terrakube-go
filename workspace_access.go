@@ -8,6 +8,9 @@ type WorkspaceAccess struct {
 	ManageState     bool    `jsonapi:"attr,manageState"`
 	ManageWorkspace bool    `jsonapi:"attr,manageWorkspace"`
 	ManageJob       bool    `jsonapi:"attr,manageJob"`
+	PlanJob         bool    `jsonapi:"attr,planJob"`
+	ApproveJob      bool    `jsonapi:"attr,approveJob"`
+	Role            string  `jsonapi:"attr,role,omitempty"`
 	Name            string  `jsonapi:"attr,name"`
 	CreatedBy       *string `jsonapi:"attr,createdBy"`
 	CreatedDate     *string `jsonapi:"attr,createdDate"`
