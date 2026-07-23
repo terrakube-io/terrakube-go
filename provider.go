@@ -4,13 +4,14 @@ import "context"
 
 // Provider represents a Terrakube provider resource within an organization.
 type Provider struct {
-	ID          string  `jsonapi:"primary,provider"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID                string  `jsonapi:"primary,provider"`
+	Name              string  `jsonapi:"attr,name"`
+	Description       *string `jsonapi:"attr,description"`
+	RegistryNamespace *string `jsonapi:"attr,registryNamespace,omitempty"`
+	CreatedBy         *string `jsonapi:"attr,createdBy"`
+	CreatedDate       *string `jsonapi:"attr,createdDate"`
+	UpdatedBy         *string `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *string `jsonapi:"attr,updatedDate"`
 }
 
 // ProviderService handles communication with the provider related methods of

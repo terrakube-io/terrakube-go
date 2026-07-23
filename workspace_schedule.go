@@ -8,7 +8,10 @@ type WorkspaceSchedule struct {
 	// Schedule is the cron expression for the schedule (JSON:API attr: "cron").
 	Schedule string `jsonapi:"attr,cron"`
 	// TemplateID is the template reference (JSON:API attr: "templateReference").
-	TemplateID string `jsonapi:"attr,templateReference"`
+	TemplateID string  `jsonapi:"attr,templateReference"`
+	Tcl        *string `jsonapi:"attr,tcl,omitempty"`
+	Description *string `jsonapi:"attr,description,omitempty"`
+	Enabled     bool    `jsonapi:"attr,enabled"`
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`

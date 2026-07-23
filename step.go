@@ -8,6 +8,7 @@ type Step struct {
 	Name        string  `jsonapi:"attr,name"`
 	Output      *string `jsonapi:"attr,output"`
 	Status      string  `jsonapi:"attr,status"`
+	LogStatus   *string `jsonapi:"attr,logStatus,omitempty"`
 	StepNumber  int     `jsonapi:"attr,stepNumber"`
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
