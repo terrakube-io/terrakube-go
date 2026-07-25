@@ -131,6 +131,19 @@ mise run coverage     # test with coverage report
 
 Full API reference is available on [pkg.go.dev](https://pkg.go.dev/github.com/terrakube-io/terrakube-go). This README covers quickstart and configuration basics.
 
+A browsable generated reference site (search, per-package navigation, and line-accurate
+links back to the source) is built from [`docs/`](docs/):
+
+```bash
+cd docs && npx sourcey build   # output in docs/dist
+```
+
+Regenerating the API snapshot after changing exported symbols requires the Go toolchain:
+
+```bash
+cd docs && npx sourcey godoc -m .. -o godoc.json
+```
+
 ## License
 
 Apache 2.0 - see [LICENSE](LICENSE).
