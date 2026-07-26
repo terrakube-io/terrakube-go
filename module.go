@@ -4,22 +4,24 @@ import "context"
 
 // Module represents a Terrakube module resource.
 type Module struct {
-	ID               string  `jsonapi:"primary,module"`
-	Name             string  `jsonapi:"attr,name"`
-	Description      string  `jsonapi:"attr,description"`
-	Provider         string  `jsonapi:"attr,provider"`
-	Source           string  `jsonapi:"attr,source"`
-	Folder           *string `jsonapi:"attr,folder"`
-	TagPrefix        *string `jsonapi:"attr,tagPrefix"`
-	DownloadQuantity int     `jsonapi:"attr,downloadQuantity"`
-	LatestVersion    *string `jsonapi:"attr,latestVersion"`
-	RegistryPath     *string `jsonapi:"attr,registryPath"`
-	CreatedBy        *string `jsonapi:"attr,createdBy"`
-	CreatedDate      *string `jsonapi:"attr,createdDate"`
-	UpdatedBy        *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate      *string `jsonapi:"attr,updatedDate"`
-	Vcs              *VCS    `jsonapi:"relation,vcs,omitempty"`
-	SSH              *SSH    `jsonapi:"relation,ssh,omitempty"`
+	ID               string           `jsonapi:"primary,module"`
+	Name             string           `jsonapi:"attr,name"`
+	Description      string           `jsonapi:"attr,description"`
+	Provider         string           `jsonapi:"attr,provider"`
+	Source           string           `jsonapi:"attr,source"`
+	Folder           *string          `jsonapi:"attr,folder"`
+	TagPrefix        *string          `jsonapi:"attr,tagPrefix"`
+	DownloadQuantity int              `jsonapi:"attr,downloadQuantity"`
+	LatestVersion    *string          `jsonapi:"attr,latestVersion"`
+	RegistryPath     *string          `jsonapi:"attr,registryPath"`
+	CreatedBy        *string          `jsonapi:"attr,createdBy"`
+	CreatedDate      *string          `jsonapi:"attr,createdDate"`
+	UpdatedBy        *string          `jsonapi:"attr,updatedBy"`
+	UpdatedDate      *string          `jsonapi:"attr,updatedDate"`
+	Organization     *Organization    `jsonapi:"relation,organization,omitempty"`
+	Vcs              *VCS             `jsonapi:"relation,vcs,omitempty"`
+	SSH              *SSH             `jsonapi:"relation,ssh,omitempty"`
+	Versions         []*ModuleVersion `jsonapi:"relation,version,omitempty"`
 }
 
 // ModuleService handles communication with the module related

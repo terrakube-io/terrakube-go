@@ -4,16 +4,16 @@ import "context"
 
 // Template represents a Terrakube template resource.
 type Template struct {
-	ID          string  `jsonapi:"primary,template"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	Version     *string `jsonapi:"attr,version"`
-	// Content is the template body in TCL format (JSON:API attr: "tcl").
-	Content string `jsonapi:"attr,tcl"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,template"`
+	Name         string        `jsonapi:"attr,name"`
+	Description  *string       `jsonapi:"attr,description"`
+	Version      *string       `jsonapi:"attr,version"`
+	Content      string        `jsonapi:"attr,tcl"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // TemplateService handles communication with the template-related endpoints.

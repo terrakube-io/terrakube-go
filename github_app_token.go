@@ -9,6 +9,7 @@ type GithubAppToken struct {
 	InstallationID string  `jsonapi:"attr,installationId"`
 	Owner          string  `jsonapi:"attr,owner"`
 	Token          *string `jsonapi:"attr,token"`
+	ExpiresAt      *string `jsonapi:"attr,expiresAt,omitempty"`
 	CreatedBy      *string `jsonapi:"attr,createdBy"`
 	CreatedDate    *string `jsonapi:"attr,createdDate"`
 	UpdatedBy      *string `jsonapi:"attr,updatedBy"`

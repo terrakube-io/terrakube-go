@@ -4,18 +4,19 @@ import "context"
 
 // Variable represents a Terrakube workspace variable.
 type Variable struct {
-	ID          string  `jsonapi:"primary,variable"`
-	Key         string  `jsonapi:"attr,key"`
-	Value       string  `jsonapi:"attr,value"`
-	Description string  `jsonapi:"attr,description"`
-	Category    string  `jsonapi:"attr,category"`
-	Sensitive   bool    `jsonapi:"attr,sensitive"`
-	Hcl         bool    `jsonapi:"attr,hcl"`
-	Incomplete  bool    `jsonapi:"attr,incomplete"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string     `jsonapi:"primary,variable"`
+	Key         string     `jsonapi:"attr,key"`
+	Value       string     `jsonapi:"attr,value"`
+	Description string     `jsonapi:"attr,description"`
+	Category    string     `jsonapi:"attr,category"`
+	Sensitive   bool       `jsonapi:"attr,sensitive"`
+	Hcl         bool       `jsonapi:"attr,hcl"`
+	Incomplete  bool       `jsonapi:"attr,incomplete"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy"`
+	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // VariableService handles communication with the workspace variable endpoints.

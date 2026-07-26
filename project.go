@@ -11,6 +11,7 @@ type Project struct {
 	CreatedDate   *string          `jsonapi:"attr,createdDate"`
 	UpdatedBy     *string          `jsonapi:"attr,updatedBy"`
 	UpdatedDate   *string          `jsonapi:"attr,updatedDate"`
+	Organization  *Organization    `jsonapi:"relation,organization,omitempty"`
 	ProjectAccess []*ProjectAccess `jsonapi:"relation,projectAccess,omitempty"`
 }
 

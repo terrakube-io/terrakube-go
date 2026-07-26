@@ -4,12 +4,13 @@ import "context"
 
 // WorkspaceTag represents a tag association on a workspace.
 type WorkspaceTag struct {
-	ID          string  `jsonapi:"primary,workspacetag"`
-	TagID       string  `jsonapi:"attr,tagId"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string     `jsonapi:"primary,workspacetag"`
+	TagID       string     `jsonapi:"attr,tagId"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy"`
+	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WorkspaceTagService handles communication with the workspace tag related

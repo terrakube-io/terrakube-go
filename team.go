@@ -4,23 +4,24 @@ import "context"
 
 // Team represents a Terrakube team resource.
 type Team struct {
-	ID               string  `jsonapi:"primary,team"`
-	Name             string  `jsonapi:"attr,name"`
-	ManageState      bool    `jsonapi:"attr,manageState"`
-	ManageWorkspace  bool    `jsonapi:"attr,manageWorkspace"`
-	ManageModule     bool    `jsonapi:"attr,manageModule"`
-	ManageProvider   bool    `jsonapi:"attr,manageProvider"`
-	ManageVcs        bool    `jsonapi:"attr,manageVcs"`
-	ManageTemplate   bool    `jsonapi:"attr,manageTemplate"`
-	ManageJob        bool    `jsonapi:"attr,manageJob"`
-	ManageCollection bool    `jsonapi:"attr,manageCollection"`
-	PlanJob          bool    `jsonapi:"attr,planJob"`
-	ApproveJob       bool    `jsonapi:"attr,approveJob"`
-	Role             string  `jsonapi:"attr,role"`
-	CreatedBy        *string `jsonapi:"attr,createdBy"`
-	CreatedDate      *string `jsonapi:"attr,createdDate"`
-	UpdatedBy        *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate      *string `jsonapi:"attr,updatedDate"`
+	ID               string        `jsonapi:"primary,team"`
+	Name             string        `jsonapi:"attr,name"`
+	ManageState      bool          `jsonapi:"attr,manageState"`
+	ManageWorkspace  bool          `jsonapi:"attr,manageWorkspace"`
+	ManageModule     bool          `jsonapi:"attr,manageModule"`
+	ManageProvider   bool          `jsonapi:"attr,manageProvider"`
+	ManageVcs        bool          `jsonapi:"attr,manageVcs"`
+	ManageTemplate   bool          `jsonapi:"attr,manageTemplate"`
+	ManageJob        bool          `jsonapi:"attr,manageJob"`
+	ManageCollection bool          `jsonapi:"attr,manageCollection"`
+	PlanJob          bool          `jsonapi:"attr,planJob"`
+	ApproveJob       bool          `jsonapi:"attr,approveJob"`
+	Role             string        `jsonapi:"attr,role"`
+	CreatedBy        *string       `jsonapi:"attr,createdBy"`
+	CreatedDate      *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy        *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate      *string       `jsonapi:"attr,updatedDate"`
+	Organization     *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // TeamService handles communication with the team-related endpoints.

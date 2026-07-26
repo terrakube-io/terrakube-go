@@ -4,23 +4,24 @@ import "context"
 
 // Implementation represents a Terrakube provider version implementation resource.
 type Implementation struct {
-	ID                  string  `jsonapi:"primary,implementation"`
-	Os                  string  `jsonapi:"attr,os"`
-	Arch                string  `jsonapi:"attr,arch"`
-	Filename            string  `jsonapi:"attr,filename"`
-	DownloadURL         *string `jsonapi:"attr,downloadUrl"`
-	ShasumsURL          *string `jsonapi:"attr,shasumsUrl"`
-	ShasumsSignatureURL *string `jsonapi:"attr,shasumsSignatureUrl"`
-	Shasum              *string `jsonapi:"attr,shasum"`
-	KeyID               *string `jsonapi:"attr,keyId"`
-	ASCIIArmor          *string `jsonapi:"attr,asciiArmor"`
-	TrustSignature      *string `jsonapi:"attr,trustSignature"`
-	Source              *string `jsonapi:"attr,source"`
-	SourceURL           *string `jsonapi:"attr,sourceUrl"`
-	CreatedBy           *string `jsonapi:"attr,createdBy"`
-	CreatedDate         *string `jsonapi:"attr,createdDate"`
-	UpdatedBy           *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate         *string `jsonapi:"attr,updatedDate"`
+	ID                  string           `jsonapi:"primary,implementation"`
+	Os                  string           `jsonapi:"attr,os"`
+	Arch                string           `jsonapi:"attr,arch"`
+	Filename            string           `jsonapi:"attr,filename"`
+	DownloadURL         *string          `jsonapi:"attr,downloadUrl"`
+	ShasumsURL          *string          `jsonapi:"attr,shasumsUrl"`
+	ShasumsSignatureURL *string          `jsonapi:"attr,shasumsSignatureUrl"`
+	Shasum              *string          `jsonapi:"attr,shasum"`
+	KeyID               *string          `jsonapi:"attr,keyId"`
+	ASCIIArmor          *string          `jsonapi:"attr,asciiArmor"`
+	TrustSignature      *string          `jsonapi:"attr,trustSignature"`
+	Source              *string          `jsonapi:"attr,source"`
+	SourceURL           *string          `jsonapi:"attr,sourceUrl"`
+	CreatedBy           *string          `jsonapi:"attr,createdBy"`
+	CreatedDate         *string          `jsonapi:"attr,createdDate"`
+	UpdatedBy           *string          `jsonapi:"attr,updatedBy"`
+	UpdatedDate         *string          `jsonapi:"attr,updatedDate"`
+	Version             *ProviderVersion `jsonapi:"relation,version,omitempty"`
 }
 
 // ImplementationService handles communication with the implementation-related endpoints.

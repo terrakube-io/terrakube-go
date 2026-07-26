@@ -11,6 +11,7 @@ type ModuleVersion struct {
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
 	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	Module      *Module `jsonapi:"relation,module,omitempty"`
 }
 
 // ModuleVersionService handles communication with the module version endpoints.

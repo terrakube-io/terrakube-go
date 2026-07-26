@@ -4,18 +4,17 @@ import "context"
 
 // History represents a Terrakube workspace history resource.
 type History struct {
-	ID           string  `jsonapi:"primary,history"`
-	JobReference string  `jsonapi:"attr,jobReference,omitempty"`
-	Output       string  `jsonapi:"attr,output,omitempty"`
-	Serial       int     `jsonapi:"attr,serial"`
-	// Md5 is the MD5 hash of the Terraform state.
-	Md5 *string `jsonapi:"attr,md5"`
-	// Lineage is the Terraform state lineage identifier.
-	Lineage *string `jsonapi:"attr,lineage"`
-	CreatedBy    *string `jsonapi:"attr,createdBy"`
-	CreatedDate  *string `jsonapi:"attr,createdDate"`
-	UpdatedBy    *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string `jsonapi:"attr,updatedDate"`
+	ID           string     `jsonapi:"primary,history"`
+	JobReference string     `jsonapi:"attr,jobReference,omitempty"`
+	Output       string     `jsonapi:"attr,output,omitempty"`
+	Serial       int        `jsonapi:"attr,serial"`
+	Md5          *string    `jsonapi:"attr,md5"`
+	Lineage      *string    `jsonapi:"attr,lineage"`
+	CreatedBy    *string    `jsonapi:"attr,createdBy"`
+	CreatedDate  *string    `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string    `jsonapi:"attr,updatedDate"`
+	Workspace    *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // HistoryService handles communication with the history-related endpoints.

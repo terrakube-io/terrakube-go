@@ -4,17 +4,18 @@ import "context"
 
 // OrganizationVariable represents a Terrakube organization-level global variable.
 type OrganizationVariable struct {
-	ID          string  `jsonapi:"primary,globalvar"`
-	Key         string  `jsonapi:"attr,key"`
-	Value       string  `jsonapi:"attr,value"`
-	Description string  `jsonapi:"attr,description"`
-	Category    string  `jsonapi:"attr,category"`
-	Sensitive   *bool   `jsonapi:"attr,sensitive,omitempty"`
-	Hcl         bool    `jsonapi:"attr,hcl"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,globalvar"`
+	Key          string        `jsonapi:"attr,key"`
+	Value        string        `jsonapi:"attr,value"`
+	Description  string        `jsonapi:"attr,description"`
+	Category     string        `jsonapi:"attr,category"`
+	Sensitive    *bool         `jsonapi:"attr,sensitive,omitempty"`
+	Hcl          bool          `jsonapi:"attr,hcl"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // OrganizationVariableService handles communication with the organization global variable endpoints.
