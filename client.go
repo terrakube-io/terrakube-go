@@ -16,6 +16,40 @@ import (
 	"github.com/google/jsonapi"
 )
 
+// doList executes a request and decodes a JSON:API list response into []*T.
+// It avoids runtime reflection by leveraging Go generics.
+func doList[T any](c *Client, req *http.Request) ([]*T, error) {
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close() //nolint:errcheck // response body close errors are inconsequential
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading response body: %w", err)
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, c.parseAPIError(req, resp.StatusCode, bodyBytes)
+	}
+
+	if len(bodyBytes) == 0 {
+		return nil, nil
+	}
+
+	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeOf((*T)(nil)))
+	if err != nil {
+		return nil, fmt.Errorf("decoding JSON:API list response: %w", err)
+	}
+
+	result := make([]*T, len(items))
+	for i, item := range items {
+		result[i] = item.(*T)
+	}
+	return result, nil
+}
+
 // APIVersion is the Terrakube OpenAPI specification version this library targets.
 const APIVersion = "2.27.0"
 
@@ -28,7 +62,10 @@ const (
 
 // ListOptions specifies optional parameters for List methods.
 type ListOptions struct {
-	Filter string
+	Filter  string // Server-side filter expression (e.g. "name==production").
+	Include string // Comma-separated relationship names to sideload (e.g. "workspace,organization").
+	Page    int    // 1-indexed page number; 0 means unset (auto-paginate all pages).
+	PageSize int   // Items per page; 0 means unset (server default).
 }
 
 // Client manages communication with the Terrakube API.
@@ -116,11 +153,26 @@ func WithHTTPClient(httpClient *http.Client) Option {
 }
 
 // WithInsecureTLS skips TLS certificate verification.
+// It modifies the TLS configuration of the existing transport rather than
+// replacing the entire http.Client, so it composes safely with WithHTTPClient.
 func WithInsecureTLS() Option {
 	return func(c *Client) error {
-		transport := http.DefaultTransport.(*http.Transport).Clone()
-		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // User-requested insecure mode
-		c.httpClient = &http.Client{Transport: transport}
+		var transport *http.Transport
+		if t, ok := c.httpClient.Transport.(*http.Transport); ok && t != nil {
+			transport = t.Clone()
+		} else {
+			transport = http.DefaultTransport.(*http.Transport).Clone()
+		}
+		if transport.TLSClientConfig == nil {
+			transport.TLSClientConfig = &tls.Config{} //nolint:gosec // Struct initialized below
+		}
+		transport.TLSClientConfig.InsecureSkipVerify = true //nolint:gosec // User-requested insecure mode
+		c.httpClient = &http.Client{
+			Transport:     transport,
+			Timeout:       c.httpClient.Timeout,
+			CheckRedirect: c.httpClient.CheckRedirect,
+			Jar:           c.httpClient.Jar,
+		}
 		return nil
 	}
 }
@@ -239,11 +291,10 @@ func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, p
 	return req, nil
 }
 
-// do executes a request and decodes the JSON:API response.
+// do executes a request and decodes a single JSON:API resource response.
 // If v is nil, no response body decoding is performed (used for DELETE).
-// If v is a pointer to a slice, jsonapi.UnmarshalManyPayload is used.
-// Otherwise jsonapi.UnmarshalPayload is used.
-func (c *Client) do(_ context.Context, req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+// For list responses, use the generic doList[T] function instead.
+func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -256,37 +307,12 @@ func (c *Client) do(_ context.Context, req *http.Request, v interface{}) (*http.
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		apiErr := &APIError{
-			StatusCode: resp.StatusCode,
-			Method:     req.Method,
-			Path:       req.URL.Path,
-			Body:       bodyBytes,
-		}
-		var errResp struct {
-			Errors []ErrorDetail `json:"errors"`
-		}
-		if json.Unmarshal(bodyBytes, &errResp) == nil {
-			apiErr.Errors = errResp.Errors
-		}
-		return resp, apiErr
+		return resp, c.parseAPIError(req, resp.StatusCode, bodyBytes)
 	}
 
 	if v != nil && len(bodyBytes) > 0 {
-		rv := reflect.ValueOf(v)
-		if rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Slice {
-			items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), rv.Elem().Type().Elem())
-			if err != nil {
-				return resp, fmt.Errorf("decoding JSON:API list response: %w", err)
-			}
-			slice := reflect.MakeSlice(rv.Elem().Type(), len(items), len(items))
-			for i, item := range items {
-				slice.Index(i).Set(reflect.ValueOf(item))
-			}
-			rv.Elem().Set(slice)
-		} else {
-			if err := jsonapi.UnmarshalPayload(bytes.NewReader(bodyBytes), v); err != nil {
-				return resp, fmt.Errorf("decoding JSON:API response: %w", err)
-			}
+		if err := jsonapi.UnmarshalPayload(bytes.NewReader(bodyBytes), v); err != nil {
+			return resp, fmt.Errorf("decoding JSON:API response: %w", err)
 		}
 	}
 
@@ -325,7 +351,7 @@ func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body in
 
 // doRaw executes a request and decodes the response using encoding/json.
 // Used for non-JSON:API endpoints.
-func (c *Client) doRaw(_ context.Context, req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+func (c *Client) doRaw(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -338,12 +364,7 @@ func (c *Client) doRaw(_ context.Context, req *http.Request, v interface{}) (*ht
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return resp, &APIError{
-			StatusCode: resp.StatusCode,
-			Method:     req.Method,
-			Path:       req.URL.Path,
-			Body:       bodyBytes,
-		}
+		return resp, c.parseAPIError(req, resp.StatusCode, bodyBytes)
 	}
 
 	if v != nil && len(bodyBytes) > 0 {
@@ -353,6 +374,24 @@ func (c *Client) doRaw(_ context.Context, req *http.Request, v interface{}) (*ht
 	}
 
 	return resp, nil
+}
+
+// parseAPIError constructs an APIError from an HTTP response, parsing
+// structured error details from the response body when possible.
+func (c *Client) parseAPIError(req *http.Request, statusCode int, body []byte) *APIError {
+	apiErr := &APIError{
+		StatusCode: statusCode,
+		Method:     req.Method,
+		Path:       req.URL.Path,
+		Body:       body,
+	}
+	var errResp struct {
+		Errors []ErrorDetail `json:"errors"`
+	}
+	if json.Unmarshal(body, &errResp) == nil {
+		apiErr.Errors = errResp.Errors
+	}
+	return apiErr
 }
 
 // validateID checks that a resource ID is not empty.

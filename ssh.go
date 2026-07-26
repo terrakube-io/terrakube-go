@@ -4,15 +4,16 @@ import "context"
 
 // SSH represents an SSH key in Terrakube.
 type SSH struct {
-	ID          string  `jsonapi:"primary,ssh"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	PrivateKey  string  `jsonapi:"attr,privateKey"`
-	SSHType     string  `jsonapi:"attr,sshType"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,ssh"`
+	Name         string        `jsonapi:"attr,name"`
+	Description  *string       `jsonapi:"attr,description"`
+	PrivateKey   string        `jsonapi:"attr,privateKey"`
+	SSHType      string        `jsonapi:"attr,sshType"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // SSHService handles communication with the SSH related methods of the Terrakube API.

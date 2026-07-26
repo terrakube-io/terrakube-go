@@ -18,7 +18,7 @@ type FederatedClaimService struct {
 // List returns all federated claims for a federated identity configuration.
 // It returns a *ValidationError if federatedID is empty and a *APIError on server errors.
 func (s *FederatedClaimService) List(ctx context.Context, federatedID string, opts *ListOptions) ([]*FederatedClaim, error) {
-	if err := validateID("federated ID", federatedID); err != nil {
+	if err := validateID("federatedID", federatedID); err != nil {
 		return nil, err
 	}
 
@@ -29,7 +29,7 @@ func (s *FederatedClaimService) List(ctx context.Context, federatedID string, op
 // Get retrieves a federated claim by ID under a federated identity configuration.
 // It returns a *ValidationError if federatedID or id is empty and a *APIError on server errors.
 func (s *FederatedClaimService) Get(ctx context.Context, federatedID, id string) (*FederatedClaim, error) {
-	if err := validateID("federated ID", federatedID); err != nil {
+	if err := validateID("federatedID", federatedID); err != nil {
 		return nil, err
 	}
 	if err := validateID("id", id); err != nil {
@@ -43,7 +43,7 @@ func (s *FederatedClaimService) Get(ctx context.Context, federatedID, id string)
 // Create creates a new federated claim for a federated identity configuration.
 // It returns a *ValidationError if federatedID is empty and a *APIError on server errors.
 func (s *FederatedClaimService) Create(ctx context.Context, federatedID string, claim *FederatedClaim) (*FederatedClaim, error) {
-	if err := validateID("federated ID", federatedID); err != nil {
+	if err := validateID("federatedID", federatedID); err != nil {
 		return nil, err
 	}
 
@@ -54,10 +54,10 @@ func (s *FederatedClaimService) Create(ctx context.Context, federatedID string, 
 // Update modifies an existing federated claim. The claim ID must be set.
 // It returns a *ValidationError if federatedID or claim ID is empty and a *APIError on server errors.
 func (s *FederatedClaimService) Update(ctx context.Context, federatedID string, claim *FederatedClaim) (*FederatedClaim, error) {
-	if err := validateID("federated ID", federatedID); err != nil {
+	if err := validateID("federatedID", federatedID); err != nil {
 		return nil, err
 	}
-	if err := validateID("federatedClaim ID", claim.ID); err != nil {
+	if err := validateID("federatedClaimID", claim.ID); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +68,7 @@ func (s *FederatedClaimService) Update(ctx context.Context, federatedID string, 
 // Delete removes a federated claim by ID under a federated identity configuration.
 // It returns a *ValidationError if federatedID or id is empty and a *APIError on server errors.
 func (s *FederatedClaimService) Delete(ctx context.Context, federatedID, id string) error {
-	if err := validateID("federated ID", federatedID); err != nil {
+	if err := validateID("federatedID", federatedID); err != nil {
 		return err
 	}
 	if err := validateID("id", id); err != nil {

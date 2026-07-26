@@ -4,14 +4,16 @@ import "context"
 
 // Agent represents an agent in Terrakube.
 type Agent struct {
-	ID          string  `jsonapi:"primary,agent"`
-	Name        string  `jsonapi:"attr,name"`
-	Description string  `jsonapi:"attr,description"`
-	URL         string  `jsonapi:"attr,url"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,agent"`
+	Name         string        `jsonapi:"attr,name"`
+	Description  string        `jsonapi:"attr,description"`
+	URL          string        `jsonapi:"attr,url"`
+	Type         string        `jsonapi:"attr,type,omitempty"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // AgentService handles communication with the Agent related methods of the Terrakube API.

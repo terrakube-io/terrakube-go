@@ -719,6 +719,7 @@ func ExampleIsNotFound() {
 	// Output: true
 }
 
+//nolint:gosec
 func ExampleSSHService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/ssh", func(w http.ResponseWriter, _ *http.Request) {
@@ -727,7 +728,7 @@ func ExampleSSHService_List() {
 			jsonapiItem("ssh", "ssh-1", map[string]interface{}{
 				"name":       "deploy-key",
 				"sshType":    "rsa",
-				"privateKey": "-----BEGIN RSA PRIVATE KEY-----\nexample\n-----END RSA PRIVATE KEY-----",
+				"privateKey": "-----BEGIN RSA PRIVATE KEY-----\nexample\n-----END RSA PRIVATE KEY-----", //nolint:gosec
 			}),
 			jsonapiItem("ssh", "ssh-2", map[string]interface{}{
 				"name":       "module-key",

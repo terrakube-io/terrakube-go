@@ -217,7 +217,7 @@ func TestActionService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "action ID")
+	assertValidationError(t, err, "actionID")
 }
 
 func TestActionService_Delete(t *testing.T) {

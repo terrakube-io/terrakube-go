@@ -4,30 +4,32 @@ import "context"
 
 // Job represents a Terrakube job resource.
 type Job struct {
-	ID                string     `jsonapi:"primary,job"`
-	Command           string     `jsonapi:"attr,command"`
-	Output            string     `jsonapi:"attr,output"`
-	Status            string     `jsonapi:"attr,status"`
-	Workspace         *Workspace `jsonapi:"relation,workspace,omitempty"`
-	ApprovalTeam      *string `jsonapi:"attr,approvalTeam"`
-	Comments          *string `jsonapi:"attr,comments"`
-	CommitID          *string `jsonapi:"attr,commitId"`
-	OverrideBranch    *string   `jsonapi:"attr,overrideBranch"`
-	OverrideSource    *string   `jsonapi:"attr,overrideSource"`
-	PlanChanges       bool      `jsonapi:"attr,planChanges"`
-	Refresh           bool      `jsonapi:"attr,refresh"`
-	RefreshOnly       bool      `jsonapi:"attr,refreshOnly"`
-	// Tcl is the Terrakube Configuration Language content for this job.
-	Tcl               *string   `jsonapi:"attr,tcl"`
-	TemplateReference *string   `jsonapi:"attr,templateReference"`
-	TerraformPlan     *string   `jsonapi:"attr,terraformPlan"`
-	Via               *string   `jsonapi:"attr,via"`
-	CreatedBy         *string   `jsonapi:"attr,createdBy"`
-	CreatedDate       *string   `jsonapi:"attr,createdDate"`
-	UpdatedBy         *string   `jsonapi:"attr,updatedBy"`
-	UpdatedDate       *string   `jsonapi:"attr,updatedDate"`
-	Steps             []*Step    `jsonapi:"relation,step,omitempty"`
-	Addresses         []*Address `jsonapi:"relation,address,omitempty"`
+	ID                string        `jsonapi:"primary,job"`
+	Command           string        `jsonapi:"attr,command"`
+	Output            string        `jsonapi:"attr,output"`
+	Status            string        `jsonapi:"attr,status"`
+	ApprovalTeam      *string       `jsonapi:"attr,approvalTeam"`
+	Comments          *string       `jsonapi:"attr,comments"`
+	CommitID          *string       `jsonapi:"attr,commitId"`
+	OverrideBranch    *string       `jsonapi:"attr,overrideBranch"`
+	OverrideSource    *string       `jsonapi:"attr,overrideSource"`
+	PlanChanges       bool          `jsonapi:"attr,planChanges"`
+	Refresh           bool          `jsonapi:"attr,refresh"`
+	RefreshOnly       bool          `jsonapi:"attr,refreshOnly"`
+	PRNumber          *int          `jsonapi:"attr,prNumber,omitempty"`
+	PRCommentError    *string       `jsonapi:"attr,prCommentError,omitempty"`
+	Tcl               *string       `jsonapi:"attr,tcl"`
+	TemplateReference *string       `jsonapi:"attr,templateReference"`
+	TerraformPlan     *string       `jsonapi:"attr,terraformPlan"`
+	Via               *string       `jsonapi:"attr,via"`
+	CreatedBy         *string       `jsonapi:"attr,createdBy"`
+	CreatedDate       *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy         *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *string       `jsonapi:"attr,updatedDate"`
+	Organization      *Organization `jsonapi:"relation,organization,omitempty"`
+	Workspace         *Workspace    `jsonapi:"relation,workspace,omitempty"`
+	Steps             []*Step       `jsonapi:"relation,step,omitempty"`
+	Addresses         []*Address    `jsonapi:"relation,address,omitempty"`
 }
 
 // JobService handles communication with the job related methods of the

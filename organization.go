@@ -4,17 +4,29 @@ import "context"
 
 // Organization represents a Terrakube organization resource.
 type Organization struct {
-	ID            string  `jsonapi:"primary,organization"`
-	Name          string  `jsonapi:"attr,name"`
-	Description   *string `jsonapi:"attr,description"`
-	ExecutionMode string  `jsonapi:"attr,executionMode"`
-	Disabled      bool    `jsonapi:"attr,disabled"`
-	Icon          *string `jsonapi:"attr,icon"`
-	CreatedBy     *string    `jsonapi:"attr,createdBy"`
-	CreatedDate   *string    `jsonapi:"attr,createdDate"`
-	UpdatedBy     *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate   *string    `jsonapi:"attr,updatedDate"`
-	Projects      []*Project `jsonapi:"relation,project,omitempty"`
+	ID                    string                  `jsonapi:"primary,organization"`
+	Name                  string                  `jsonapi:"attr,name"`
+	Description           *string                 `jsonapi:"attr,description"`
+	ExecutionMode         string                  `jsonapi:"attr,executionMode"`
+	Disabled              bool                    `jsonapi:"attr,disabled"`
+	Icon                  *string                 `jsonapi:"attr,icon"`
+	CreatedBy             *string                 `jsonapi:"attr,createdBy"`
+	CreatedDate           *string                 `jsonapi:"attr,createdDate"`
+	UpdatedBy             *string                 `jsonapi:"attr,updatedBy"`
+	UpdatedDate           *string                 `jsonapi:"attr,updatedDate"`
+	Collections           []*Collection           `jsonapi:"relation,collection,omitempty"`
+	Workspaces            []*Workspace            `jsonapi:"relation,workspace,omitempty"`
+	Projects              []*Project              `jsonapi:"relation,project,omitempty"`
+	Modules               []*Module               `jsonapi:"relation,module,omitempty"`
+	Providers             []*Provider             `jsonapi:"relation,provider,omitempty"`
+	Jobs                  []*Job                  `jsonapi:"relation,job,omitempty"`
+	Teams                 []*Team                 `jsonapi:"relation,team,omitempty"`
+	Vcs                   []*VCS                  `jsonapi:"relation,vcs,omitempty"`
+	SSH                   []*SSH                  `jsonapi:"relation,ssh,omitempty"`
+	Agents                []*Agent                `jsonapi:"relation,agent,omitempty"`
+	Templates             []*Template             `jsonapi:"relation,template,omitempty"`
+	OrganizationVariables []*OrganizationVariable `jsonapi:"relation,globalvar,omitempty"`
+	Tags                  []*Tag                  `jsonapi:"relation,tag,omitempty"`
 }
 
 // OrganizationService handles communication with the organization related
@@ -51,7 +63,7 @@ func (s *OrganizationService) Create(ctx context.Context, org *Organization) (*O
 // Update modifies an existing organization. The organization's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *OrganizationService) Update(ctx context.Context, org *Organization) (*Organization, error) {
-	if err := validateID("organization ID", org.ID); err != nil {
+	if err := validateID("organizationID", org.ID); err != nil {
 		return nil, err
 	}
 

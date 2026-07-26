@@ -4,14 +4,17 @@ import "context"
 
 // Collection represents a Terrakube collection resource.
 type Collection struct {
-	ID          string  `jsonapi:"primary,collection"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	Priority    int32   `jsonapi:"attr,priority"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string                 `jsonapi:"primary,collection"`
+	Name        string                 `jsonapi:"attr,name"`
+	Description *string                `jsonapi:"attr,description"`
+	Priority    int32                  `jsonapi:"attr,priority"`
+	CreatedBy   *string                `jsonapi:"attr,createdBy"`
+	CreatedDate *string                `jsonapi:"attr,createdDate"`
+	UpdatedBy   *string                `jsonapi:"attr,updatedBy"`
+	UpdatedDate *string                `jsonapi:"attr,updatedDate"`
+	Organization *Organization          `jsonapi:"relation,organization,omitempty"`
+	Items       []*CollectionItem      `jsonapi:"relation,item,omitempty"`
+	References  []*CollectionReference `jsonapi:"relation,reference,omitempty"`
 }
 
 // CollectionService handles communication with the collection related methods

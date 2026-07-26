@@ -4,23 +4,24 @@ import "context"
 
 // Implementation represents a Terrakube provider version implementation resource.
 type Implementation struct {
-	ID                  string  `jsonapi:"primary,implementation"`
-	Os                  string  `jsonapi:"attr,os"`
-	Arch                string  `jsonapi:"attr,arch"`
-	Filename            string  `jsonapi:"attr,filename"`
-	DownloadURL         *string `jsonapi:"attr,downloadUrl"`
-	ShasumsURL          *string `jsonapi:"attr,shasumsUrl"`
-	ShasumsSignatureURL *string `jsonapi:"attr,shasumsSignatureUrl"`
-	Shasum              *string `jsonapi:"attr,shasum"`
-	KeyID               *string `jsonapi:"attr,keyId"`
-	ASCIIArmor          *string `jsonapi:"attr,asciiArmor"`
-	TrustSignature      *string `jsonapi:"attr,trustSignature"`
-	Source              *string `jsonapi:"attr,source"`
-	SourceURL           *string `jsonapi:"attr,sourceUrl"`
-	CreatedBy           *string `jsonapi:"attr,createdBy"`
-	CreatedDate         *string `jsonapi:"attr,createdDate"`
-	UpdatedBy           *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate         *string `jsonapi:"attr,updatedDate"`
+	ID                  string           `jsonapi:"primary,implementation"`
+	Os                  string           `jsonapi:"attr,os"`
+	Arch                string           `jsonapi:"attr,arch"`
+	Filename            string           `jsonapi:"attr,filename"`
+	DownloadURL         *string          `jsonapi:"attr,downloadUrl"`
+	ShasumsURL          *string          `jsonapi:"attr,shasumsUrl"`
+	ShasumsSignatureURL *string          `jsonapi:"attr,shasumsSignatureUrl"`
+	Shasum              *string          `jsonapi:"attr,shasum"`
+	KeyID               *string          `jsonapi:"attr,keyId"`
+	ASCIIArmor          *string          `jsonapi:"attr,asciiArmor"`
+	TrustSignature      *string          `jsonapi:"attr,trustSignature"`
+	Source              *string          `jsonapi:"attr,source"`
+	SourceURL           *string          `jsonapi:"attr,sourceUrl"`
+	CreatedBy           *string          `jsonapi:"attr,createdBy"`
+	CreatedDate         *string          `jsonapi:"attr,createdDate"`
+	UpdatedBy           *string          `jsonapi:"attr,updatedBy"`
+	UpdatedDate         *string          `jsonapi:"attr,updatedDate"`
+	Version             *ProviderVersion `jsonapi:"relation,version,omitempty"`
 }
 
 // ImplementationService handles communication with the implementation-related endpoints.
@@ -31,13 +32,13 @@ type ImplementationService struct {
 // List returns all implementations for a provider version.
 // It returns a *ValidationError if orgID, providerID, or versionID is empty and a *APIError on server errors.
 func (s *ImplementationService) List(ctx context.Context, orgID, providerID, versionID string, opts *ListOptions) ([]*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
 
@@ -48,16 +49,16 @@ func (s *ImplementationService) List(ctx context.Context, orgID, providerID, ver
 // Get returns a single implementation by ID.
 // It returns a *ValidationError if orgID, providerID, versionID, or id is empty and a *APIError on server errors.
 func (s *ImplementationService) Get(ctx context.Context, orgID, providerID, versionID, id string) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
-	if err := validateID("implementation ID", id); err != nil {
+	if err := validateID("implementationID", id); err != nil {
 		return nil, err
 	}
 
@@ -68,13 +69,13 @@ func (s *ImplementationService) Get(ctx context.Context, orgID, providerID, vers
 // Create creates a new implementation for a provider version.
 // It returns a *ValidationError if orgID, providerID, or versionID is empty and a *APIError on server errors.
 func (s *ImplementationService) Create(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
 
@@ -85,16 +86,16 @@ func (s *ImplementationService) Create(ctx context.Context, orgID, providerID, v
 // Update modifies an existing implementation. The implementation's ID field must be set.
 // It returns a *ValidationError if orgID, providerID, versionID, or the ID is empty and a *APIError on server errors.
 func (s *ImplementationService) Update(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
-	if err := validateID("implementation ID", impl.ID); err != nil {
+	if err := validateID("implementationID", impl.ID); err != nil {
 		return nil, err
 	}
 
@@ -105,16 +106,16 @@ func (s *ImplementationService) Update(ctx context.Context, orgID, providerID, v
 // Delete removes an implementation by ID.
 // It returns a *ValidationError if orgID, providerID, versionID, or id is empty and a *APIError on server errors.
 func (s *ImplementationService) Delete(ctx context.Context, orgID, providerID, versionID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return err
 	}
-	if err := validateID("implementation ID", id); err != nil {
+	if err := validateID("implementationID", id); err != nil {
 		return err
 	}
 

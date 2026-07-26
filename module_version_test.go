@@ -68,7 +68,7 @@ func TestModuleVersionService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_List_EmptyModuleID(t *testing.T) {
@@ -81,7 +81,7 @@ func TestModuleVersionService_List_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Get(t *testing.T) {
@@ -125,7 +125,7 @@ func TestModuleVersionService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_Get_EmptyModuleID(t *testing.T) {
@@ -138,7 +138,7 @@ func TestModuleVersionService_Get_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Get_EmptyID(t *testing.T) {
@@ -151,7 +151,7 @@ func TestModuleVersionService_Get_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Get_NotFound(t *testing.T) {
@@ -233,7 +233,7 @@ func TestModuleVersionService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Delete(t *testing.T) {
@@ -261,7 +261,7 @@ func TestModuleVersionService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_Delete_EmptyModuleID(t *testing.T) {
@@ -274,7 +274,7 @@ func TestModuleVersionService_Delete_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Delete_EmptyID(t *testing.T) {
@@ -287,7 +287,7 @@ func TestModuleVersionService_Delete_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Delete_ServerError(t *testing.T) {

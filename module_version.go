@@ -11,6 +11,7 @@ type ModuleVersion struct {
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
 	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	Module      *Module `jsonapi:"relation,module,omitempty"`
 }
 
 // ModuleVersionService handles communication with the module version endpoints.
@@ -21,10 +22,10 @@ type ModuleVersionService struct {
 // List returns all versions for a module.
 // It returns a *ValidationError if orgID or moduleID is empty and a *APIError on server errors.
 func (s *ModuleVersionService) List(ctx context.Context, orgID, moduleID string, opts *ListOptions) ([]*ModuleVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("module ID", moduleID); err != nil {
+	if err := validateID("moduleID", moduleID); err != nil {
 		return nil, err
 	}
 
@@ -35,13 +36,13 @@ func (s *ModuleVersionService) List(ctx context.Context, orgID, moduleID string,
 // Get returns a single module version by ID.
 // It returns a *ValidationError if orgID, moduleID, or id is empty and a *APIError on server errors.
 func (s *ModuleVersionService) Get(ctx context.Context, orgID, moduleID, id string) (*ModuleVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("module ID", moduleID); err != nil {
+	if err := validateID("moduleID", moduleID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", id); err != nil {
+	if err := validateID("versionID", id); err != nil {
 		return nil, err
 	}
 
@@ -52,10 +53,10 @@ func (s *ModuleVersionService) Get(ctx context.Context, orgID, moduleID, id stri
 // Create creates a new version for a module.
 // It returns a *ValidationError if orgID or moduleID is empty and a *APIError on server errors.
 func (s *ModuleVersionService) Create(ctx context.Context, orgID, moduleID string, version *ModuleVersion) (*ModuleVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("module ID", moduleID); err != nil {
+	if err := validateID("moduleID", moduleID); err != nil {
 		return nil, err
 	}
 
@@ -66,13 +67,13 @@ func (s *ModuleVersionService) Create(ctx context.Context, orgID, moduleID strin
 // Update modifies an existing module version. The version's ID field must be set.
 // It returns a *ValidationError if orgID, moduleID, or the ID is empty and a *APIError on server errors.
 func (s *ModuleVersionService) Update(ctx context.Context, orgID, moduleID string, version *ModuleVersion) (*ModuleVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("module ID", moduleID); err != nil {
+	if err := validateID("moduleID", moduleID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", version.ID); err != nil {
+	if err := validateID("versionID", version.ID); err != nil {
 		return nil, err
 	}
 
@@ -83,13 +84,13 @@ func (s *ModuleVersionService) Update(ctx context.Context, orgID, moduleID strin
 // Delete removes a module version by ID.
 // It returns a *ValidationError if orgID, moduleID, or id is empty and a *APIError on server errors.
 func (s *ModuleVersionService) Delete(ctx context.Context, orgID, moduleID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("module ID", moduleID); err != nil {
+	if err := validateID("moduleID", moduleID); err != nil {
 		return err
 	}
-	if err := validateID("version ID", id); err != nil {
+	if err := validateID("versionID", id); err != nil {
 		return err
 	}
 

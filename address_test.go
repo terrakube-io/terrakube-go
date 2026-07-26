@@ -67,7 +67,7 @@ func TestAddressService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestAddressService_List_EmptyJobID(t *testing.T) {
@@ -80,7 +80,7 @@ func TestAddressService_List_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty jobID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestAddressService_Get(t *testing.T) {
@@ -123,7 +123,7 @@ func TestAddressService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestAddressService_Get_EmptyJobID(t *testing.T) {
@@ -136,7 +136,7 @@ func TestAddressService_Get_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty jobID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestAddressService_Get_EmptyID(t *testing.T) {
@@ -149,7 +149,7 @@ func TestAddressService_Get_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "address ID")
+	assertValidationError(t, err, "addressID")
 }
 
 func TestAddressService_Get_NotFound(t *testing.T) {
@@ -230,7 +230,7 @@ func TestAddressService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "address ID")
+	assertValidationError(t, err, "addressID")
 }
 
 func TestAddressService_Delete(t *testing.T) {
@@ -258,7 +258,7 @@ func TestAddressService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestAddressService_Delete_EmptyJobID(t *testing.T) {
@@ -271,7 +271,7 @@ func TestAddressService_Delete_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty jobID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestAddressService_Delete_EmptyID(t *testing.T) {
@@ -284,7 +284,7 @@ func TestAddressService_Delete_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "address ID")
+	assertValidationError(t, err, "addressID")
 }
 
 func TestAddressService_Delete_ServerError(t *testing.T) {

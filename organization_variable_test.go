@@ -75,7 +75,7 @@ func TestOrganizationVariableService_List_EmptyOrgID(t *testing.T) {
 	client := newTestClientFromURL(t, "https://example.com")
 
 	_, err := client.OrganizationVariables.List(context.Background(), "", nil)
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestOrganizationVariableService_Get(t *testing.T) {
@@ -130,8 +130,8 @@ func TestOrganizationVariableService_Get_EmptyIDs(t *testing.T) {
 		varID string
 		field string
 	}{
-		{"empty org ID", "", "gv-1", "organization ID"},
-		{"empty globalvar ID", "org-1", "", "globalvar ID"},
+		{"empty org ID", "", "gv-1", "organizationID"},
+		{"empty globalvar ID", "org-1", "", "globalvarID"},
 	}
 
 	for _, tt := range tests {
@@ -179,7 +179,7 @@ func TestOrganizationVariableService_Create_EmptyOrgID(t *testing.T) {
 	client := newTestClientFromURL(t, "https://example.com")
 
 	_, err := client.OrganizationVariables.Create(context.Background(), "", &terrakube.OrganizationVariable{})
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestOrganizationVariableService_Update(t *testing.T) {
@@ -214,7 +214,7 @@ func TestOrganizationVariableService_Update_EmptyOrgID(t *testing.T) {
 	client := newTestClientFromURL(t, "https://example.com")
 
 	_, err := client.OrganizationVariables.Update(context.Background(), "", &terrakube.OrganizationVariable{ID: "gv-1"})
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestOrganizationVariableService_Update_EmptyVarID(t *testing.T) {
@@ -223,7 +223,7 @@ func TestOrganizationVariableService_Update_EmptyVarID(t *testing.T) {
 	client := newTestClientFromURL(t, "https://example.com")
 
 	_, err := client.OrganizationVariables.Update(context.Background(), "org-1", &terrakube.OrganizationVariable{ID: ""})
-	assertValidationError(t, err, "globalvar ID")
+	assertValidationError(t, err, "globalvarID")
 }
 
 func TestOrganizationVariableService_Delete(t *testing.T) {
@@ -253,8 +253,8 @@ func TestOrganizationVariableService_Delete_EmptyIDs(t *testing.T) {
 		varID string
 		field string
 	}{
-		{"empty org ID", "", "gv-1", "organization ID"},
-		{"empty globalvar ID", "org-1", "", "globalvar ID"},
+		{"empty org ID", "", "gv-1", "organizationID"},
+		{"empty globalvar ID", "org-1", "", "globalvarID"},
 	}
 
 	for _, tt := range tests {

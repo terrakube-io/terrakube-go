@@ -4,18 +4,17 @@ import "context"
 
 // WorkspaceSchedule represents a scheduled job for a workspace.
 type WorkspaceSchedule struct {
-	ID          string  `jsonapi:"primary,schedule"`
-	// Schedule is the cron expression for the schedule (JSON:API attr: "cron").
-	Schedule string `jsonapi:"attr,cron"`
-	// TemplateID is the template reference (JSON:API attr: "templateReference").
-	TemplateID string  `jsonapi:"attr,templateReference"`
-	Tcl        *string `jsonapi:"attr,tcl,omitempty"`
-	Description *string `jsonapi:"attr,description,omitempty"`
-	Enabled     bool    `jsonapi:"attr,enabled"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string     `jsonapi:"primary,schedule"`
+	Schedule    string     `jsonapi:"attr,cron"`
+	TemplateID  string     `jsonapi:"attr,templateReference"`
+	Tcl         *string    `jsonapi:"attr,tcl,omitempty"`
+	Description *string    `jsonapi:"attr,description,omitempty"`
+	Enabled     bool       `jsonapi:"attr,enabled"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy"`
+	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WorkspaceScheduleService handles communication with the workspace schedule

@@ -4,12 +4,13 @@ import "context"
 
 // Tag represents a Terrakube tag resource.
 type Tag struct {
-	ID          string  `jsonapi:"primary,tag"`
-	Name        string  `jsonapi:"attr,name"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,tag"`
+	Name         string        `jsonapi:"attr,name"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // TagService handles communication with the tag-related endpoints.
