@@ -32,13 +32,13 @@ type ImplementationService struct {
 // List returns all implementations for a provider version.
 // It returns a *ValidationError if orgID, providerID, or versionID is empty and a *APIError on server errors.
 func (s *ImplementationService) List(ctx context.Context, orgID, providerID, versionID string, opts *ListOptions) ([]*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
 
@@ -49,16 +49,16 @@ func (s *ImplementationService) List(ctx context.Context, orgID, providerID, ver
 // Get returns a single implementation by ID.
 // It returns a *ValidationError if orgID, providerID, versionID, or id is empty and a *APIError on server errors.
 func (s *ImplementationService) Get(ctx context.Context, orgID, providerID, versionID, id string) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
-	if err := validateID("implementation ID", id); err != nil {
+	if err := validateID("implementationID", id); err != nil {
 		return nil, err
 	}
 
@@ -69,13 +69,13 @@ func (s *ImplementationService) Get(ctx context.Context, orgID, providerID, vers
 // Create creates a new implementation for a provider version.
 // It returns a *ValidationError if orgID, providerID, or versionID is empty and a *APIError on server errors.
 func (s *ImplementationService) Create(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
 
@@ -86,16 +86,16 @@ func (s *ImplementationService) Create(ctx context.Context, orgID, providerID, v
 // Update modifies an existing implementation. The implementation's ID field must be set.
 // It returns a *ValidationError if orgID, providerID, versionID, or the ID is empty and a *APIError on server errors.
 func (s *ImplementationService) Update(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return nil, err
 	}
-	if err := validateID("implementation ID", impl.ID); err != nil {
+	if err := validateID("implementationID", impl.ID); err != nil {
 		return nil, err
 	}
 
@@ -106,16 +106,16 @@ func (s *ImplementationService) Update(ctx context.Context, orgID, providerID, v
 // Delete removes an implementation by ID.
 // It returns a *ValidationError if orgID, providerID, versionID, or id is empty and a *APIError on server errors.
 func (s *ImplementationService) Delete(ctx context.Context, orgID, providerID, versionID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return err
 	}
-	if err := validateID("version ID", versionID); err != nil {
+	if err := validateID("versionID", versionID); err != nil {
 		return err
 	}
-	if err := validateID("implementation ID", id); err != nil {
+	if err := validateID("implementationID", id); err != nil {
 		return err
 	}
 

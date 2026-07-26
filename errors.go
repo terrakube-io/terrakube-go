@@ -66,3 +66,12 @@ func IsUnauthorized(err error) bool {
 	}
 	return false
 }
+
+// IsForbidden returns true if the error is a 403 API error.
+func IsForbidden(err error) bool {
+	var apiErr *APIError
+	if errors.As(err, &apiErr) {
+		return apiErr.StatusCode == 403
+	}
+	return false
+}

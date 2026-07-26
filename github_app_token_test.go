@@ -186,7 +186,7 @@ func TestGithubAppTokenService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "github app token ID")
+	assertValidationError(t, err, "githubAppTokenID")
 }
 
 func TestGithubAppTokenService_Delete(t *testing.T) {

@@ -68,7 +68,7 @@ func TestStepService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestStepService_List_EmptyJobID(t *testing.T) {
@@ -81,7 +81,7 @@ func TestStepService_List_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty job ID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestStepService_Get(t *testing.T) {
@@ -130,9 +130,9 @@ func TestStepService_Get_EmptyIDs(t *testing.T) {
 		id    string
 		field string
 	}{
-		{"empty org ID", "", "job-1", "step-1", "organization ID"},
-		{"empty job ID", "org-1", "", "step-1", "job ID"},
-		{"empty step ID", "org-1", "job-1", "", "step ID"},
+		{"empty org ID", "", "job-1", "step-1", "organizationID"},
+		{"empty job ID", "org-1", "", "step-1", "jobID"},
+		{"empty step ID", "org-1", "job-1", "", "stepID"},
 	}
 
 	for _, tt := range tests {
@@ -203,7 +203,7 @@ func TestStepService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestStepService_Create_EmptyJobID(t *testing.T) {
@@ -216,7 +216,7 @@ func TestStepService_Create_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty job ID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestStepService_Update(t *testing.T) {
@@ -254,9 +254,9 @@ func TestStepService_Update_EmptyIDs(t *testing.T) {
 		step  *terrakube.Step
 		field string
 	}{
-		{"empty org ID", "", "job-1", &terrakube.Step{ID: "step-1"}, "organization ID"},
-		{"empty job ID", "org-1", "", &terrakube.Step{ID: "step-1"}, "job ID"},
-		{"empty step ID", "org-1", "job-1", &terrakube.Step{ID: ""}, "step ID"},
+		{"empty org ID", "", "job-1", &terrakube.Step{ID: "step-1"}, "organizationID"},
+		{"empty job ID", "org-1", "", &terrakube.Step{ID: "step-1"}, "jobID"},
+		{"empty step ID", "org-1", "job-1", &terrakube.Step{ID: ""}, "stepID"},
 	}
 
 	for _, tt := range tests {
@@ -299,9 +299,9 @@ func TestStepService_Delete_EmptyIDs(t *testing.T) {
 		id    string
 		field string
 	}{
-		{"empty org ID", "", "job-1", "step-1", "organization ID"},
-		{"empty job ID", "org-1", "", "step-1", "job ID"},
-		{"empty step ID", "org-1", "job-1", "", "step ID"},
+		{"empty org ID", "", "job-1", "step-1", "organizationID"},
+		{"empty job ID", "org-1", "", "step-1", "jobID"},
+		{"empty step ID", "org-1", "job-1", "", "stepID"},
 	}
 
 	for _, tt := range tests {

@@ -64,7 +64,7 @@ func (s *OperationsService) Submit(ctx context.Context, ops *AtomicRequest) (*At
 	}
 
 	result := &AtomicResponse{}
-	_, err = s.client.doRaw(ctx, req, result)
+	_, err = s.client.doRaw(req, result)
 	if err != nil {
 		return nil, err
 	}

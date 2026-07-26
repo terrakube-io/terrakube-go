@@ -14,7 +14,7 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 	t.Helper()
 
 	rv := reflect.ValueOf(entity)
-	if rv.Kind() == reflect.Ptr {
+	if rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
 	rt := rv.Type()
@@ -43,7 +43,7 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 		case "attr":
 			if len(parts) > 1 {
 				attrVal := val.Interface()
-				if val.Kind() == reflect.Ptr {
+				if val.Kind() == reflect.Pointer {
 					if val.IsNil() {
 						continue
 					}
@@ -54,14 +54,14 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 		case "relation":
 			if len(parts) > 1 && !val.IsZero() {
 				relVal := val.Interface()
-				if val.Kind() == reflect.Ptr {
+				if val.Kind() == reflect.Pointer {
 					if val.IsNil() {
 						continue
 					}
 					relVal = val.Elem().Interface()
 				}
 				relRV := reflect.ValueOf(relVal)
-				if relRV.Kind() == reflect.Ptr {
+				if relRV.Kind() == reflect.Pointer {
 					relRV = relRV.Elem()
 				}
 				relRT := relRV.Type()
@@ -106,7 +106,7 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 	t.Helper()
 
 	rv := reflect.ValueOf(entities)
-	if rv.Kind() == reflect.Ptr {
+	if rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
 	if rv.Kind() != reflect.Slice {
@@ -116,7 +116,7 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 	items := make([]interface{}, 0, rv.Len())
 	for i := range rv.Len() {
 		elem := rv.Index(i)
-		if elem.Kind() == reflect.Ptr {
+		if elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
 		rt := elem.Type()
@@ -144,7 +144,7 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 			case "attr":
 				if len(parts) > 1 {
 					attrVal := val.Interface()
-					if val.Kind() == reflect.Ptr {
+					if val.Kind() == reflect.Pointer {
 						if val.IsNil() {
 							continue
 						}

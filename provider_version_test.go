@@ -68,7 +68,7 @@ func TestProviderVersionService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestProviderVersionService_List_EmptyProviderID(t *testing.T) {
@@ -81,7 +81,7 @@ func TestProviderVersionService_List_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty provider ID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestProviderVersionService_Get(t *testing.T) {
@@ -142,9 +142,9 @@ func TestProviderVersionService_Get_EmptyIDs(t *testing.T) {
 		id         string
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", "ver-1", "organization ID"},
-		{"empty provider ID", "org-1", "", "ver-1", "provider ID"},
-		{"empty version ID", "org-1", "prov-1", "", "version ID"},
+		{"empty org ID", "", "prov-1", "ver-1", "organizationID"},
+		{"empty provider ID", "org-1", "", "ver-1", "providerID"},
+		{"empty version ID", "org-1", "prov-1", "", "versionID"},
 	}
 
 	for _, tt := range tests {
@@ -217,7 +217,7 @@ func TestProviderVersionService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestProviderVersionService_Create_EmptyProviderID(t *testing.T) {
@@ -230,7 +230,7 @@ func TestProviderVersionService_Create_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty provider ID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestProviderVersionService_Update(t *testing.T) {
@@ -270,9 +270,9 @@ func TestProviderVersionService_Update_EmptyIDs(t *testing.T) {
 		version    *terrakube.ProviderVersion
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", &terrakube.ProviderVersion{ID: "ver-1"}, "organization ID"},
-		{"empty provider ID", "org-1", "", &terrakube.ProviderVersion{ID: "ver-1"}, "provider ID"},
-		{"empty version ID", "org-1", "prov-1", &terrakube.ProviderVersion{ID: ""}, "version ID"},
+		{"empty org ID", "", "prov-1", &terrakube.ProviderVersion{ID: "ver-1"}, "organizationID"},
+		{"empty provider ID", "org-1", "", &terrakube.ProviderVersion{ID: "ver-1"}, "providerID"},
+		{"empty version ID", "org-1", "prov-1", &terrakube.ProviderVersion{ID: ""}, "versionID"},
 	}
 
 	for _, tt := range tests {
@@ -315,9 +315,9 @@ func TestProviderVersionService_Delete_EmptyIDs(t *testing.T) {
 		id         string
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", "ver-1", "organization ID"},
-		{"empty provider ID", "org-1", "", "ver-1", "provider ID"},
-		{"empty version ID", "org-1", "prov-1", "", "version ID"},
+		{"empty org ID", "", "prov-1", "ver-1", "organizationID"},
+		{"empty provider ID", "org-1", "", "ver-1", "providerID"},
+		{"empty version ID", "org-1", "prov-1", "", "versionID"},
 	}
 
 	for _, tt := range tests {

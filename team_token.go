@@ -33,7 +33,7 @@ func (s *TeamTokenService) Create(ctx context.Context, token *TeamToken) (*TeamT
 	}
 
 	result := &TeamToken{}
-	_, err = s.client.doRaw(ctx, req, result)
+	_, err = s.client.doRaw(req, result)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (s *TeamTokenService) List(ctx context.Context) ([]TeamToken, error) {
 	}
 
 	var tokens []TeamToken
-	_, err = s.client.doRaw(ctx, req, &tokens)
+	_, err = s.client.doRaw(req, &tokens)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +70,6 @@ func (s *TeamTokenService) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	_, err = s.client.doRaw(ctx, req, nil)
+	_, err = s.client.doRaw(req, nil)
 	return err
 }

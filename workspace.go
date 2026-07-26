@@ -51,7 +51,7 @@ type WorkspaceService struct {
 // List returns all workspaces for an organization, optionally filtered.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *WorkspaceService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Workspace, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -62,7 +62,7 @@ func (s *WorkspaceService) List(ctx context.Context, orgID string, opts *ListOpt
 // Get retrieves a workspace by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *WorkspaceService) Get(ctx context.Context, orgID, id string) (*Workspace, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 	if err := validateID("id", id); err != nil {
@@ -76,7 +76,7 @@ func (s *WorkspaceService) Get(ctx context.Context, orgID, id string) (*Workspac
 // Create creates a new workspace within an organization.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *WorkspaceService) Create(ctx context.Context, orgID string, ws *Workspace) (*Workspace, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -87,10 +87,10 @@ func (s *WorkspaceService) Create(ctx context.Context, orgID string, ws *Workspa
 // Update modifies an existing workspace within an organization. The workspace's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *WorkspaceService) Update(ctx context.Context, orgID string, ws *Workspace) (*Workspace, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("workspace ID", ws.ID); err != nil {
+	if err := validateID("workspaceID", ws.ID); err != nil {
 		return nil, err
 	}
 
@@ -101,7 +101,7 @@ func (s *WorkspaceService) Update(ctx context.Context, orgID string, ws *Workspa
 // Delete removes a workspace by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *WorkspaceService) Delete(ctx context.Context, orgID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
 	if err := validateID("id", id); err != nil {

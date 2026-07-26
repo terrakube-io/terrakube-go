@@ -24,10 +24,10 @@ type ProviderVersionService struct {
 // List returns all versions for the given provider within an organization.
 // It returns a *ValidationError if orgID or providerID is empty and a *APIError on server errors.
 func (s *ProviderVersionService) List(ctx context.Context, orgID, providerID string, opts *ListOptions) ([]*ProviderVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
 
@@ -38,13 +38,13 @@ func (s *ProviderVersionService) List(ctx context.Context, orgID, providerID str
 // Get returns a single provider version by ID.
 // It returns a *ValidationError if orgID, providerID, or id is empty and a *APIError on server errors.
 func (s *ProviderVersionService) Get(ctx context.Context, orgID, providerID, id string) (*ProviderVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", id); err != nil {
+	if err := validateID("versionID", id); err != nil {
 		return nil, err
 	}
 
@@ -55,10 +55,10 @@ func (s *ProviderVersionService) Get(ctx context.Context, orgID, providerID, id 
 // Create creates a new version for the given provider.
 // It returns a *ValidationError if orgID or providerID is empty and a *APIError on server errors.
 func (s *ProviderVersionService) Create(ctx context.Context, orgID, providerID string, version *ProviderVersion) (*ProviderVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
 
@@ -69,13 +69,13 @@ func (s *ProviderVersionService) Create(ctx context.Context, orgID, providerID s
 // Update modifies an existing provider version. The version's ID field must be set.
 // It returns a *ValidationError if orgID, providerID, or the ID is empty and a *APIError on server errors.
 func (s *ProviderVersionService) Update(ctx context.Context, orgID, providerID string, version *ProviderVersion) (*ProviderVersion, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return nil, err
 	}
-	if err := validateID("version ID", version.ID); err != nil {
+	if err := validateID("versionID", version.ID); err != nil {
 		return nil, err
 	}
 
@@ -86,13 +86,13 @@ func (s *ProviderVersionService) Update(ctx context.Context, orgID, providerID s
 // Delete removes a provider version by ID.
 // It returns a *ValidationError if orgID, providerID, or id is empty and a *APIError on server errors.
 func (s *ProviderVersionService) Delete(ctx context.Context, orgID, providerID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("provider ID", providerID); err != nil {
+	if err := validateID("providerID", providerID); err != nil {
 		return err
 	}
-	if err := validateID("version ID", id); err != nil {
+	if err := validateID("versionID", id); err != nil {
 		return err
 	}
 

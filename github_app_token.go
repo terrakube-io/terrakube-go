@@ -49,7 +49,7 @@ func (s *GithubAppTokenService) Create(ctx context.Context, token *GithubAppToke
 // Update modifies an existing GitHub App token. The token's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *GithubAppTokenService) Update(ctx context.Context, token *GithubAppToken) (*GithubAppToken, error) {
-	if err := validateID("github app token ID", token.ID); err != nil {
+	if err := validateID("githubAppTokenID", token.ID); err != nil {
 		return nil, err
 	}
 

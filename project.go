@@ -23,7 +23,7 @@ type ProjectService struct {
 // List returns all projects for an organization, optionally filtered.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProjectService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Project, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -34,7 +34,7 @@ func (s *ProjectService) List(ctx context.Context, orgID string, opts *ListOptio
 // Get retrieves a project by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProjectService) Get(ctx context.Context, orgID, id string) (*Project, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 	if err := validateID("id", id); err != nil {
@@ -48,7 +48,7 @@ func (s *ProjectService) Get(ctx context.Context, orgID, id string) (*Project, e
 // Create creates a new project within an organization.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProjectService) Create(ctx context.Context, orgID string, project *Project) (*Project, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -59,10 +59,10 @@ func (s *ProjectService) Create(ctx context.Context, orgID string, project *Proj
 // Update modifies an existing project within an organization. The project's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *ProjectService) Update(ctx context.Context, orgID string, project *Project) (*Project, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("project ID", project.ID); err != nil {
+	if err := validateID("projectID", project.ID); err != nil {
 		return nil, err
 	}
 
@@ -73,7 +73,7 @@ func (s *ProjectService) Update(ctx context.Context, orgID string, project *Proj
 // Delete removes a project by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProjectService) Delete(ctx context.Context, orgID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
 	if err := validateID("id", id); err != nil {

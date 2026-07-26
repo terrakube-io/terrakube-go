@@ -90,8 +90,8 @@ func TestVariableService_List_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "organization ID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "organization ID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -111,8 +111,8 @@ func TestVariableService_List_EmptyWorkspaceID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "workspace ID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "workspace ID")
+	if valErr.Field != "workspaceID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "workspaceID")
 	}
 }
 
@@ -156,9 +156,9 @@ func TestVariableService_Get_EmptyIDs(t *testing.T) {
 		varID  string
 		field  string
 	}{
-		{"empty org ID", "", "ws-1", "var-1", "organization ID"},
-		{"empty workspace ID", "org-1", "", "var-1", "workspace ID"},
-		{"empty variable ID", "org-1", "ws-1", "", "variable ID"},
+		{"empty org ID", "", "ws-1", "var-1", "organizationID"},
+		{"empty workspace ID", "org-1", "", "var-1", "workspaceID"},
+		{"empty variable ID", "org-1", "ws-1", "", "variableID"},
 	}
 
 	for _, tt := range tests {

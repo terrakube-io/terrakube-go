@@ -22,7 +22,7 @@ type Organization struct {
 	Jobs                  []*Job                  `jsonapi:"relation,job,omitempty"`
 	Teams                 []*Team                 `jsonapi:"relation,team,omitempty"`
 	Vcs                   []*VCS                  `jsonapi:"relation,vcs,omitempty"`
-	Ssh                   []*SSH                  `jsonapi:"relation,ssh,omitempty"`
+	SSH                   []*SSH                  `jsonapi:"relation,ssh,omitempty"`
 	Agents                []*Agent                `jsonapi:"relation,agent,omitempty"`
 	Templates             []*Template             `jsonapi:"relation,template,omitempty"`
 	OrganizationVariables []*OrganizationVariable `jsonapi:"relation,globalvar,omitempty"`
@@ -63,7 +63,7 @@ func (s *OrganizationService) Create(ctx context.Context, org *Organization) (*O
 // Update modifies an existing organization. The organization's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *OrganizationService) Update(ctx context.Context, org *Organization) (*Organization, error) {
-	if err := validateID("organization ID", org.ID); err != nil {
+	if err := validateID("organizationID", org.ID); err != nil {
 		return nil, err
 	}
 

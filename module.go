@@ -33,7 +33,7 @@ type ModuleService struct {
 // List returns all modules for an organization, optionally filtered.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ModuleService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Module, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -44,7 +44,7 @@ func (s *ModuleService) List(ctx context.Context, orgID string, opts *ListOption
 // Get retrieves a module by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ModuleService) Get(ctx context.Context, orgID, id string) (*Module, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 	if err := validateID("id", id); err != nil {
@@ -58,7 +58,7 @@ func (s *ModuleService) Get(ctx context.Context, orgID, id string) (*Module, err
 // Create creates a new module within an organization.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ModuleService) Create(ctx context.Context, orgID string, mod *Module) (*Module, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -69,10 +69,10 @@ func (s *ModuleService) Create(ctx context.Context, orgID string, mod *Module) (
 // Update modifies an existing module within an organization. The module's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 func (s *ModuleService) Update(ctx context.Context, orgID string, mod *Module) (*Module, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("module ID", mod.ID); err != nil {
+	if err := validateID("moduleID", mod.ID); err != nil {
 		return nil, err
 	}
 
@@ -83,7 +83,7 @@ func (s *ModuleService) Update(ctx context.Context, orgID string, mod *Module) (
 // Delete removes a module by ID within an organization.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ModuleService) Delete(ctx context.Context, orgID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
 	if err := validateID("id", id); err != nil {

@@ -69,7 +69,7 @@ func TestWorkspaceService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Get(t *testing.T) {
@@ -124,7 +124,7 @@ func TestWorkspaceService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Get_EmptyID(t *testing.T) {
@@ -200,7 +200,7 @@ func TestWorkspaceService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Create_BooleanFalse(t *testing.T) {
@@ -259,7 +259,7 @@ func TestWorkspaceService_Update_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Update_EmptyID(t *testing.T) {
@@ -272,7 +272,7 @@ func TestWorkspaceService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "workspace ID")
+	assertValidationError(t, err, "workspaceID")
 }
 
 func TestWorkspaceService_Delete(t *testing.T) {
@@ -300,7 +300,7 @@ func TestWorkspaceService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Delete_EmptyID(t *testing.T) {

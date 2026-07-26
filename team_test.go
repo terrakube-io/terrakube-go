@@ -94,8 +94,8 @@ func TestTeamService_List_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "orgID" {
-		t.Errorf("ValidationError.Field = %q, want %q", valErr.Field, "orgID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("ValidationError.Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -191,8 +191,8 @@ func TestTeamService_Get_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "orgID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "orgID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -291,8 +291,8 @@ func TestTeamService_Create_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "orgID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "orgID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -365,8 +365,8 @@ func TestTeamService_Update_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "orgID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "orgID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -426,8 +426,8 @@ func TestTeamService_Delete_EmptyOrgID(t *testing.T) {
 	if !errors.As(err, &valErr) {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "orgID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "orgID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 

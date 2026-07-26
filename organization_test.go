@@ -208,7 +208,7 @@ func TestOrganizationService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestOrganizationService_Delete(t *testing.T) {

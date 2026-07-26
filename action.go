@@ -54,7 +54,7 @@ func (s *ActionService) Create(ctx context.Context, action *Action) (*Action, er
 // Update modifies an existing action. The action's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, error) {
-	if err := validateID("action ID", action.ID); err != nil {
+	if err := validateID("actionID", action.ID); err != nil {
 		return nil, err
 	}
 
