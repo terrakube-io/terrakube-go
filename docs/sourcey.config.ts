@@ -2,14 +2,17 @@ import { defineConfig } from "sourcey";
 
 // API reference for the Terrakube Go client library.
 //
-// Regenerate the godoc snapshot (requires the Go toolchain):
-//   npx sourcey godoc -m . -o godoc.json
-// Build the static site (no Go required — reads the committed snapshot):
-//   npx sourcey build
+// Build locally (from this directory):
+//   npm install --no-save sourcey
+//   ./node_modules/.bin/sourcey godoc -m .. -o godoc.json   # needs the Go toolchain
+//   ./node_modules/.bin/sourcey build
 //
-// mode:"snapshot" pins to the committed godoc.json so CI and contributors
-// without the Go toolchain can still build the docs (a plain `go list` run
-// in the docs dir would fail when it is not the module dir).
+// godoc.json is a generated artifact and is NOT committed — the Docs workflow
+// regenerates it from the checkout on every build, so the reference can never
+// drift from the source it documents.
+//
+// mode:"snapshot" reads that regenerated file rather than shelling out to
+// `go list` from this directory (which is not the module dir, so it would fail).
 export default defineConfig({
   prettyUrls: "strip",
   baseUrl: "/terrakube-go",
