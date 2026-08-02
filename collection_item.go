@@ -11,10 +11,6 @@ type CollectionItem struct {
 	Category    string      `jsonapi:"attr,category"`
 	Sensitive   bool        `jsonapi:"attr,sensitive"`
 	Hcl         bool        `jsonapi:"attr,hcl"`
-	CreatedBy   *string     `jsonapi:"attr,createdBy"`
-	CreatedDate *string     `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string     `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string     `jsonapi:"attr,updatedDate"`
 	Collection  *Collection `jsonapi:"relation,collection,omitempty"`
 }
 
