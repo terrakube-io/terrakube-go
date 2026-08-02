@@ -9,10 +9,6 @@ type Provider struct {
 	Description       *string            `jsonapi:"attr,description"`
 	Imported          bool               `jsonapi:"attr,imported"`
 	RegistryNamespace *string            `jsonapi:"attr,registryNamespace,omitempty"`
-	CreatedBy         *string            `jsonapi:"attr,createdBy"`
-	CreatedDate       *string            `jsonapi:"attr,createdDate"`
-	UpdatedBy         *string            `jsonapi:"attr,updatedBy"`
-	UpdatedDate       *string            `jsonapi:"attr,updatedDate"`
 	Organization      *Organization      `jsonapi:"relation,organization,omitempty"`
 	Versions          []*ProviderVersion `jsonapi:"relation,version,omitempty"`
 }

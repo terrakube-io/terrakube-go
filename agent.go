@@ -9,10 +9,6 @@ type Agent struct {
 	Description  string        `jsonapi:"attr,description"`
 	URL          string        `jsonapi:"attr,url"`
 	Type         string        `jsonapi:"attr,type,omitempty"`
-	CreatedBy    *string       `jsonapi:"attr,createdBy"`
-	CreatedDate  *string       `jsonapi:"attr,createdDate"`
-	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
 	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 

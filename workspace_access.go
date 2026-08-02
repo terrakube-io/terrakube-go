@@ -12,10 +12,6 @@ type WorkspaceAccess struct {
 	ApproveJob      bool       `jsonapi:"attr,approveJob"`
 	Role            string     `jsonapi:"attr,role,omitempty"`
 	Name            string     `jsonapi:"attr,name"`
-	CreatedBy       *string    `jsonapi:"attr,createdBy"`
-	CreatedDate     *string    `jsonapi:"attr,createdDate"`
-	UpdatedBy       *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string    `jsonapi:"attr,updatedDate"`
 	Workspace       *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 

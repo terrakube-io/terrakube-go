@@ -17,10 +17,6 @@ type Implementation struct {
 	TrustSignature      *string          `jsonapi:"attr,trustSignature"`
 	Source              *string          `jsonapi:"attr,source"`
 	SourceURL           *string          `jsonapi:"attr,sourceUrl"`
-	CreatedBy           *string          `jsonapi:"attr,createdBy"`
-	CreatedDate         *string          `jsonapi:"attr,createdDate"`
-	UpdatedBy           *string          `jsonapi:"attr,updatedBy"`
-	UpdatedDate         *string          `jsonapi:"attr,updatedDate"`
 	Version             *ProviderVersion `jsonapi:"relation,version,omitempty"`
 }
 

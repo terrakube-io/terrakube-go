@@ -11,10 +11,6 @@ type OrganizationVariable struct {
 	Category     string        `jsonapi:"attr,category"`
 	Sensitive    *bool         `jsonapi:"attr,sensitive,omitempty"`
 	Hcl          bool          `jsonapi:"attr,hcl"`
-	CreatedBy    *string       `jsonapi:"attr,createdBy"`
-	CreatedDate  *string       `jsonapi:"attr,createdDate"`
-	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
 	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 

@@ -6,10 +6,6 @@ import "context"
 type CollectionReference struct {
 	ID          string      `jsonapi:"primary,reference"`
 	Description *string     `jsonapi:"attr,description"`
-	CreatedBy   *string     `jsonapi:"attr,createdBy"`
-	CreatedDate *string     `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string     `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string     `jsonapi:"attr,updatedDate"`
 	Workspace   *Workspace  `jsonapi:"relation,workspace,omitempty"`
 	Collection  *Collection `jsonapi:"relation,collection,omitempty"`
 }

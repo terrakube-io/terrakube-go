@@ -150,11 +150,11 @@ func TestVariableService_Get_EmptyIDs(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		orgID  string
-		wsID   string
-		varID  string
-		field  string
+		name  string
+		orgID string
+		wsID  string
+		varID string
+		field string
 	}{
 		{"empty org ID", "", "ws-1", "var-1", "organizationID"},
 		{"empty workspace ID", "org-1", "", "var-1", "workspaceID"},
@@ -444,5 +444,28 @@ func TestVariableService_AuthHeader(t *testing.T) {
 	_, err = client.Variables.Get(context.Background(), "org-1", "ws-1", "var-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestVariable_OmitEmptyFields(t *testing.T) {
+	t.Parallel()
+
+	v := &terrakube.Variable{
+		ID:       "var-1",
+		Key:      "MY_VAR",
+		Category: "ENV",
+	}
+
+	var buf bytes.Buffer
+	if err := jsonapi.MarshalPayload(&buf, v); err != nil {
+		t.Fatalf("failed to marshal: %v", err)
+	}
+
+	payload := buf.String()
+
+	for _, field := range []string{`"description"`, `"incomplete"`, `"createdBy"`, `"createdDate"`, `"updatedBy"`, `"updatedDate"`} {
+		if bytes.Contains([]byte(payload), []byte(field)) {
+			t.Errorf("empty field %s should be omitted from JSON:API payload, but was found", field)
+		}
 	}
 }
