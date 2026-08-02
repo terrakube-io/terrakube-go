@@ -12,12 +12,8 @@ type Module struct {
 	Folder           *string          `jsonapi:"attr,folder"`
 	TagPrefix        *string          `jsonapi:"attr,tagPrefix"`
 	DownloadQuantity int              `jsonapi:"attr,downloadQuantity"`
-	LatestVersion    *string          `jsonapi:"attr,latestVersion"`
-	RegistryPath     *string          `jsonapi:"attr,registryPath"`
-	CreatedBy        *string          `jsonapi:"attr,createdBy"`
-	CreatedDate      *string          `jsonapi:"attr,createdDate"`
-	UpdatedBy        *string          `jsonapi:"attr,updatedBy"`
-	UpdatedDate      *string          `jsonapi:"attr,updatedDate"`
+	LatestVersion    *string          `jsonapi:"attr,latestVersion,omitempty"`
+	RegistryPath     *string          `jsonapi:"attr,registryPath,omitempty"`
 	Organization     *Organization    `jsonapi:"relation,organization,omitempty"`
 	Vcs              *VCS             `jsonapi:"relation,vcs,omitempty"`
 	SSH              *SSH             `jsonapi:"relation,ssh,omitempty"`

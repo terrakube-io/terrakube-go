@@ -7,10 +7,6 @@ type ProviderVersion struct {
 	ID              string            `jsonapi:"primary,version"`
 	VersionNumber   string            `jsonapi:"attr,versionNumber"`
 	Protocols       *string           `jsonapi:"attr,protocols"`
-	CreatedBy       *string           `jsonapi:"attr,createdBy"`
-	CreatedDate     *string           `jsonapi:"attr,createdDate"`
-	UpdatedBy       *string           `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string           `jsonapi:"attr,updatedDate"`
 	Provider        *Provider         `jsonapi:"relation,provider,omitempty"`
 	Implementations []*Implementation `jsonapi:"relation,implementation,omitempty"`
 }

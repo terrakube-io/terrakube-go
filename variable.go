@@ -16,7 +16,7 @@ type Variable struct {
 	CreatedDate *string    `jsonapi:"attr,createdDate,omitempty"`
 	UpdatedBy   *string    `jsonapi:"attr,updatedBy,omitempty"`
 	UpdatedDate *string    `jsonapi:"attr,updatedDate,omitempty"`
-	Workspace   *Workspace `jsonapi:"relation,workspace"`
+	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // VariableService handles communication with the workspace variable endpoints.

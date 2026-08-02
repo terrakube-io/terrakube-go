@@ -17,10 +17,6 @@ type Team struct {
 	PlanJob          bool          `jsonapi:"attr,planJob"`
 	ApproveJob       bool          `jsonapi:"attr,approveJob"`
 	Role             string        `jsonapi:"attr,role"`
-	CreatedBy        *string       `jsonapi:"attr,createdBy"`
-	CreatedDate      *string       `jsonapi:"attr,createdDate"`
-	UpdatedBy        *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate      *string       `jsonapi:"attr,updatedDate"`
 	Organization     *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
