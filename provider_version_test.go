@@ -90,14 +90,8 @@ func TestProviderVersionService_Get(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
 		proto := "5.0"
-		createdBy := "admin"
-		createdDate := "2024-01-01"
-		updatedBy := "admin"
-		updatedDate := "2024-06-01"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ProviderVersion{
 			ID: "ver-1", VersionNumber: "1.0.0", Protocols: &proto,
-			CreatedBy: &createdBy, CreatedDate: &createdDate,
-			UpdatedBy: &updatedBy, UpdatedDate: &updatedDate,
 		})
 	})
 
@@ -114,18 +108,6 @@ func TestProviderVersionService_Get(t *testing.T) {
 	}
 	if version.Protocols == nil || *version.Protocols != "5.0" {
 		t.Errorf("Protocols = %v, want %q", version.Protocols, "5.0")
-	}
-	if version.CreatedBy == nil || *version.CreatedBy != "admin" {
-		t.Errorf("CreatedBy = %v, want %q", version.CreatedBy, "admin")
-	}
-	if version.CreatedDate == nil || *version.CreatedDate != "2024-01-01" {
-		t.Errorf("CreatedDate = %v, want %q", version.CreatedDate, "2024-01-01")
-	}
-	if version.UpdatedBy == nil || *version.UpdatedBy != "admin" {
-		t.Errorf("UpdatedBy = %v, want %q", version.UpdatedBy, "admin")
-	}
-	if version.UpdatedDate == nil || *version.UpdatedDate != "2024-06-01" {
-		t.Errorf("UpdatedDate = %v, want %q", version.UpdatedDate, "2024-06-01")
 	}
 }
 

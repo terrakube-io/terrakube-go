@@ -77,11 +77,8 @@ func TestProviderService_Get(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1", func(w http.ResponseWriter, _ *http.Request) {
 		desc := "AWS provider"
-		createdBy := "admin"
-		createdDate := "2024-01-01"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Provider{
 			ID: "prov-1", Name: "aws", Description: &desc,
-			CreatedBy: &createdBy, CreatedDate: &createdDate,
 		})
 	})
 
@@ -98,12 +95,6 @@ func TestProviderService_Get(t *testing.T) {
 	}
 	if provider.Description == nil || *provider.Description != "AWS provider" {
 		t.Errorf("Description = %v, want %q", provider.Description, "AWS provider")
-	}
-	if provider.CreatedBy == nil || *provider.CreatedBy != "admin" {
-		t.Errorf("CreatedBy = %v, want %q", provider.CreatedBy, "admin")
-	}
-	if provider.CreatedDate == nil || *provider.CreatedDate != "2024-01-01" {
-		t.Errorf("CreatedDate = %v, want %q", provider.CreatedDate, "2024-01-01")
 	}
 }
 
