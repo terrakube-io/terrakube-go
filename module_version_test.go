@@ -320,3 +320,29 @@ func TestModuleVersionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.ModuleVersions.Get(context.Background(), "org-1", "mod-1", "ver-1")
 }
+
+func TestModuleVersionService_GitTag(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	tag := "v1.2.3"
+	srv.HandleFunc("POST /api/v1/organization/org-1/module/mod-1/version", func(w http.ResponseWriter, _ *http.Request) {
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.ModuleVersion{
+			ID:      "ver-1",
+			Version: "1.2.3",
+			GitTag:  &tag,
+		})
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.ModuleVersions.Create(context.Background(), "org-1", "mod-1", &terrakube.ModuleVersion{
+		Version: "1.2.3",
+		GitTag:  &tag,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if created.GitTag == nil || *created.GitTag != "v1.2.3" {
+		t.Errorf("GitTag = %v, want %q", created.GitTag, "v1.2.3")
+	}
+}

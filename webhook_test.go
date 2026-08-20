@@ -709,3 +709,37 @@ func TestWebhookEventService_AuthHeader(t *testing.T) {
 	}
 }
 
+func TestWebhookEventService_PRFlagsAndPathType(t *testing.T) {
+	t.Parallel()
+	srv := testutil.NewServer(t)
+
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, _ *http.Request) {
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.WebhookEvent{
+			ID:                "evt1",
+			Path:              "/terraform/dev/.*",
+			PathType:          "REGEX",
+			PRWorkflowEnabled: true,
+			PRApplyEnabled:    true,
+		})
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.WebhookEvents.Create(context.Background(), "org1", "ws1", "wh1", &terrakube.WebhookEvent{
+		Path:              "/terraform/dev/.*",
+		PathType:          "REGEX",
+		PRWorkflowEnabled: true,
+		PRApplyEnabled:    true,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if created.PathType != "REGEX" {
+		t.Errorf("PathType = %q, want %q", created.PathType, "REGEX")
+	}
+	if !created.PRWorkflowEnabled {
+		t.Errorf("PRWorkflowEnabled = false, want true")
+	}
+	if !created.PRApplyEnabled {
+		t.Errorf("PRApplyEnabled = false, want true")
+	}
+}

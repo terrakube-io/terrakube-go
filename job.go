@@ -22,6 +22,8 @@ type Job struct {
 	TemplateReference *string       `jsonapi:"attr,templateReference"`
 	TerraformPlan     *string       `jsonapi:"attr,terraformPlan"`
 	Via               *string       `jsonapi:"attr,via"`
+	TargetAddrs       []string      `jsonapi:"attr,targetAddrs,omitempty"`
+	ReplaceAddrs      []string      `jsonapi:"attr,replaceAddrs,omitempty"`
 	CreatedBy         *string       `jsonapi:"attr,createdBy"`
 	CreatedDate       *string       `jsonapi:"attr,createdDate"`
 	UpdatedBy         *string       `jsonapi:"attr,updatedBy"`

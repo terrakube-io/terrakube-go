@@ -51,7 +51,7 @@ func doList[T any](c *Client, req *http.Request) ([]*T, error) {
 }
 
 // APIVersion is the Terrakube OpenAPI specification version this library targets.
-const APIVersion = "2.27.0"
+const APIVersion = "2.33.0"
 
 const (
 	apiBasePath  = "/api/v1/"
@@ -62,10 +62,10 @@ const (
 
 // ListOptions specifies optional parameters for List methods.
 type ListOptions struct {
-	Filter  string // Server-side filter expression (e.g. "name==production").
-	Include string // Comma-separated relationship names to sideload (e.g. "workspace,organization").
-	Page    int    // 1-indexed page number; 0 means unset (auto-paginate all pages).
-	PageSize int   // Items per page; 0 means unset (server default).
+	Filter   string // Server-side filter expression (e.g. "name==production").
+	Include  string // Comma-separated relationship names to sideload (e.g. "workspace,organization").
+	Page     int    // 1-indexed page number; 0 means unset (auto-paginate all pages).
+	PageSize int    // Items per page; 0 means unset (server default).
 }
 
 // Client manages communication with the Terrakube API.
@@ -75,41 +75,43 @@ type Client struct {
 	httpClient *http.Client
 	userAgent  string
 
-	Organizations         *OrganizationService
-	Workspaces            *WorkspaceService
-	Modules               *ModuleService
-	Teams                 *TeamService
-	TeamTokens            *TeamTokenService
-	Variables             *VariableService
-	OrganizationVariables *OrganizationVariableService
-	Templates             *TemplateService
-	Tags                  *TagService
-	VCS                   *VCSService
-	SSH                   *SSHService
-	Agents                *AgentService
-	Collections           *CollectionService
-	CollectionItems       *CollectionItemService
-	CollectionReferences  *CollectionReferenceService
-	WorkspaceTags         *WorkspaceTagService
-	WorkspaceAccess       *WorkspaceAccessService
-	WorkspaceSchedules    *WorkspaceScheduleService
-	Webhooks              *WebhookService
-	WebhookEvents         *WebhookEventService
-	History               *HistoryService
-	Jobs                  *JobService
-	Actions               *ActionService
-	Steps                 *StepService
-	Providers             *ProviderService
-	ProviderVersions      *ProviderVersionService
-	Implementations       *ImplementationService
-	ModuleVersions        *ModuleVersionService
-	GithubAppTokens       *GithubAppTokenService
-	Addresses             *AddressService
-	Projects              *ProjectService
-	ProjectAccess         *ProjectAccessService
-	Federated             *FederatedService
-	FederatedClaims       *FederatedClaimService
-	Operations            *OperationsService
+	Organizations              *OrganizationService
+	Workspaces                 *WorkspaceService
+	Modules                    *ModuleService
+	Teams                      *TeamService
+	TeamTokens                 *TeamTokenService
+	Variables                  *VariableService
+	OrganizationVariables      *OrganizationVariableService
+	Templates                  *TemplateService
+	Tags                       *TagService
+	VCS                        *VCSService
+	SSH                        *SSHService
+	Agents                     *AgentService
+	Collections                *CollectionService
+	CollectionItems            *CollectionItemService
+	CollectionReferences       *CollectionReferenceService
+	WorkspaceTags              *WorkspaceTagService
+	WorkspaceAccess            *WorkspaceAccessService
+	WorkspaceSchedules         *WorkspaceScheduleService
+	Webhooks                   *WebhookService
+	WebhookEvents              *WebhookEventService
+	History                    *HistoryService
+	Jobs                       *JobService
+	Actions                    *ActionService
+	Steps                      *StepService
+	Providers                  *ProviderService
+	ProviderVersions           *ProviderVersionService
+	Implementations            *ImplementationService
+	ModuleVersions             *ModuleVersionService
+	GithubAppTokens            *GithubAppTokenService
+	Addresses                  *AddressService
+	Projects                   *ProjectService
+	ProjectAccess              *ProjectAccessService
+	Federated                  *FederatedService
+	FederatedClaims            *FederatedClaimService
+	Operations                 *OperationsService
+	NotificationConfigurations *NotificationConfigurationService
+	NotificationTriggers       *NotificationTriggerService
 }
 
 // Option configures a Client.
@@ -240,6 +242,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.Federated = &FederatedService{crudService[Federated]{client: c, filterKey: "filter[federated]"}}
 	c.FederatedClaims = &FederatedClaimService{crudService[FederatedClaim]{client: c, filterKey: "filter[claims]"}}
 	c.Operations = &OperationsService{client: c}
+	c.NotificationConfigurations = &NotificationConfigurationService{crudService[NotificationConfiguration]{client: c, filterKey: "filter[notification_configuration]"}}
+	c.NotificationTriggers = &NotificationTriggerService{crudService[NotificationTrigger]{client: c, filterKey: "filter[notification_trigger]"}}
 
 	return c, nil
 }
