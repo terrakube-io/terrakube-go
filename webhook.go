@@ -18,17 +18,20 @@ type Webhook struct {
 
 // WebhookEvent represents a webhook event entity.
 type WebhookEvent struct {
-	ID          string   `jsonapi:"primary,webhook_event"`
-	Branch      string   `jsonapi:"attr,branch"`
-	CreatedBy   string   `jsonapi:"attr,createdBy"`
-	CreatedDate string   `jsonapi:"attr,createdDate"`
-	Event       string   `jsonapi:"attr,event"`
-	Path        string   `jsonapi:"attr,path"`
-	Priority    int32    `jsonapi:"attr,priority"`
-	TemplateID  string   `jsonapi:"attr,templateId"`
-	UpdatedBy   string   `jsonapi:"attr,updatedBy"`
-	UpdatedDate string   `jsonapi:"attr,updatedDate"`
-	Webhook     *Webhook `jsonapi:"relation,webhook,omitempty"`
+	ID                string   `jsonapi:"primary,webhook_event"`
+	Branch            string   `jsonapi:"attr,branch"`
+	CreatedBy         string   `jsonapi:"attr,createdBy"`
+	CreatedDate       string   `jsonapi:"attr,createdDate"`
+	Event             string   `jsonapi:"attr,event"`
+	Path              string   `jsonapi:"attr,path"`
+	PathType          string   `jsonapi:"attr,pathType,omitempty"`
+	Priority          int32    `jsonapi:"attr,priority"`
+	TemplateID        string   `jsonapi:"attr,templateId"`
+	PRWorkflowEnabled bool     `jsonapi:"attr,prWorkflowEnabled,omitempty"`
+	PRApplyEnabled    bool     `jsonapi:"attr,prApplyEnabled,omitempty"`
+	UpdatedBy         string   `jsonapi:"attr,updatedBy"`
+	UpdatedDate       string   `jsonapi:"attr,updatedDate"`
+	Webhook           *Webhook `jsonapi:"relation,webhook,omitempty"`
 }
 
 // WebhookService handles communication with the webhook related methods

@@ -4,25 +4,26 @@ import "context"
 
 // Organization represents a Terrakube organization resource.
 type Organization struct {
-	ID                    string                  `jsonapi:"primary,organization"`
-	Name                  string                  `jsonapi:"attr,name"`
-	Description           *string                 `jsonapi:"attr,description"`
-	ExecutionMode         string                  `jsonapi:"attr,executionMode"`
-	Disabled              bool                    `jsonapi:"attr,disabled"`
-	Icon                  *string                 `jsonapi:"attr,icon"`
-	Collections           []*Collection           `jsonapi:"relation,collection,omitempty"`
-	Workspaces            []*Workspace            `jsonapi:"relation,workspace,omitempty"`
-	Projects              []*Project              `jsonapi:"relation,project,omitempty"`
-	Modules               []*Module               `jsonapi:"relation,module,omitempty"`
-	Providers             []*Provider             `jsonapi:"relation,provider,omitempty"`
-	Jobs                  []*Job                  `jsonapi:"relation,job,omitempty"`
-	Teams                 []*Team                 `jsonapi:"relation,team,omitempty"`
-	Vcs                   []*VCS                  `jsonapi:"relation,vcs,omitempty"`
-	SSH                   []*SSH                  `jsonapi:"relation,ssh,omitempty"`
-	Agents                []*Agent                `jsonapi:"relation,agent,omitempty"`
-	Templates             []*Template             `jsonapi:"relation,template,omitempty"`
-	OrganizationVariables []*OrganizationVariable `jsonapi:"relation,globalvar,omitempty"`
-	Tags                  []*Tag                  `jsonapi:"relation,tag,omitempty"`
+	ID                         string                       `jsonapi:"primary,organization"`
+	Name                       string                       `jsonapi:"attr,name"`
+	Description                *string                      `jsonapi:"attr,description"`
+	ExecutionMode              string                       `jsonapi:"attr,executionMode"`
+	Disabled                   bool                         `jsonapi:"attr,disabled"`
+	Icon                       *string                      `jsonapi:"attr,icon"`
+	Collections                []*Collection                `jsonapi:"relation,collection,omitempty"`
+	Workspaces                 []*Workspace                 `jsonapi:"relation,workspace,omitempty"`
+	Projects                   []*Project                   `jsonapi:"relation,project,omitempty"`
+	Modules                    []*Module                    `jsonapi:"relation,module,omitempty"`
+	Providers                  []*Provider                  `jsonapi:"relation,provider,omitempty"`
+	Jobs                       []*Job                       `jsonapi:"relation,job,omitempty"`
+	Teams                      []*Team                      `jsonapi:"relation,team,omitempty"`
+	Vcs                        []*VCS                       `jsonapi:"relation,vcs,omitempty"`
+	SSH                        []*SSH                       `jsonapi:"relation,ssh,omitempty"`
+	Agents                     []*Agent                     `jsonapi:"relation,agent,omitempty"`
+	Templates                  []*Template                  `jsonapi:"relation,template,omitempty"`
+	OrganizationVariables      []*OrganizationVariable      `jsonapi:"relation,globalvar,omitempty"`
+	Tags                       []*Tag                       `jsonapi:"relation,tag,omitempty"`
+	NotificationConfigurations []*NotificationConfiguration `jsonapi:"relation,notificationConfiguration,omitempty"`
 }
 
 // OrganizationService handles communication with the organization related

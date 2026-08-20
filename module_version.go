@@ -7,6 +7,7 @@ type ModuleVersion struct {
 	ID          string  `jsonapi:"primary,version"`
 	Version     string  `jsonapi:"attr,version"`
 	Commit      *string `jsonapi:"attr,commit"`
+	GitTag      *string `jsonapi:"attr,gitTag,omitempty"`
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`

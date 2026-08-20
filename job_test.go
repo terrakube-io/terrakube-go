@@ -288,3 +288,31 @@ func TestJobService_AuthHeader(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+func TestJobService_TargetAndReplaceAddrs(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/organization/org-1/job", func(w http.ResponseWriter, _ *http.Request) {
+		job := newTestJob()
+		job.TargetAddrs = []string{"module.vpc.aws_subnet.public[0]"}
+		job.ReplaceAddrs = []string{"aws_instance.web"}
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, job)
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.Jobs.Create(context.Background(), "org-1", &terrakube.Job{
+		Command:      "terraform apply",
+		TargetAddrs:  []string{"module.vpc.aws_subnet.public[0]"},
+		ReplaceAddrs: []string{"aws_instance.web"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(created.TargetAddrs) != 1 || created.TargetAddrs[0] != "module.vpc.aws_subnet.public[0]" {
+		t.Errorf("TargetAddrs = %v, want [module.vpc.aws_subnet.public[0]]", created.TargetAddrs)
+	}
+	if len(created.ReplaceAddrs) != 1 || created.ReplaceAddrs[0] != "aws_instance.web" {
+		t.Errorf("ReplaceAddrs = %v, want [aws_instance.web]", created.ReplaceAddrs)
+	}
+}

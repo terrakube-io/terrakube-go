@@ -1151,41 +1151,123 @@ type OperationsSubmitter interface {
 	Submit(ctx context.Context, ops *AtomicRequest) (*AtomicResponse, error)
 }
 
+// NotificationConfigurationLister lists organization-level notification configurations.
+type NotificationConfigurationLister interface {
+	List(ctx context.Context, orgID string, opts *ListOptions) ([]*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationWorkspaceLister lists workspace-level notification configurations.
+type NotificationConfigurationWorkspaceLister interface {
+	ListByWorkspace(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationGetter retrieves a single notification configuration.
+type NotificationConfigurationGetter interface {
+	Get(ctx context.Context, orgID, id string) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationCreator creates organization-level notification configurations.
+type NotificationConfigurationCreator interface {
+	Create(ctx context.Context, orgID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationWorkspaceCreator creates workspace-level notification configurations.
+type NotificationConfigurationWorkspaceCreator interface {
+	CreateForWorkspace(ctx context.Context, orgID, workspaceID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationUpdater updates notification configurations.
+type NotificationConfigurationUpdater interface {
+	Update(ctx context.Context, orgID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationDeleter deletes notification configurations.
+type NotificationConfigurationDeleter interface {
+	Delete(ctx context.Context, orgID, id string) error
+}
+
+// NotificationConfigurationCRUD combines all notification configuration operations.
+type NotificationConfigurationCRUD interface {
+	NotificationConfigurationLister
+	NotificationConfigurationWorkspaceLister
+	NotificationConfigurationGetter
+	NotificationConfigurationCreator
+	NotificationConfigurationWorkspaceCreator
+	NotificationConfigurationUpdater
+	NotificationConfigurationDeleter
+}
+
+// NotificationTriggerLister lists notification triggers.
+type NotificationTriggerLister interface {
+	List(ctx context.Context, orgID, configID string, opts *ListOptions) ([]*NotificationTrigger, error)
+}
+
+// NotificationTriggerGetter retrieves a single notification trigger.
+type NotificationTriggerGetter interface {
+	Get(ctx context.Context, orgID, configID, id string) (*NotificationTrigger, error)
+}
+
+// NotificationTriggerCreator creates notification triggers.
+type NotificationTriggerCreator interface {
+	Create(ctx context.Context, orgID, configID string, trigger *NotificationTrigger) (*NotificationTrigger, error)
+}
+
+// NotificationTriggerUpdater updates notification triggers.
+type NotificationTriggerUpdater interface {
+	Update(ctx context.Context, orgID, configID string, trigger *NotificationTrigger) (*NotificationTrigger, error)
+}
+
+// NotificationTriggerDeleter deletes notification triggers.
+type NotificationTriggerDeleter interface {
+	Delete(ctx context.Context, orgID, configID, id string) error
+}
+
+// NotificationTriggerCRUD combines all notification trigger operations.
+type NotificationTriggerCRUD interface {
+	NotificationTriggerLister
+	NotificationTriggerGetter
+	NotificationTriggerCreator
+	NotificationTriggerUpdater
+	NotificationTriggerDeleter
+}
+
 // Compile-time interface satisfaction checks.
 var (
-	_ OrganizationCRUD         = (*OrganizationService)(nil)
-	_ WorkspaceCRUD            = (*WorkspaceService)(nil)
-	_ ModuleCRUD               = (*ModuleService)(nil)
-	_ TeamCRUD                 = (*TeamService)(nil)
-	_ TeamTokenCRUD            = (*TeamTokenService)(nil)
-	_ VariableCRUD             = (*VariableService)(nil)
-	_ OrganizationVariableCRUD = (*OrganizationVariableService)(nil)
-	_ TemplateCRUD             = (*TemplateService)(nil)
-	_ TagCRUD                  = (*TagService)(nil)
-	_ VCSCRUD                  = (*VCSService)(nil)
-	_ SSHCRUD                  = (*SSHService)(nil)
-	_ AgentCRUD                = (*AgentService)(nil)
-	_ CollectionCRUD           = (*CollectionService)(nil)
-	_ CollectionItemCRUD       = (*CollectionItemService)(nil)
-	_ CollectionReferenceCRUD  = (*CollectionReferenceService)(nil)
-	_ WorkspaceTagCRUD         = (*WorkspaceTagService)(nil)
-	_ WorkspaceAccessCRUD      = (*WorkspaceAccessService)(nil)
-	_ WorkspaceScheduleCRUD    = (*WorkspaceScheduleService)(nil)
-	_ WebhookCRUD              = (*WebhookService)(nil)
-	_ WebhookEventCRUD         = (*WebhookEventService)(nil)
-	_ HistoryCRUD              = (*HistoryService)(nil)
-	_ JobCRUD                  = (*JobService)(nil)
-	_ ActionCRUD               = (*ActionService)(nil)
-	_ StepCRUD                 = (*StepService)(nil)
-	_ ProviderCRUD             = (*ProviderService)(nil)
-	_ ProviderVersionCRUD      = (*ProviderVersionService)(nil)
-	_ ImplementationCRUD       = (*ImplementationService)(nil)
-	_ ModuleVersionCRUD        = (*ModuleVersionService)(nil)
-	_ GithubAppTokenCRUD       = (*GithubAppTokenService)(nil)
-	_ AddressCRUD              = (*AddressService)(nil)
-	_ ProjectCRUD              = (*ProjectService)(nil)
-	_ ProjectAccessCRUD        = (*ProjectAccessService)(nil)
-	_ FederatedCRUD            = (*FederatedService)(nil)
-	_ FederatedClaimCRUD       = (*FederatedClaimService)(nil)
-	_ OperationsSubmitter      = (*OperationsService)(nil)
+	_ OrganizationCRUD              = (*OrganizationService)(nil)
+	_ WorkspaceCRUD                 = (*WorkspaceService)(nil)
+	_ ModuleCRUD                    = (*ModuleService)(nil)
+	_ TeamCRUD                      = (*TeamService)(nil)
+	_ TeamTokenCRUD                 = (*TeamTokenService)(nil)
+	_ VariableCRUD                  = (*VariableService)(nil)
+	_ OrganizationVariableCRUD      = (*OrganizationVariableService)(nil)
+	_ TemplateCRUD                  = (*TemplateService)(nil)
+	_ TagCRUD                       = (*TagService)(nil)
+	_ VCSCRUD                       = (*VCSService)(nil)
+	_ SSHCRUD                       = (*SSHService)(nil)
+	_ AgentCRUD                     = (*AgentService)(nil)
+	_ CollectionCRUD                = (*CollectionService)(nil)
+	_ CollectionItemCRUD            = (*CollectionItemService)(nil)
+	_ CollectionReferenceCRUD       = (*CollectionReferenceService)(nil)
+	_ WorkspaceTagCRUD              = (*WorkspaceTagService)(nil)
+	_ WorkspaceAccessCRUD           = (*WorkspaceAccessService)(nil)
+	_ WorkspaceScheduleCRUD         = (*WorkspaceScheduleService)(nil)
+	_ WebhookCRUD                   = (*WebhookService)(nil)
+	_ WebhookEventCRUD              = (*WebhookEventService)(nil)
+	_ HistoryCRUD                   = (*HistoryService)(nil)
+	_ JobCRUD                       = (*JobService)(nil)
+	_ ActionCRUD                    = (*ActionService)(nil)
+	_ StepCRUD                      = (*StepService)(nil)
+	_ ProviderCRUD                  = (*ProviderService)(nil)
+	_ ProviderVersionCRUD           = (*ProviderVersionService)(nil)
+	_ ImplementationCRUD            = (*ImplementationService)(nil)
+	_ ModuleVersionCRUD             = (*ModuleVersionService)(nil)
+	_ GithubAppTokenCRUD            = (*GithubAppTokenService)(nil)
+	_ AddressCRUD                   = (*AddressService)(nil)
+	_ ProjectCRUD                   = (*ProjectService)(nil)
+	_ ProjectAccessCRUD             = (*ProjectAccessService)(nil)
+	_ FederatedCRUD                 = (*FederatedService)(nil)
+	_ FederatedClaimCRUD            = (*FederatedClaimService)(nil)
+	_ OperationsSubmitter           = (*OperationsService)(nil)
+	_ NotificationConfigurationCRUD = (*NotificationConfigurationService)(nil)
+	_ NotificationTriggerCRUD       = (*NotificationTriggerService)(nil)
 )
