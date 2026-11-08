@@ -24,6 +24,7 @@ type Job struct {
 	Via               *string       `jsonapi:"attr,via"`
 	TargetAddrs       []string      `jsonapi:"attr,targetAddrs,omitempty"`
 	ReplaceAddrs      []string      `jsonapi:"attr,replaceAddrs,omitempty"`
+	QueuedAt          *string       `jsonapi:"attr,queuedAt,omitempty"` // set by the server, 2.35+
 	CreatedBy         *string       `jsonapi:"attr,createdBy"`
 	CreatedDate       *string       `jsonapi:"attr,createdDate"`
 	UpdatedBy         *string       `jsonapi:"attr,updatedBy"`

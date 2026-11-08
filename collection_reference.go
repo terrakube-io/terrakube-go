@@ -2,11 +2,27 @@ package terrakube
 
 import "context"
 
+// Scopes of a collection reference: what the collection is attached to.
+const (
+	// CollectionReferenceScopeWorkspace attaches the collection to one workspace. It is the default.
+	CollectionReferenceScopeWorkspace = "WORKSPACE"
+	// CollectionReferenceScopeProject attaches the collection to every workspace in a project.
+	CollectionReferenceScopeProject = "PROJECT"
+	// CollectionReferenceScopeOrganization attaches the collection to every workspace in the organization.
+	CollectionReferenceScopeOrganization = "ORGANIZATION"
+)
+
 // CollectionReference represents a reference within a Terrakube collection.
+//
+// Set Workspace for a workspace reference, Project (and Scope PROJECT) for a project reference, or Scope
+// ORGANIZATION alone for an organization wide one. Scope is optional and omitted from the payload when unset, so
+// workspace references keep working against Terrakube versions that predate scopes (before 2.35).
 type CollectionReference struct {
 	ID          string      `jsonapi:"primary,reference"`
 	Description *string     `jsonapi:"attr,description"`
+	Scope       *string     `jsonapi:"attr,scope,omitempty"`
 	Workspace   *Workspace  `jsonapi:"relation,workspace,omitempty"`
+	Project     *Project    `jsonapi:"relation,project,omitempty"`
 	Collection  *Collection `jsonapi:"relation,collection,omitempty"`
 }
 

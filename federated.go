@@ -4,10 +4,10 @@ import "context"
 
 // Federated represents a Terrakube federated identity provider resource.
 type Federated struct {
-	ID        string           `jsonapi:"primary,federated"`
-	Name      string           `jsonapi:"attr,name"`
-	IssuerURL string           `jsonapi:"attr,issuerUrl"`
-	Audience  string           `jsonapi:"attr,audience"`
+	ID        string            `jsonapi:"primary,federated"`
+	Name      string            `jsonapi:"attr,name"`
+	IssuerURL string            `jsonapi:"attr,issuerUrl"`
+	Audience  string            `jsonapi:"attr,audience"`
 	Claims    []*FederatedClaim `jsonapi:"relation,claims,omitempty"`
 }
 

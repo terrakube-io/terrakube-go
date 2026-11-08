@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/google/jsonapi"
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
-	"github.com/google/jsonapi"
 )
 
 func TestTeamService_List(t *testing.T) {

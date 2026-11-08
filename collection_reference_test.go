@@ -2,7 +2,9 @@ package terrakube_test
 
 import (
 	"context"
+	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
@@ -271,4 +273,56 @@ func TestCollectionReferenceService_AuthHeader(t *testing.T) {
 
 	client := newTestClient(t, srv)
 	_, _ = client.CollectionReferences.Get(context.Background(), "ref-1")
+}
+
+func TestCollectionReferenceService_Create_ProjectScope(t *testing.T) {
+	t.Parallel()
+
+	scope := terrakube.CollectionReferenceScopeProject
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/organization/org-1/collection/col-1/reference", func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		for _, want := range []string{`"scope":"PROJECT"`, `"project"`, `"id":"proj-1"`} {
+			if !strings.Contains(string(body), want) {
+				t.Errorf("request body %s is missing %s", body, want)
+			}
+		}
+		if strings.Contains(string(body), `"workspace"`) {
+			t.Errorf("a project reference must not carry a workspace: %s", body)
+		}
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.CollectionReference{ID: "ref-2", Scope: &scope})
+	})
+
+	client := newTestClient(t, srv)
+	ref, err := client.CollectionReferences.Create(context.Background(), "org-1", "col-1", &terrakube.CollectionReference{
+		Scope:   &scope,
+		Project: &terrakube.Project{ID: "proj-1"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if ref.Scope == nil || *ref.Scope != terrakube.CollectionReferenceScopeProject {
+		t.Errorf("Scope = %v, want PROJECT", ref.Scope)
+	}
+}
+
+func TestCollectionReferenceService_Create_WorkspaceReferenceOmitsScope(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/organization/org-1/collection/col-1/reference", func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "scope") {
+			t.Errorf("workspace references must not send a scope: %s", body)
+		}
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, newTestCollectionReference())
+	})
+
+	client := newTestClient(t, srv)
+	_, err := client.CollectionReferences.Create(context.Background(), "org-1", "col-1", &terrakube.CollectionReference{
+		Workspace: &terrakube.Workspace{ID: "ws-1"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 }
