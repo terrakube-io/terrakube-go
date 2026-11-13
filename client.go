@@ -84,9 +84,10 @@ const (
 //
 // Page and PageSize request one specific page. Leave both at zero to list the
 // collection: resource types the library pages are fetched page by page until
-// the server reports no more; all others, and any type for which the server
-// refuses paging, are fetched in one request, so the result stops at any limit
-// the server applies to that type. Links in responses are never followed.
+// the server reports no more, ordered by id; all others, and any type for
+// which the server refuses paging, are fetched in one request in the server's
+// order, so the result stops at any limit the server applies to that type.
+// Links in responses are never followed.
 //
 // The server accepts Page and PageSize only for some resource types: workspace,
 // workspace tag, action, federated, agent, organization variable, and workspace
