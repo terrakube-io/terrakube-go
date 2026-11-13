@@ -55,11 +55,25 @@ jobs:
           cp "$(mkcert -CAROOT)/rootCA.pem" rootCA.pem
           echo "127.0.0.1 terrakube-api.localhost terrakube-dex.localhost" | sudo tee -a /etc/hosts
 
+      # The stack's .env points the API at "terrakube-redis" and
+      # "terrakube-minio", names its compose file does not define.
       - name: Start Terrakube
         working-directory: ${{ env.COMPOSE_DIR }}
         env:
           TK_VERSION: ${{ steps.api.outputs.version }}
-        run: docker compose up -d --quiet-pull
+        run: |
+          cat > docker-compose.override.yml <<'YAML'
+          services:
+            redis-service:
+              networks:
+                default:
+                  aliases: [terrakube-redis]
+            minio:
+              networks:
+                default:
+                  aliases: [terrakube-minio]
+          YAML
+          docker compose up -d --quiet-pull
 
       - name: Wait for the API
         working-directory: ${{ env.COMPOSE_DIR }}
@@ -73,8 +87,10 @@ jobs:
           done
           echo "The API did not become healthy in 5 minutes"
           docker compose ps --all
-          # The start of the log holds the reason; the end is the JVM's exit report.
-          docker compose logs --no-log-prefix terrakube-api | head -n 250
+          # Without the database migration lines and the JVM's exit report,
+          # what is left is short and holds the reason.
+          docker compose logs --no-log-prefix terrakube-api \
+            | grep -vE 'liquibase|^\s*$|^\s*(-|\()|^\s+at ' | tail -n 120
           exit 1
 
       # Nobody can log in here, so the test signs its own personal access token.
