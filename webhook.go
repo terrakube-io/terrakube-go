@@ -5,11 +5,7 @@ import "context"
 // Webhook represents a workspace webhook (v1 flat format).
 type Webhook struct {
 	ID           string          `jsonapi:"primary,webhook"`
-	Path         string          `jsonapi:"attr,path"`       // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	Branch       string          `jsonapi:"attr,branch"`     // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	TemplateID   string          `jsonapi:"attr,templateId"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	RemoteHookID string          `jsonapi:"attr,remoteHookId"`
-	Event        string          `jsonapi:"attr,event"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	CreatedBy    *string         `jsonapi:"attr,createdBy"`
 	CreatedDate  *string         `jsonapi:"attr,createdDate"`
 	UpdatedBy    *string         `jsonapi:"attr,updatedBy"`

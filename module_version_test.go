@@ -89,7 +89,7 @@ func TestModuleVersionService_Get(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ModuleVersion{
-			ID: "ver-1", Version: "1.0.0", Commit: new("abc123"), CreatedBy: new("admin"),
+			ID: "ver-1", Version: "1.0.0", Commit: new("abc123"), Status: new("active"),
 		})
 	})
 
@@ -107,8 +107,8 @@ func TestModuleVersionService_Get(t *testing.T) {
 	if ver.Commit == nil || *ver.Commit != "abc123" {
 		t.Errorf("Commit = %v, want %q", ver.Commit, "abc123")
 	}
-	if ver.CreatedBy == nil || *ver.CreatedBy != "admin" {
-		t.Errorf("CreatedBy = %v, want %q", ver.CreatedBy, "admin")
+	if ver.Status == nil || *ver.Status != "active" {
+		t.Errorf("Status = %v, want %q", ver.Status, "active")
 	}
 }
 

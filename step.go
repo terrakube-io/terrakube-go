@@ -8,12 +8,7 @@ type Step struct {
 	Name              string              `jsonapi:"attr,name"`
 	Output            *string             `jsonapi:"attr,output"`
 	Status            string              `jsonapi:"attr,status"`
-	LogStatus         *string             `jsonapi:"attr,logStatus,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	StepNumber        int                 `jsonapi:"attr,stepNumber"`
-	CreatedBy         *string             `jsonapi:"attr,createdBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	CreatedDate       *string             `jsonapi:"attr,createdDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	UpdatedBy         *string             `jsonapi:"attr,updatedBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	UpdatedDate       *string             `jsonapi:"attr,updatedDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	DeliveryRevision  *int64              `jsonapi:"attr,deliveryRevision"`
 	DeliveryState     *string             `jsonapi:"attr,deliveryState"`
 	DeliveryTimestamp *int64              `jsonapi:"attr,deliveryTimestamp"`

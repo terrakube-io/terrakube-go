@@ -15,8 +15,8 @@ func TestAddressService_List(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/address", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Address{
-			{ID: "addr-1", Name: "aws_instance.web", Type: "resource"},
-			{ID: "addr-2", Name: "module.vpc", Type: "module"},
+			{ID: "addr-1", Name: "aws_instance.web"},
+			{ID: "addr-2", Name: "module.vpc"},
 		})
 	})
 
@@ -43,7 +43,7 @@ func TestAddressService_List_WithFilter(t *testing.T) {
 			t.Error("expected filter query parameter")
 		}
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Address{
-			{ID: "addr-1", Name: "aws_instance.web", Type: "resource"},
+			{ID: "addr-1", Name: "aws_instance.web"},
 		})
 	})
 
@@ -89,7 +89,7 @@ func TestAddressService_Get(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/address/addr-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Address{
-			ID: "addr-1", Name: "aws_instance.web", Type: "resource", CreatedBy: new("admin"),
+			ID: "addr-1", Name: "aws_instance.web", CreatedBy: new("admin"),
 		})
 	})
 
@@ -103,9 +103,6 @@ func TestAddressService_Get(t *testing.T) {
 	}
 	if addr.Name != "aws_instance.web" {
 		t.Errorf("Name = %q, want %q", addr.Name, "aws_instance.web")
-	}
-	if addr.Type != "resource" {
-		t.Errorf("Type = %q, want %q", addr.Type, "resource")
 	}
 	if addr.CreatedBy == nil || *addr.CreatedBy != "admin" {
 		t.Errorf("CreatedBy = %v, want %q", addr.CreatedBy, "admin")
@@ -178,13 +175,13 @@ func TestAddressService_Create(t *testing.T) {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Address{
-			ID: "addr-new", Name: "aws_s3_bucket.data", Type: "resource",
+			ID: "addr-new", Name: "aws_s3_bucket.data",
 		})
 	})
 
 	client := newTestClient(t, srv)
 	addr, err := client.Addresses.Create(context.Background(), "org-1", "job-1", &terrakube.Address{
-		Name: "aws_s3_bucket.data", Type: "resource",
+		Name: "aws_s3_bucket.data",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -203,13 +200,13 @@ func TestAddressService_Update(t *testing.T) {
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/job/job-1/address/addr-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Address{
-			ID: "addr-1", Name: "aws_instance.updated", Type: "resource",
+			ID: "addr-1", Name: "aws_instance.updated",
 		})
 	})
 
 	client := newTestClient(t, srv)
 	addr, err := client.Addresses.Update(context.Background(), "org-1", "job-1", &terrakube.Address{
-		ID: "addr-1", Name: "aws_instance.updated", Type: "resource",
+		ID: "addr-1", Name: "aws_instance.updated",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -311,7 +308,7 @@ func TestAddressService_AuthHeader(t *testing.T) {
 			t.Errorf("Authorization = %q, want %q", auth, "Bearer test-token")
 		}
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Address{
-			ID: "addr-1", Name: "aws_instance.web", Type: "resource",
+			ID: "addr-1", Name: "aws_instance.web",
 		})
 	})
 

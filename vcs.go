@@ -4,28 +4,26 @@ import "context"
 
 // VCS represents a version control system connection in Terrakube.
 type VCS struct {
-	ID              string        `jsonapi:"primary,vcs"`
-	Name            string        `jsonapi:"attr,name"`
-	Description     string        `jsonapi:"attr,description"`
-	VcsType         string        `jsonapi:"attr,vcsType"`
-	ConnectionType  string        `jsonapi:"attr,connectionType"`
-	ClientID        string        `jsonapi:"attr,clientId"`
-	ClientSecret    string        `jsonapi:"attr,clientSecret"`
-	PrivateKey      string        `jsonapi:"attr,privateKey"`
-	Endpoint        string        `jsonapi:"attr,endpoint"`
-	APIURL          string        `jsonapi:"attr,apiUrl"`
-	Status          string        `jsonapi:"attr,status"`
-	Callback        *string       `jsonapi:"attr,callback"`
-	AccessToken     *string       `jsonapi:"attr,accessToken"`
-	RefreshToken    *string       `jsonapi:"attr,refreshToken,omitempty"`    // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	TokenExpiration *string       `jsonapi:"attr,tokenExpiration,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	RedirectURL     *string       `jsonapi:"attr,redirectUrl"`
-	CreatedBy       *string       `jsonapi:"attr,createdBy"`
-	CreatedDate     *string       `jsonapi:"attr,createdDate"`
-	UpdatedBy       *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string       `jsonapi:"attr,updatedDate"`
-	Organization    *Organization `jsonapi:"relation,organization,omitempty"`
-	Workspaces      []*Workspace  `jsonapi:"relation,workspace,omitempty"`
+	ID             string        `jsonapi:"primary,vcs"`
+	Name           string        `jsonapi:"attr,name"`
+	Description    string        `jsonapi:"attr,description"`
+	VcsType        string        `jsonapi:"attr,vcsType"`
+	ConnectionType string        `jsonapi:"attr,connectionType"`
+	ClientID       string        `jsonapi:"attr,clientId"`
+	ClientSecret   string        `jsonapi:"attr,clientSecret"`
+	PrivateKey     string        `jsonapi:"attr,privateKey"`
+	Endpoint       string        `jsonapi:"attr,endpoint"`
+	APIURL         string        `jsonapi:"attr,apiUrl"`
+	Status         string        `jsonapi:"attr,status"`
+	Callback       *string       `jsonapi:"attr,callback"`
+	AccessToken    *string       `jsonapi:"attr,accessToken"`
+	RedirectURL    *string       `jsonapi:"attr,redirectUrl"`
+	CreatedBy      *string       `jsonapi:"attr,createdBy"`
+	CreatedDate    *string       `jsonapi:"attr,createdDate"`
+	UpdatedBy      *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate    *string       `jsonapi:"attr,updatedDate"`
+	Organization   *Organization `jsonapi:"relation,organization,omitempty"`
+	Workspaces     []*Workspace  `jsonapi:"relation,workspace,omitempty"`
 }
 
 // VCSService handles communication with the VCS related methods of the Terrakube API.
