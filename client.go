@@ -51,7 +51,7 @@ func (c *Client) doList[T any](req *http.Request) ([]*T, error) {
 }
 
 // APIVersion is the Terrakube OpenAPI specification version this library targets.
-const APIVersion = "2.33.0"
+const APIVersion = "2.34.1"
 
 const (
 	apiBasePath  = "/api/v1/"
@@ -112,6 +112,13 @@ type Client struct {
 	Operations                 *OperationsService
 	NotificationConfigurations *NotificationConfigurationService
 	NotificationTriggers       *NotificationTriggerService
+	PolicyAttachments          *PolicyAttachmentService
+	PolicyEvaluations          *PolicyEvaluationService
+	PolicyExemptions           *PolicyExemptionService
+	PolicyOverrides            *PolicyOverrideService
+	PolicySets                 *PolicySetService
+	PolicySetParameters        *PolicySetParameterService
+	RunTriggers                *RunTriggerService
 }
 
 // Option configures a Client.
@@ -234,16 +241,23 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.Providers = &ProviderService{client: c, filterKey: "filter[provider]"}
 	c.ProviderVersions = &ProviderVersionService{client: c, filterKey: "filter[version]"}
 	c.Implementations = &ImplementationService{client: c, filterKey: "filter[implementation]"}
-	c.ModuleVersions = &ModuleVersionService{client: c, filterKey: "filter[version]"}
+	c.ModuleVersions = &ModuleVersionService{client: c, filterKey: "filter[module_version]"}
 	c.GithubAppTokens = &GithubAppTokenService{client: c}
 	c.Addresses = &AddressService{client: c, filterKey: "filter[address]"}
 	c.Projects = &ProjectService{client: c, filterKey: "filter[project]"}
-	c.ProjectAccess = &ProjectAccessService{client: c, filterKey: "filter[projectAccess]"}
+	c.ProjectAccess = &ProjectAccessService{client: c, filterKey: "filter[project_access]"}
 	c.Federated = &FederatedService{client: c, filterKey: "filter[federated]"}
-	c.FederatedClaims = &FederatedClaimService{client: c, filterKey: "filter[claims]"}
+	c.FederatedClaims = &FederatedClaimService{client: c, filterKey: "filter[federated_claim]"}
 	c.Operations = &OperationsService{client: c}
 	c.NotificationConfigurations = &NotificationConfigurationService{client: c, filterKey: "filter[notification_configuration]"}
 	c.NotificationTriggers = &NotificationTriggerService{client: c, filterKey: "filter[notification_trigger]"}
+	c.PolicyAttachments = &PolicyAttachmentService{client: c, filterKey: "filter[policy_attachment]"}
+	c.PolicyEvaluations = &PolicyEvaluationService{client: c, filterKey: "filter[policy_evaluation]"}
+	c.PolicyExemptions = &PolicyExemptionService{client: c, filterKey: "filter[policy_exemption]"}
+	c.PolicyOverrides = &PolicyOverrideService{client: c, filterKey: "filter[policy_override]"}
+	c.PolicySets = &PolicySetService{client: c, filterKey: "filter[policy_set]"}
+	c.PolicySetParameters = &PolicySetParameterService{client: c, filterKey: "filter[policy_set_parameter]"}
+	c.RunTriggers = &RunTriggerService{client: c, filterKey: "filter[runTrigger]"}
 
 	return c, nil
 }

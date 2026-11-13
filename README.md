@@ -83,13 +83,22 @@ func main() {
 | Provider Version | `ProviderVersions` | Provider |
 | Implementation | `Implementations` | Provider Version |
 | GitHub App Token | `GithubAppTokens` | Top-level |
+| Notification Configuration | `NotificationConfigurations` | Organization |
+| Notification Trigger | `NotificationTriggers` | Notification Configuration |
+| Policy Set | `PolicySets` | Organization |
+| Policy Set Parameter | `PolicySetParameters` | Policy Set |
+| Policy Attachment | `PolicyAttachments` | Policy Set |
+| Policy Exemption | `PolicyExemptions` | Organization |
+| Policy Evaluation | `PolicyEvaluations` | Job (read-only) |
+| Policy Override | `PolicyOverrides` | Policy Evaluation |
+| Run Trigger | `RunTriggers` | Workspace |
 
 ## API Version
 
 The `APIVersion` constant tracks which Terrakube OpenAPI specification version this library targets.
 
 ```go
-fmt.Println(terrakube.APIVersion) // "2.33.0"
+fmt.Println(terrakube.APIVersion) // "2.34.1"
 ```
 
 ## Configuration
@@ -128,6 +137,28 @@ mise run lint         # run linter
 mise run check        # vet + lint + test
 mise run coverage     # test with coverage report
 ```
+
+## OpenAPI Spec Tracking
+
+The library supports one Terrakube API version at a time, the one in the `APIVersion` constant. Its OpenAPI document is vendored in [`openapi/`](openapi/). The `speccheck` tool in [`tools/speccheck`](tools/speccheck) (a separate Go module, so its dependencies never reach the library) keeps the client and the document in step:
+
+```bash
+mise run spec-check                                  # compare models, paths, and filter keys with openapi/v{APIVersion}.json
+mise run spec-check -- --verbose                     # also list fields that exist only in Go
+mise run spec-fetch -- --server=https://terrakube-api.example.com --version=2.35.0   # token from $TERRAKUBE_TOKEN
+mise run spec-diff -- --from=2.34.1 --to=2.35.0     # what changed, with semver guidance
+mise run spec-sync -- --to=2.35.0 --dry-run         # what sync would change
+mise run spec-sync -- --to=2.35.0                   # update the source
+```
+
+To move to a new Terrakube release:
+
+1. Fetch its document. Terrakube no longer publishes current documents on GitHub, so fetch it from a running server of that version (`GET /doc`, bearer token from `$TERRAKUBE_TOKEN`). `--repo`/`--ref` fetch from GitHub when an upstream file exists.
+2. Run `spec-diff` against the current version to see what changed.
+3. Run `spec-sync --to=<version>`. It updates `APIVersion`, fixes resource types and filter keys, adds new attributes and relationships, marks fields the document no longer lists with a `// DEPRECATED (...)` comment (it never deletes them), and generates new resources with their service, interfaces, and tests.
+4. Review the generated code, add new resources to the table above, and run `mise run check` and `mise run spec-check -- --fail-on-missing`.
+
+CI runs the tool's tests and fails when the client no longer matches the vendored document.
 
 ## Documentation
 

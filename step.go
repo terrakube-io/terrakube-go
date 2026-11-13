@@ -4,17 +4,21 @@ import "context"
 
 // Step represents a Terrakube step resource within a job.
 type Step struct {
-	ID          string  `jsonapi:"primary,step"`
-	Name        string  `jsonapi:"attr,name"`
-	Output      *string `jsonapi:"attr,output"`
-	Status      string  `jsonapi:"attr,status"`
-	LogStatus   *string `jsonapi:"attr,logStatus,omitempty"`
-	StepNumber  int     `jsonapi:"attr,stepNumber"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
-	Job         *Job    `jsonapi:"relation,job,omitempty"`
+	ID                string              `jsonapi:"primary,step"`
+	Name              string              `jsonapi:"attr,name"`
+	Output            *string             `jsonapi:"attr,output"`
+	Status            string              `jsonapi:"attr,status"`
+	LogStatus         *string             `jsonapi:"attr,logStatus,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	StepNumber        int                 `jsonapi:"attr,stepNumber"`
+	CreatedBy         *string             `jsonapi:"attr,createdBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	CreatedDate       *string             `jsonapi:"attr,createdDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedBy         *string             `jsonapi:"attr,updatedBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedDate       *string             `jsonapi:"attr,updatedDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	DeliveryRevision  *int64              `jsonapi:"attr,deliveryRevision"`
+	DeliveryState     *string             `jsonapi:"attr,deliveryState"`
+	DeliveryTimestamp *int64              `jsonapi:"attr,deliveryTimestamp"`
+	Job               *Job                `jsonapi:"relation,job,omitempty"`
+	PolicyEvaluation  []*PolicyEvaluation `jsonapi:"relation,policyEvaluation,omitempty"`
 }
 
 // StepService handles communication with the step related methods of the

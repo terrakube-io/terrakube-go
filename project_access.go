@@ -12,6 +12,7 @@ type ProjectAccess struct {
 	PlanJob         bool     `jsonapi:"attr,planJob"`
 	ApproveJob      bool     `jsonapi:"attr,approveJob"`
 	Role            string   `jsonapi:"attr,role"`
+	DestroyJob      bool     `jsonapi:"attr,destroyJob"`
 	Project         *Project `jsonapi:"relation,project,omitempty"`
 }
 

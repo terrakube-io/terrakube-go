@@ -316,3 +316,35 @@ func TestModuleService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Modules.Get(context.Background(), "org-1", "mod-1")
 }
+
+// TestModuleService_List_WithVersions is the regression test for #37: the
+// server links and includes module versions with the type "module_version".
+func TestModuleService_List_WithVersions(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /api/v1/organization/org-1/module", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/vnd.api+json")
+		_, _ = w.Write([]byte(`{
+			"data": [{
+				"type": "module", "id": "mod-1",
+				"attributes": {"name": "vpc"},
+				"relationships": {"version": {"data": [{"type": "module_version", "id": "mv-1"}]}}
+			}],
+			"included": [{"type": "module_version", "id": "mv-1", "attributes": {"version": "1.0.0"}}]
+		}`))
+	})
+
+	client := newTestClient(t, srv)
+
+	mods, err := client.Modules.List(context.Background(), "org-1", nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(mods) != 1 || len(mods[0].Versions) != 1 {
+		t.Fatalf("got %d modules, want 1 module with 1 version", len(mods))
+	}
+	if got := mods[0].Versions[0].Version; got != "1.0.0" {
+		t.Errorf("Versions[0].Version = %q, want %q", got, "1.0.0")
+	}
+}

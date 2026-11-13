@@ -10,6 +10,7 @@ type WorkspaceTag struct {
 	CreatedDate *string    `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
 	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	Value       *string    `jsonapi:"attr,value"`
 	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 

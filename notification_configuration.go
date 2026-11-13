@@ -20,6 +20,7 @@ type NotificationConfiguration struct {
 	Workspace      *Workspace             `jsonapi:"relation,workspace,omitempty"`
 	Triggers       []*NotificationTrigger `jsonapi:"relation,triggers,omitempty"`
 	Templates      []*Template            `jsonapi:"relation,templates,omitempty"`
+	PolicySet      []*PolicySet           `jsonapi:"relation,policySet,omitempty"`
 }
 
 // NotificationConfigurationService handles communication with the notification configuration

@@ -416,7 +416,7 @@ func TestWebhookEventService_Get(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.WebhookEvent{
 			ID:          "evt1",
 			Branch:      "main",
@@ -463,7 +463,7 @@ func TestWebhookEventService_Get_NotFound(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/missing", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/missing", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusNotFound, "event not found")
 	})
 
@@ -509,7 +509,7 @@ func TestWebhookEventService_Create(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Content-Type") != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", r.Header.Get("Content-Type"), "application/vnd.api+json")
 		}
@@ -558,7 +558,7 @@ func TestWebhookEventService_Create_ServerError(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusInternalServerError, "internal error")
 	})
 
@@ -580,7 +580,7 @@ func TestWebhookEventService_Update(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("PATCH /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("PATCH /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.WebhookEvent{
 			ID: "evt1", Branch: "release", Event: "tag", Priority: 5,
 		})
@@ -633,7 +633,7 @@ func TestWebhookEventService_Delete(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
@@ -676,7 +676,7 @@ func TestWebhookEventService_Delete_NotFound(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/missing", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/missing", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusNotFound, "event not found")
 	})
 
@@ -694,7 +694,7 @@ func TestWebhookEventService_AuthHeader(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth != "Bearer test-token" {
 			t.Errorf("Authorization = %q, want %q", auth, "Bearer test-token")
@@ -713,7 +713,7 @@ func TestWebhookEventService_PRFlagsAndPathType(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.WebhookEvent{
 			ID:                "evt1",
 			Path:              "/terraform/dev/.*",

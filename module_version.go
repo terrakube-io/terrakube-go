@@ -4,15 +4,17 @@ import "context"
 
 // ModuleVersion represents a Terrakube module version resource.
 type ModuleVersion struct {
-	ID          string  `jsonapi:"primary,version"`
-	Version     string  `jsonapi:"attr,version"`
-	Commit      *string `jsonapi:"attr,commit"`
-	GitTag      *string `jsonapi:"attr,gitTag,omitempty"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
-	Module      *Module `jsonapi:"relation,module,omitempty"`
+	ID                 string  `jsonapi:"primary,module_version"`
+	Version            string  `jsonapi:"attr,version"`
+	Commit             *string `jsonapi:"attr,commit"`
+	GitTag             *string `jsonapi:"attr,gitTag,omitempty"`
+	CreatedBy          *string `jsonapi:"attr,createdBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	CreatedDate        *string `jsonapi:"attr,createdDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedBy          *string `jsonapi:"attr,updatedBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedDate        *string `jsonapi:"attr,updatedDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	DeprecationMessage *string `jsonapi:"attr,deprecationMessage"`
+	Status             *string `jsonapi:"attr,status"`
+	Module             *Module `jsonapi:"relation,module,omitempty"`
 }
 
 // ModuleVersionService handles communication with the module version endpoints.

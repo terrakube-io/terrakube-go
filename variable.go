@@ -12,10 +12,10 @@ type Variable struct {
 	Sensitive   bool       `jsonapi:"attr,sensitive"`
 	Hcl         bool       `jsonapi:"attr,hcl"`
 	Incomplete  bool       `jsonapi:"attr,incomplete,omitempty"`
-	CreatedBy   *string    `jsonapi:"attr,createdBy,omitempty"`
-	CreatedDate *string    `jsonapi:"attr,createdDate,omitempty"`
-	UpdatedBy   *string    `jsonapi:"attr,updatedBy,omitempty"`
-	UpdatedDate *string    `jsonapi:"attr,updatedDate,omitempty"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy,omitempty"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	CreatedDate *string    `jsonapi:"attr,createdDate,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy,omitempty"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	UpdatedDate *string    `jsonapi:"attr,updatedDate,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 

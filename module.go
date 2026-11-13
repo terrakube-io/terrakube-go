@@ -14,6 +14,10 @@ type Module struct {
 	DownloadQuantity int              `jsonapi:"attr,downloadQuantity"`
 	LatestVersion    *string          `jsonapi:"attr,latestVersion,omitempty"`
 	RegistryPath     *string          `jsonapi:"attr,registryPath,omitempty"`
+	CreatedBy        *string          `jsonapi:"attr,createdBy"`
+	CreatedDate      *string          `jsonapi:"attr,createdDate"`
+	UpdatedBy        *string          `jsonapi:"attr,updatedBy"`
+	UpdatedDate      *string          `jsonapi:"attr,updatedDate"`
 	Organization     *Organization    `jsonapi:"relation,organization,omitempty"`
 	Vcs              *VCS             `jsonapi:"relation,vcs,omitempty"`
 	SSH              *SSH             `jsonapi:"relation,ssh,omitempty"`

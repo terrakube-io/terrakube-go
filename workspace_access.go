@@ -12,6 +12,7 @@ type WorkspaceAccess struct {
 	ApproveJob      bool       `jsonapi:"attr,approveJob"`
 	Role            string     `jsonapi:"attr,role,omitempty"`
 	Name            string     `jsonapi:"attr,name"`
+	DestroyJob      bool       `jsonapi:"attr,destroyJob"`
 	Workspace       *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
