@@ -851,7 +851,7 @@ func TestCrudService_List_IgnoresLinks(t *testing.T) {
 func TestCrudService_List_AllPages(t *testing.T) {
 	t.Parallel()
 
-	const totals = "page%5Btotals%5D="
+	const totals = "page%5Btotals%5D=&sort=id"
 	pageQ := func(n, size int) string {
 		return fmt.Sprintf("page%%5Bnumber%%5D=%d&page%%5Bsize%%5D=%d&%s", n, size, totals)
 	}

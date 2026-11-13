@@ -77,14 +77,17 @@ func (s *crudService[T]) listPage(ctx context.Context, path string, params url.V
 
 // listAll fetches every page of a collection using the server's meta.page.
 // The first request asks only for totals, so the server picks the page size;
-// later pages repeat that size.
+// later pages repeat that size. Every request sorts by id: the server adds no
+// order of its own, and without one the pages of a collection can overlap.
 func (s *crudService[T]) listAll(ctx context.Context, path string, params url.Values) ([]*T, error) {
 	params.Set("page[totals]", "")
+	params.Set("sort", "id")
 	all, page, err := s.listPage(ctx, path, params)
 	if apiErr, ok := errors.AsType[*APIError](err); ok && apiErr.StatusCode == http.StatusBadRequest {
 		// Which resource types a server can page depends on its version.
 		// If it refuses page parameters, list the collection in one request.
 		params.Del("page[totals]")
+		params.Del("sort")
 		all, _, err = s.listPage(ctx, path, params)
 		return all, err
 	}
