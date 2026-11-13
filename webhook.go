@@ -49,7 +49,8 @@ type WebhookEventService struct {
 	crudService[WebhookEvent]
 }
 
-// List returns all webhooks for a workspace.
+// List returns the webhook of a workspace. A workspace has at most one, so the
+// result holds zero or one element, and the server ignores opts.Filter here.
 // It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WebhookService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {

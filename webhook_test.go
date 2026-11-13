@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"slices"
 	"testing"
 	"time"
 
@@ -727,5 +728,58 @@ func TestWebhookEventService_PRFlagsAndPathType(t *testing.T) {
 	}
 	if !created.PRApplyEnabled {
 		t.Errorf("PRApplyEnabled = false, want true")
+	}
+}
+
+// TestWebhookService_List_ToOne: the server addresses a workspace's webhook as
+// a to-one relationship, so the response is one resource object, or null.
+func TestWebhookService_List_ToOne(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name, body string
+		wantIDs    []string
+	}{
+		{"one webhook", `{"data":{"type":"webhook","id":"wh1","attributes":{"remoteHookId":"rh1","createdDate":"2026-11-13T23:01:23Z"},"relationships":{"events":{"data":[]}}}}`, []string{"wh1"}},
+		{"no webhook", `{"data":null}`, []string{}},
+		{"array, as other servers may answer", `{"data":[{"type":"webhook","id":"wh1","attributes":{"remoteHookId":"rh1"}}]}`, []string{"wh1"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook", func(w http.ResponseWriter, _ *http.Request) {
+				_, _ = w.Write([]byte(tt.body))
+			})
+
+			webhooks, err := newTestClient(t, srv).Webhooks.List(context.Background(), "org1", "ws1", nil)
+			if err != nil {
+				t.Fatalf("List: %v", err)
+			}
+			ids := make([]string, 0, len(webhooks))
+			for _, w := range webhooks {
+				ids = append(ids, w.ID)
+			}
+			if !slices.Equal(ids, tt.wantIDs) {
+				t.Errorf("ids = %q, want %q", ids, tt.wantIDs)
+			}
+			if len(webhooks) == 1 && webhooks[0].RemoteHookID != "rh1" {
+				t.Errorf("RemoteHookID = %q, want rh1", webhooks[0].RemoteHookID)
+			}
+		})
+	}
+}
+
+// TestWebhookService_List_UndecodableBody: the single-object fallback must not
+// hide a response that is neither a list nor a webhook.
+func TestWebhookService_List_UndecodableBody(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`{"data":{"type":"workspace","id":"ws1","attributes":{}}}`))
+	})
+	if _, err := newTestClient(t, srv).Webhooks.List(context.Background(), "org1", "ws1", nil); err == nil {
+		t.Fatal("expected a decoding error for a resource of another type")
 	}
 }

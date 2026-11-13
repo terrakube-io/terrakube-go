@@ -47,7 +47,13 @@ func (c *Client) doList[T any](req *http.Request) ([]*T, *pageInfo, error) {
 
 	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
-		return nil, nil, fmt.Errorf("decoding JSON:API list response: %w", err)
+		// A to-one relationship path (a workspace's webhook) answers with one
+		// resource object instead of an array, or null when there is none.
+		one := new(T)
+		if jsonapi.UnmarshalPayload(bytes.NewReader(bodyBytes), one) != nil {
+			return nil, nil, fmt.Errorf("decoding JSON:API list response: %w", err)
+		}
+		return []*T{one}, nil, nil
 	}
 
 	result := make([]*T, len(items))
