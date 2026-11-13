@@ -8,7 +8,7 @@ type Agent struct {
 	Name         string        `jsonapi:"attr,name"`
 	Description  string        `jsonapi:"attr,description"`
 	URL          string        `jsonapi:"attr,url"`
-	Type         string        `jsonapi:"attr,type,omitempty"`
+	Type         string        `jsonapi:"attr,type,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 

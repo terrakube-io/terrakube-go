@@ -83,13 +83,22 @@ func main() {
 | Provider Version | `ProviderVersions` | Provider |
 | Implementation | `Implementations` | Provider Version |
 | GitHub App Token | `GithubAppTokens` | Top-level |
+| Notification Configuration | `NotificationConfigurations` | Organization |
+| Notification Trigger | `NotificationTriggers` | Notification Configuration |
+| Policy Set | `PolicySets` | Organization |
+| Policy Set Parameter | `PolicySetParameters` | Policy Set |
+| Policy Attachment | `PolicyAttachments` | Policy Set |
+| Policy Exemption | `PolicyExemptions` | Organization |
+| Policy Evaluation | `PolicyEvaluations` | Job (read-only) |
+| Policy Override | `PolicyOverrides` | Policy Evaluation |
+| Run Trigger | `RunTriggers` | Workspace |
 
 ## API Version
 
 The `APIVersion` constant tracks which Terrakube OpenAPI specification version this library targets.
 
 ```go
-fmt.Println(terrakube.APIVersion) // "2.33.0"
+fmt.Println(terrakube.APIVersion) // "2.34.1"
 ```
 
 ## Configuration

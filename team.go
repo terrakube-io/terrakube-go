@@ -17,6 +17,8 @@ type Team struct {
 	PlanJob          bool          `jsonapi:"attr,planJob"`
 	ApproveJob       bool          `jsonapi:"attr,approveJob"`
 	Role             string        `jsonapi:"attr,role"`
+	DestroyJob       bool          `jsonapi:"attr,destroyJob"`
+	ManagePolicies   bool          `jsonapi:"attr,managePolicies"`
 	Organization     *Organization `jsonapi:"relation,organization,omitempty"`
 }
 

@@ -24,6 +24,8 @@ type Organization struct {
 	OrganizationVariables      []*OrganizationVariable      `jsonapi:"relation,globalvar,omitempty"`
 	Tags                       []*Tag                       `jsonapi:"relation,tag,omitempty"`
 	NotificationConfigurations []*NotificationConfiguration `jsonapi:"relation,notificationConfiguration,omitempty"`
+	PolicyExemption            []*PolicyExemption           `jsonapi:"relation,policyExemption,omitempty"`
+	PolicySet                  []*PolicySet                 `jsonapi:"relation,policySet,omitempty"`
 }
 
 // OrganizationService handles communication with the organization related

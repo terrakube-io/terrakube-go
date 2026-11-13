@@ -7,7 +7,7 @@ type WorkspaceSchedule struct {
 	ID          string     `jsonapi:"primary,schedule"`
 	Schedule    string     `jsonapi:"attr,cron"`
 	TemplateID  string     `jsonapi:"attr,templateReference"`
-	Tcl         *string    `jsonapi:"attr,tcl,omitempty"`
+	Tcl         *string    `jsonapi:"attr,tcl,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	Description *string    `jsonapi:"attr,description,omitempty"`
 	Enabled     bool       `jsonapi:"attr,enabled"`
 	CreatedBy   *string    `jsonapi:"attr,createdBy"`

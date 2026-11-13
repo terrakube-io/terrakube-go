@@ -4,11 +4,13 @@ import "context"
 
 // ProviderVersion represents a Terrakube provider version resource.
 type ProviderVersion struct {
-	ID              string            `jsonapi:"primary,version"`
-	VersionNumber   string            `jsonapi:"attr,versionNumber"`
-	Protocols       *string           `jsonapi:"attr,protocols"`
-	Provider        *Provider         `jsonapi:"relation,provider,omitempty"`
-	Implementations []*Implementation `jsonapi:"relation,implementation,omitempty"`
+	ID                 string            `jsonapi:"primary,version"`
+	VersionNumber      string            `jsonapi:"attr,versionNumber"`
+	Protocols          *string           `jsonapi:"attr,protocols"`
+	DeprecationMessage *string           `jsonapi:"attr,deprecationMessage"`
+	Status             *string           `jsonapi:"attr,status"`
+	Provider           *Provider         `jsonapi:"relation,provider,omitempty"`
+	Implementations    []*Implementation `jsonapi:"relation,implementation,omitempty"`
 }
 
 // ProviderVersionService handles communication with the provider version

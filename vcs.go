@@ -17,8 +17,8 @@ type VCS struct {
 	Status          string        `jsonapi:"attr,status"`
 	Callback        *string       `jsonapi:"attr,callback"`
 	AccessToken     *string       `jsonapi:"attr,accessToken"`
-	RefreshToken    *string       `jsonapi:"attr,refreshToken,omitempty"`
-	TokenExpiration *string       `jsonapi:"attr,tokenExpiration,omitempty"`
+	RefreshToken    *string       `jsonapi:"attr,refreshToken,omitempty"`    // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	TokenExpiration *string       `jsonapi:"attr,tokenExpiration,omitempty"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	RedirectURL     *string       `jsonapi:"attr,redirectUrl"`
 	CreatedBy       *string       `jsonapi:"attr,createdBy"`
 	CreatedDate     *string       `jsonapi:"attr,createdDate"`

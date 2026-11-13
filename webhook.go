@@ -4,16 +4,20 @@ import "context"
 
 // Webhook represents a workspace webhook (v1 flat format).
 type Webhook struct {
-	ID           string  `jsonapi:"primary,webhook"`
-	Path         string  `jsonapi:"attr,path"`
-	Branch       string  `jsonapi:"attr,branch"`
-	TemplateID   string  `jsonapi:"attr,templateId"`
-	RemoteHookID string  `jsonapi:"attr,remoteHookId"`
-	Event        string  `jsonapi:"attr,event"`
-	CreatedBy    *string `jsonapi:"attr,createdBy"`
-	CreatedDate  *string `jsonapi:"attr,createdDate"`
-	UpdatedBy    *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string `jsonapi:"attr,updatedDate"`
+	ID           string          `jsonapi:"primary,webhook"`
+	Path         string          `jsonapi:"attr,path"`       // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	Branch       string          `jsonapi:"attr,branch"`     // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	TemplateID   string          `jsonapi:"attr,templateId"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	RemoteHookID string          `jsonapi:"attr,remoteHookId"`
+	Event        string          `jsonapi:"attr,event"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
+	CreatedBy    *string         `jsonapi:"attr,createdBy"`
+	CreatedDate  *string         `jsonapi:"attr,createdDate"`
+	UpdatedBy    *string         `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *string         `jsonapi:"attr,updatedDate"`
+	MigratedV2   bool            `jsonapi:"attr,migratedV2"`
+	SyncError    *string         `jsonapi:"attr,syncError"`
+	Events       []*WebhookEvent `jsonapi:"relation,events,omitempty"`
+	Workspace    *Workspace      `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WebhookEvent represents a webhook event entity.
@@ -158,7 +162,7 @@ func (s *WebhookEventService) Get(ctx context.Context, orgID, workspaceID, webho
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", eventID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", eventID)
 	return s.get(ctx, path)
 }
 
@@ -175,7 +179,7 @@ func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, we
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event")
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events")
 	return s.create(ctx, path, event)
 }
 
@@ -195,7 +199,7 @@ func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, we
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", event.ID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", event.ID)
 	return s.update(ctx, path, event)
 }
 
@@ -215,6 +219,6 @@ func (s *WebhookEventService) Delete(ctx context.Context, orgID, workspaceID, we
 		return err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", eventID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", eventID)
 	return s.del(ctx, path)
 }

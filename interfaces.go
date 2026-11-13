@@ -1231,6 +1231,201 @@ type NotificationTriggerCRUD interface {
 	NotificationTriggerDeleter
 }
 
+// PolicyAttachmentLister lists policy attachments.
+type PolicyAttachmentLister interface {
+	List(ctx context.Context, orgID, policySetID string, opts *ListOptions) ([]*PolicyAttachment, error)
+}
+
+// PolicyAttachmentGetter retrieves a single policy attachment.
+type PolicyAttachmentGetter interface {
+	Get(ctx context.Context, orgID, policySetID, policyAttachmentID string) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentCreator creates policy attachments.
+type PolicyAttachmentCreator interface {
+	Create(ctx context.Context, orgID, policySetID string, entity *PolicyAttachment) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentUpdater updates policy attachments.
+type PolicyAttachmentUpdater interface {
+	Update(ctx context.Context, orgID, policySetID string, entity *PolicyAttachment) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentDeleter deletes policy attachments.
+type PolicyAttachmentDeleter interface {
+	Delete(ctx context.Context, orgID, policySetID, policyAttachmentID string) error
+}
+
+// PolicyAttachmentCRUD combines all policy attachment operations.
+type PolicyAttachmentCRUD interface {
+	PolicyAttachmentLister
+	PolicyAttachmentGetter
+	PolicyAttachmentCreator
+	PolicyAttachmentUpdater
+	PolicyAttachmentDeleter
+}
+
+// PolicyEvaluationLister lists policy evaluations.
+type PolicyEvaluationLister interface {
+	List(ctx context.Context, orgID, jobID string, opts *ListOptions) ([]*PolicyEvaluation, error)
+}
+
+// PolicyEvaluationGetter retrieves a single policy evaluation.
+type PolicyEvaluationGetter interface {
+	Get(ctx context.Context, orgID, jobID, policyEvaluationID string) (*PolicyEvaluation, error)
+}
+
+// PolicyExemptionLister lists policy exemptions.
+type PolicyExemptionLister interface {
+	List(ctx context.Context, orgID string, opts *ListOptions) ([]*PolicyExemption, error)
+}
+
+// PolicyExemptionGetter retrieves a single policy exemption.
+type PolicyExemptionGetter interface {
+	Get(ctx context.Context, orgID, policyExemptionID string) (*PolicyExemption, error)
+}
+
+// PolicyExemptionCreator creates policy exemptions.
+type PolicyExemptionCreator interface {
+	Create(ctx context.Context, orgID string, entity *PolicyExemption) (*PolicyExemption, error)
+}
+
+// PolicyExemptionUpdater updates policy exemptions.
+type PolicyExemptionUpdater interface {
+	Update(ctx context.Context, orgID string, entity *PolicyExemption) (*PolicyExemption, error)
+}
+
+// PolicyExemptionDeleter deletes policy exemptions.
+type PolicyExemptionDeleter interface {
+	Delete(ctx context.Context, orgID, policyExemptionID string) error
+}
+
+// PolicyExemptionCRUD combines all policy exemption operations.
+type PolicyExemptionCRUD interface {
+	PolicyExemptionLister
+	PolicyExemptionGetter
+	PolicyExemptionCreator
+	PolicyExemptionUpdater
+	PolicyExemptionDeleter
+}
+
+// PolicyOverrideGetter retrieves a single policy override.
+type PolicyOverrideGetter interface {
+	Get(ctx context.Context, orgID, jobID, policyEvaluationID, policyOverrideID string) (*PolicyOverride, error)
+}
+
+// PolicyOverrideCreator creates policy overrides.
+type PolicyOverrideCreator interface {
+	Create(ctx context.Context, orgID, jobID, policyEvaluationID string, entity *PolicyOverride) (*PolicyOverride, error)
+}
+
+// PolicyOverrideUpdater updates policy overrides.
+type PolicyOverrideUpdater interface {
+	Update(ctx context.Context, orgID, jobID, policyEvaluationID string, entity *PolicyOverride) (*PolicyOverride, error)
+}
+
+// PolicySetLister lists policy sets.
+type PolicySetLister interface {
+	List(ctx context.Context, orgID string, opts *ListOptions) ([]*PolicySet, error)
+}
+
+// PolicySetGetter retrieves a single policy set.
+type PolicySetGetter interface {
+	Get(ctx context.Context, orgID, policySetID string) (*PolicySet, error)
+}
+
+// PolicySetCreator creates policy sets.
+type PolicySetCreator interface {
+	Create(ctx context.Context, orgID string, entity *PolicySet) (*PolicySet, error)
+}
+
+// PolicySetUpdater updates policy sets.
+type PolicySetUpdater interface {
+	Update(ctx context.Context, orgID string, entity *PolicySet) (*PolicySet, error)
+}
+
+// PolicySetDeleter deletes policy sets.
+type PolicySetDeleter interface {
+	Delete(ctx context.Context, orgID, policySetID string) error
+}
+
+// PolicySetCRUD combines all policy set operations.
+type PolicySetCRUD interface {
+	PolicySetLister
+	PolicySetGetter
+	PolicySetCreator
+	PolicySetUpdater
+	PolicySetDeleter
+}
+
+// PolicySetParameterLister lists policy set parameters.
+type PolicySetParameterLister interface {
+	List(ctx context.Context, orgID, policySetID string, opts *ListOptions) ([]*PolicySetParameter, error)
+}
+
+// PolicySetParameterGetter retrieves a single policy set parameter.
+type PolicySetParameterGetter interface {
+	Get(ctx context.Context, orgID, policySetID, policySetParameterID string) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterCreator creates policy set parameters.
+type PolicySetParameterCreator interface {
+	Create(ctx context.Context, orgID, policySetID string, entity *PolicySetParameter) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterUpdater updates policy set parameters.
+type PolicySetParameterUpdater interface {
+	Update(ctx context.Context, orgID, policySetID string, entity *PolicySetParameter) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterDeleter deletes policy set parameters.
+type PolicySetParameterDeleter interface {
+	Delete(ctx context.Context, orgID, policySetID, policySetParameterID string) error
+}
+
+// PolicySetParameterCRUD combines all policy set parameter operations.
+type PolicySetParameterCRUD interface {
+	PolicySetParameterLister
+	PolicySetParameterGetter
+	PolicySetParameterCreator
+	PolicySetParameterUpdater
+	PolicySetParameterDeleter
+}
+
+// RunTriggerLister lists run triggers.
+type RunTriggerLister interface {
+	List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*RunTrigger, error)
+}
+
+// RunTriggerGetter retrieves a single run trigger.
+type RunTriggerGetter interface {
+	Get(ctx context.Context, orgID, workspaceID, runTriggerID string) (*RunTrigger, error)
+}
+
+// RunTriggerCreator creates run triggers.
+type RunTriggerCreator interface {
+	Create(ctx context.Context, orgID, workspaceID string, entity *RunTrigger) (*RunTrigger, error)
+}
+
+// RunTriggerUpdater updates run triggers.
+type RunTriggerUpdater interface {
+	Update(ctx context.Context, orgID, workspaceID string, entity *RunTrigger) (*RunTrigger, error)
+}
+
+// RunTriggerDeleter deletes run triggers.
+type RunTriggerDeleter interface {
+	Delete(ctx context.Context, orgID, workspaceID, runTriggerID string) error
+}
+
+// RunTriggerCRUD combines all run trigger operations.
+type RunTriggerCRUD interface {
+	RunTriggerLister
+	RunTriggerGetter
+	RunTriggerCreator
+	RunTriggerUpdater
+	RunTriggerDeleter
+}
+
 // Compile-time interface satisfaction checks.
 var (
 	_ OrganizationCRUD              = (*OrganizationService)(nil)
@@ -1270,4 +1465,14 @@ var (
 	_ OperationsSubmitter           = (*OperationsService)(nil)
 	_ NotificationConfigurationCRUD = (*NotificationConfigurationService)(nil)
 	_ NotificationTriggerCRUD       = (*NotificationTriggerService)(nil)
+	_ PolicyAttachmentCRUD          = (*PolicyAttachmentService)(nil)
+	_ PolicyEvaluationLister        = (*PolicyEvaluationService)(nil)
+	_ PolicyEvaluationGetter        = (*PolicyEvaluationService)(nil)
+	_ PolicyExemptionCRUD           = (*PolicyExemptionService)(nil)
+	_ PolicyOverrideGetter          = (*PolicyOverrideService)(nil)
+	_ PolicyOverrideCreator         = (*PolicyOverrideService)(nil)
+	_ PolicyOverrideUpdater         = (*PolicyOverrideService)(nil)
+	_ PolicySetCRUD                 = (*PolicySetService)(nil)
+	_ PolicySetParameterCRUD        = (*PolicySetParameterService)(nil)
+	_ RunTriggerCRUD                = (*RunTriggerService)(nil)
 )
