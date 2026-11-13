@@ -306,4 +306,3 @@ func TestCollectionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Collections.Get(context.Background(), "org-1", "col-1")
 }
-
