@@ -82,10 +82,10 @@ const (
 // refuses paging, are fetched in one request, so the result stops at any limit
 // the server applies to that type. Links in responses are never followed.
 //
-// The server accepts Page and PageSize only for some resource types. On
-// Terrakube 2.34.1 these are workspace, workspace tag, action, federated,
-// agent, organization variable, and workspace access; most others answer
-// 400 "Cannot paginate".
+// The server accepts Page and PageSize only for some resource types: workspace,
+// workspace tag, action, federated, agent, organization variable, and workspace
+// access (verified on Terrakube 2.34.1). For every other resource type List
+// returns a *ValidationError without sending a request when either is set.
 type ListOptions struct {
 	Filter   string // Server-side filter expression (e.g. "name==production").
 	Include  string // Comma-separated relationship names to sideload (e.g. "workspace,organization").

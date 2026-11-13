@@ -17,14 +17,22 @@ type crudService[T any] struct {
 }
 
 // list retrieves a collection of resources at the given path, optionally filtered.
-// With ListOptions.Page or ListOptions.PageSize set, that one page is returned.
+// With ListOptions.Page or ListOptions.PageSize set, that one page is returned,
+// or a *ValidationError for a resource type the server cannot page.
 // Otherwise the collection is listed: completely and page by page for resource
 // types the server can page, and in a single request for all others. Every
 // request goes to the configured endpoint; links in responses are not followed.
 func (s *crudService[T]) list(ctx context.Context, path string, opts *ListOptions) ([]*T, error) {
 	params := s.buildListParams(opts)
+	onePage := opts != nil && (opts.Page > 0 || opts.PageSize > 0)
 
-	if !s.paged || (opts != nil && (opts.Page > 0 || opts.PageSize > 0)) {
+	if onePage && !s.paged {
+		return nil, &ValidationError{
+			Field:   "ListOptions.Page/PageSize",
+			Message: "is not supported for this resource type: the server cannot paginate it",
+		}
+	}
+	if onePage || !s.paged {
 		items, _, err := s.listPage(ctx, path, params)
 		return items, err
 	}

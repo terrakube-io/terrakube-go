@@ -704,35 +704,23 @@ func TestCrudService_List_CustomFilterKey(t *testing.T) {
 	}
 }
 
-// TestCrudService_List_SinglePage covers listing one requested page, which
-// sends the caller's page parameters in a single request.
-func TestCrudService_List_SinglePage(t *testing.T) {
+// TestCrudService_List_PageOptionsUnpagedType: page options on a resource type
+// the server cannot paginate fail before any request is sent.
+func TestCrudService_List_PageOptionsUnpagedType(t *testing.T) {
 	t.Parallel()
 
-	var hits atomic.Int32
-	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, r *http.Request) {
-		hits.Add(1)
-		q := r.URL.Query()
-		if got := q.Get("page[number]"); got != "2" {
-			t.Errorf("page[number] = %q, want %q", got, "2")
+	for _, opts := range []*ListOptions{{Page: 2}, {PageSize: 1}, {Page: 2, PageSize: 1}} {
+		srv := newRecordedServer(t, func(_ int, w http.ResponseWriter, _ *http.Request) {
+			_, _ = w.Write([]byte(listBody("organization", []string{"o1"}, "")))
+		})
+		items, err := srv.client(t).Organizations.List(context.Background(), opts)
+		if _, ok := errors.AsType[*ValidationError](err); !ok {
+			t.Errorf("opts %+v: err = %v, want *ValidationError", *opts, err)
 		}
-		if got := q.Get("page[size]"); got != "1" {
-			t.Errorf("page[size] = %q, want %q", got, "1")
+		if items != nil {
+			t.Errorf("opts %+v: got %d items, want nil", *opts, len(items))
 		}
-		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*Organization{{ID: "org-1", Name: "Alpha"}})
-	})
-
-	client := newCrudTestClient(t, srv)
-	items, err := client.Organizations.List(context.Background(), &ListOptions{Page: 2, PageSize: 1})
-	if err != nil {
-		t.Fatalf("List: %v", err)
-	}
-	if len(items) != 1 || items[0].ID != "org-1" {
-		t.Fatalf("got %d items, want org-1", len(items))
-	}
-	if n := hits.Load(); n != 1 {
-		t.Errorf("got %d requests, want 1", n)
+		wantQueries(t, srv.recorded())
 	}
 }
 
