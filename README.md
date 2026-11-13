@@ -10,6 +10,8 @@ Go client library for the [Terrakube](https://terrakube.io) API.
 go get github.com/terrakube-io/terrakube-go
 ```
 
+Requires Go 1.27 or later.
+
 ## Usage
 
 ```go
@@ -117,7 +119,7 @@ if err != nil {
 
 ## Development
 
-Requires Go 1.26+ and [mise](https://mise.jdx.dev/).
+Requires Go 1.27+ and [mise](https://mise.jdx.dev/).
 
 ```bash
 mise install          # install tools

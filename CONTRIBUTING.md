@@ -2,7 +2,7 @@
 
 ## Development Setup
 
-1. Install [Go 1.24+](https://go.dev/dl/)
+1. Install [Go 1.27+](https://go.dev/dl/)
 2. Install [mise](https://mise.jdx.dev/) for tool management
 3. Clone the repo and install dependencies:
 

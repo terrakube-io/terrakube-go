@@ -1,5 +1,5 @@
 module github.com/terrakube-io/terrakube-go
 
-go 1.24
+go 1.27
 
 require github.com/google/jsonapi v1.0.0
