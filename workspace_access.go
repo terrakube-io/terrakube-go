@@ -69,6 +69,8 @@ func (s *WorkspaceAccessService) Create(ctx context.Context, orgID, workspaceID 
 
 // Update modifies an existing workspace access entry. The access entry's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WorkspaceAccessService) Update(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

@@ -93,6 +93,8 @@ func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, 
 
 // Update modifies an existing job. The job's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

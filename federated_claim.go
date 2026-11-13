@@ -53,6 +53,8 @@ func (s *FederatedClaimService) Create(ctx context.Context, federatedID string, 
 
 // Update modifies an existing federated claim. The claim ID must be set.
 // It returns a *ValidationError if federatedID or claim ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *FederatedClaimService) Update(ctx context.Context, federatedID string, claim *FederatedClaim) (*FederatedClaim, error) {
 	if err := validateID("federatedID", federatedID); err != nil {
 		return nil, err

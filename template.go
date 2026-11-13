@@ -59,6 +59,8 @@ func (s *TemplateService) Create(ctx context.Context, orgID string, tmpl *Templa
 
 // Update modifies an existing template in the given organization. The template's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *TemplateService) Update(ctx context.Context, orgID string, tmpl *Template) (*Template, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

@@ -63,6 +63,8 @@ func (s *PolicyExemptionService) Create(ctx context.Context, orgID string, entit
 
 // Update modifies an existing policy exemption. The policy exemption's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *PolicyExemptionService) Update(ctx context.Context, orgID string, entity *PolicyExemption) (*PolicyExemption, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

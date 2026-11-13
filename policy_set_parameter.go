@@ -68,6 +68,8 @@ func (s *PolicySetParameterService) Create(ctx context.Context, orgID, policySet
 
 // Update modifies an existing policy set parameter. The policy set parameter's ID field must be set.
 // It returns a *ValidationError if orgID, policySetID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *PolicySetParameterService) Update(ctx context.Context, orgID, policySetID string, entity *PolicySetParameter) (*PolicySetParameter, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

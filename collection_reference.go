@@ -58,6 +58,8 @@ func (s *CollectionReferenceService) Create(ctx context.Context, orgID, collecti
 // Update modifies an existing collection reference using the flat endpoint.
 // The reference's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *CollectionReferenceService) Update(ctx context.Context, ref *CollectionReference) (*CollectionReference, error) {
 	if err := validateID("referenceID", ref.ID); err != nil {
 		return nil, err

@@ -65,6 +65,8 @@ func (s *TeamService) Create(ctx context.Context, orgID string, team *Team) (*Te
 
 // Update modifies an existing team within an organization. The team's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *TeamService) Update(ctx context.Context, orgID string, team *Team) (*Team, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

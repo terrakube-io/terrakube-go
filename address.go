@@ -65,6 +65,8 @@ func (s *AddressService) Create(ctx context.Context, orgID, jobID string, addres
 
 // Update modifies an existing address. The address's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *AddressService) Update(ctx context.Context, orgID, jobID string, address *Address) (*Address, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

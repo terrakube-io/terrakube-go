@@ -45,6 +45,19 @@ func main() {
 }
 ```
 
+### Updating
+
+`Update` sends every attribute of the struct, not only the ones you changed, so a field left at its zero value overwrites the value on the server. Fetch the resource with `Get`, change it, and pass it to `Update`:
+
+```go
+ws, err := client.Workspaces.Get(ctx, orgID, wsID)
+if err != nil {
+    log.Fatal(err)
+}
+ws.Description = new("managed by automation")
+ws, err = client.Workspaces.Update(ctx, orgID, ws)
+```
+
 ### Listing
 
 `List` with no page options lists the collection and never follows links found in responses. Workspaces, workspace tags, actions, federated, agents, organization variables, and workspace access are fetched page by page until the server reports no more. Every other resource type, and any type for which the server refuses paging, is fetched in one request, so the result stops at any limit the server applies to it.

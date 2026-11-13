@@ -57,6 +57,8 @@ func (s *OrganizationVariableService) Create(ctx context.Context, orgID string, 
 
 // Update modifies an existing organization variable. The variable's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *OrganizationVariableService) Update(ctx context.Context, orgID string, variable *OrganizationVariable) (*OrganizationVariable, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

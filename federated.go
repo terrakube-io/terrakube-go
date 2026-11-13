@@ -43,6 +43,8 @@ func (s *FederatedService) Create(ctx context.Context, fed *Federated) (*Federat
 
 // Update modifies an existing federated identity configuration. The ID field must be set.
 // It returns a *ValidationError if ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *FederatedService) Update(ctx context.Context, fed *Federated) (*Federated, error) {
 	if err := validateID("federatedID", fed.ID); err != nil {
 		return nil, err
