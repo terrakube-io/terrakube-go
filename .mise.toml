@@ -18,5 +18,8 @@ run = "go vet ./..."
 [tasks.coverage]
 run = "go test -race -coverprofile=coverage.out ./... && go tool cover -func=coverage.out"
 
+[tasks.fix]
+run = "go fix -diff ./..."
+
 [tasks.check]
-depends = ["vet", "lint", "test"]
+depends = ["vet", "lint", "fix", "test"]

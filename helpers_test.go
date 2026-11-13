@@ -59,7 +59,7 @@ func assertJSONBoolField(t *testing.T, body []byte, attrName string, expected bo
 	t.Helper()
 	var payload struct {
 		Data struct {
-			Attributes map[string]interface{} `json:"attributes"`
+			Attributes map[string]any `json:"attributes"`
 		} `json:"data"`
 	}
 	if err := json.Unmarshal(body, &payload); err != nil {

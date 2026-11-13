@@ -25,11 +25,11 @@ type OperationRef struct {
 
 // Operation represents a single atomic operation.
 type Operation struct {
-	Op   OperationAction        `json:"op"`
-	Ref  OperationRef           `json:"ref,omitempty"`
-	Href string                 `json:"href,omitempty"`
-	Data map[string]interface{} `json:"data,omitempty"`
-	Meta map[string]interface{} `json:"meta,omitempty"`
+	Op   OperationAction `json:"op"`
+	Ref  OperationRef    `json:"ref"`
+	Href string          `json:"href,omitempty"`
+	Data map[string]any  `json:"data,omitempty"`
+	Meta map[string]any  `json:"meta,omitempty"`
 }
 
 // AtomicRequest is the request body for POST /operations.
@@ -39,8 +39,8 @@ type AtomicRequest struct {
 
 // AtomicResult represents the result of a single atomic operation.
 type AtomicResult struct {
-	Data map[string]interface{} `json:"data,omitempty"`
-	Meta map[string]interface{} `json:"meta,omitempty"`
+	Data map[string]any `json:"data,omitempty"`
+	Meta map[string]any `json:"meta,omitempty"`
 }
 
 // AtomicResponse is the response from POST /operations.

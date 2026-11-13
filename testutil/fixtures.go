@@ -10,7 +10,7 @@ import (
 
 // WriteJSONAPI writes a single JSON:API resource response.
 // entity must have jsonapi struct tags with a "primary" field.
-func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interface{}) {
+func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity any) {
 	t.Helper()
 
 	rv := reflect.ValueOf(entity)
@@ -21,8 +21,8 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 
 	typeName := ""
 	id := ""
-	attrs := map[string]interface{}{}
-	rels := map[string]interface{}{}
+	attrs := map[string]any{}
+	rels := map[string]any{}
 
 	for i := range rt.NumField() {
 		field := rt.Field(i)
@@ -66,7 +66,7 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 				}
 				relRT := relRV.Type()
 
-				relData := map[string]interface{}{}
+				relData := map[string]any{}
 				for j := range relRT.NumField() {
 					relTag := relRT.Field(j).Tag.Get("jsonapi")
 					relParts := splitTag(relTag)
@@ -77,21 +77,21 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 					}
 				}
 				if len(relData) > 0 {
-					rels[parts[1]] = map[string]interface{}{"data": relData}
+					rels[parts[1]] = map[string]any{"data": relData}
 				}
 			}
 		}
 	}
 
-	resp := map[string]interface{}{
-		"data": map[string]interface{}{
+	resp := map[string]any{
+		"data": map[string]any{
 			"type":       typeName,
 			"id":         id,
 			"attributes": attrs,
 		},
 	}
 	if len(rels) > 0 {
-		resp["data"].(map[string]interface{})["relationships"] = rels
+		resp["data"].(map[string]any)["relationships"] = rels
 	}
 
 	w.Header().Set("Content-Type", "application/vnd.api+json")
@@ -102,7 +102,7 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity interf
 }
 
 // WriteJSONAPIList writes a JSON:API list response containing multiple resources.
-func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities interface{}) {
+func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities any) {
 	t.Helper()
 
 	rv := reflect.ValueOf(entities)
@@ -113,7 +113,7 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 		t.Fatalf("testutil: WriteJSONAPIList expects a slice, got %s", rv.Kind())
 	}
 
-	items := make([]interface{}, 0, rv.Len())
+	items := make([]any, 0, rv.Len())
 	for i := range rv.Len() {
 		elem := rv.Index(i)
 		if elem.Kind() == reflect.Pointer {
@@ -123,7 +123,7 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 
 		typeName := ""
 		id := ""
-		attrs := map[string]interface{}{}
+		attrs := map[string]any{}
 
 		for j := range rt.NumField() {
 			field := rt.Field(j)
@@ -155,14 +155,14 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 			}
 		}
 
-		items = append(items, map[string]interface{}{
+		items = append(items, map[string]any{
 			"type":       typeName,
 			"id":         id,
 			"attributes": attrs,
 		})
 	}
 
-	resp := map[string]interface{}{
+	resp := map[string]any{
 		"data": items,
 	}
 
@@ -176,8 +176,8 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 // WriteError writes a JSON:API error response.
 func WriteError(t testing.TB, w http.ResponseWriter, status int, detail string) {
 	t.Helper()
-	resp := map[string]interface{}{
-		"errors": []map[string]interface{}{
+	resp := map[string]any{
+		"errors": []map[string]any{
 			{"detail": detail, "status": fmt.Sprintf("%d", status)},
 		},
 	}
@@ -189,7 +189,7 @@ func WriteError(t testing.TB, w http.ResponseWriter, status int, detail string) 
 }
 
 // WriteJSON writes a standard JSON response (for non-JSON:API endpoints).
-func WriteJSON(t testing.TB, w http.ResponseWriter, status int, v interface{}) {
+func WriteJSON(t testing.TB, w http.ResponseWriter, status int, v any) {
 	t.Helper()
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

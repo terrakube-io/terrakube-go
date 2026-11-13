@@ -41,8 +41,8 @@ func TestOperationsService_Submit(t *testing.T) {
 
 		testutil.WriteJSON(t, w, http.StatusOK, &terrakube.AtomicResponse{
 			Results: []terrakube.AtomicResult{
-				{Data: map[string]interface{}{"type": "workspace", "id": "ws-1"}},
-				{Data: map[string]interface{}{"type": "variable", "id": "var-1"}},
+				{Data: map[string]any{"type": "workspace", "id": "ws-1"}},
+				{Data: map[string]any{"type": "variable", "id": "var-1"}},
 			},
 		})
 	})
@@ -54,15 +54,15 @@ func TestOperationsService_Submit(t *testing.T) {
 			{
 				Op:  terrakube.OperationAdd,
 				Ref: terrakube.OperationRef{Type: "workspace"},
-				Data: map[string]interface{}{
-					"attributes": map[string]interface{}{"name": "ws-new"},
+				Data: map[string]any{
+					"attributes": map[string]any{"name": "ws-new"},
 				},
 			},
 			{
 				Op:  terrakube.OperationUpdate,
 				Ref: terrakube.OperationRef{Type: "variable", ID: "var-1"},
-				Data: map[string]interface{}{
-					"attributes": map[string]interface{}{"value": "updated"},
+				Data: map[string]any{
+					"attributes": map[string]any{"value": "updated"},
 				},
 			},
 		},
@@ -126,5 +126,28 @@ func TestOperationsService_Submit_ServerError(t *testing.T) {
 	})
 	if err == nil {
 		t.Fatal("expected error for 500 response")
+	}
+}
+
+// TestOperation_ZeroRefIsSerialized pins that "ref" is always sent, even for a
+// zero OperationRef: encoding/json ignores omitempty on struct-typed fields.
+func TestOperation_ZeroRefIsSerialized(t *testing.T) {
+	t.Parallel()
+
+	b, err := json.Marshal(terrakube.Operation{Op: terrakube.OperationAdd, Href: "/x"})
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(b, &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	ref, ok := got["ref"].(map[string]any)
+	if !ok {
+		t.Fatalf("ref missing or not an object in %s", b)
+	}
+	if typ, ok := ref["type"]; !ok || typ != "" {
+		t.Errorf("ref = %v, want {\"type\":\"\"}", ref)
 	}
 }

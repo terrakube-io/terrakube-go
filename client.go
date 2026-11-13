@@ -38,7 +38,7 @@ func doList[T any](c *Client, req *http.Request) ([]*T, error) {
 		return nil, nil
 	}
 
-	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeOf((*T)(nil)))
+	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
 		return nil, fmt.Errorf("decoding JSON:API list response: %w", err)
 	}
@@ -258,12 +258,12 @@ func (c *Client) apiPath(segments ...string) string {
 }
 
 // request builds an authenticated JSON:API HTTP request.
-func (c *Client) request(ctx context.Context, method, reqPath string, body interface{}) (*http.Request, error) {
+func (c *Client) request(ctx context.Context, method, reqPath string, body any) (*http.Request, error) {
 	return c.requestWithQuery(ctx, method, reqPath, nil, body)
 }
 
 // requestWithQuery builds an authenticated JSON:API HTTP request with query parameters.
-func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, params url.Values, body interface{}) (*http.Request, error) {
+func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, params url.Values, body any) (*http.Request, error) {
 	rel := &url.URL{Path: reqPath}
 	u := c.baseURL.ResolveReference(rel)
 
@@ -298,7 +298,7 @@ func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, p
 // do executes a request and decodes a single JSON:API resource response.
 // If v is nil, no response body decoding is performed (used for DELETE).
 // For list responses, use the generic doList[T] function instead.
-func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+func (c *Client) do(req *http.Request, v any) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -325,7 +325,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { 
 
 // requestRaw builds an authenticated HTTP request with standard JSON content type.
 // Used for non-JSON:API endpoints like TeamToken.
-func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body interface{}) (*http.Request, error) {
+func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body any) (*http.Request, error) {
 	rel := &url.URL{Path: rawPath}
 	u := c.baseURL.ResolveReference(rel)
 
@@ -355,7 +355,7 @@ func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body in
 
 // doRaw executes a request and decodes the response using encoding/json.
 // Used for non-JSON:API endpoints.
-func (c *Client) doRaw(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+func (c *Client) doRaw(req *http.Request, v any) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err

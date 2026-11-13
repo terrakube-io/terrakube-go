@@ -122,7 +122,7 @@ func doListWithLinks[T any](c *Client, req *http.Request) ([]*T, string, error) 
 		return nil, "", nil
 	}
 
-	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeOf((*T)(nil)))
+	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
 		return nil, "", fmt.Errorf("decoding JSON:API list response: %w", err)
 	}

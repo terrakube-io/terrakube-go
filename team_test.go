@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/google/jsonapi"
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
-	"github.com/google/jsonapi"
 )
 
 func TestTeamService_List(t *testing.T) {
@@ -504,7 +504,7 @@ func TestTeam_BooleanFieldsSerialization(t *testing.T) {
 	}
 
 	var data struct {
-		Attributes map[string]interface{} `json:"attributes"`
+		Attributes map[string]any `json:"attributes"`
 	}
 	if err := json.Unmarshal(payload["data"], &data); err != nil {
 		t.Fatalf("failed to unmarshal data: %v", err)

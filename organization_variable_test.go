@@ -12,8 +12,6 @@ import (
 	"github.com/terrakube-io/terrakube-go/testutil"
 )
 
-func boolPtr(b bool) *bool { return &b }
-
 func newTestOrganizationVariable() *terrakube.OrganizationVariable {
 	return &terrakube.OrganizationVariable{
 		ID:          "gv-1",
@@ -21,7 +19,7 @@ func newTestOrganizationVariable() *terrakube.OrganizationVariable {
 		Value:       "DEBUG",
 		Description: "Terraform log level",
 		Category:    "ENV",
-		Sensitive:   boolPtr(false),
+		Sensitive:   new(false),
 		Hcl:         false,
 	}
 }
@@ -161,7 +159,7 @@ func TestOrganizationVariableService_Create(t *testing.T) {
 		Key:       "TF_LOG",
 		Value:     "DEBUG",
 		Category:  "ENV",
-		Sensitive: boolPtr(false),
+		Sensitive: new(false),
 		Hcl:       false,
 	}
 	v, err := client.OrganizationVariables.Create(context.Background(), "org-1", input)
@@ -290,7 +288,7 @@ func TestOrganizationVariable_BooleanFalseNotDropped(t *testing.T) {
 		Key:       "MY_VAR",
 		Value:     "val",
 		Category:  "ENV",
-		Sensitive: boolPtr(false),
+		Sensitive: new(false),
 		Hcl:       false,
 	}
 
@@ -341,7 +339,7 @@ func TestOrganizationVariable_BooleanTruePreserved(t *testing.T) {
 		Key:       "MY_VAR",
 		Value:     "val",
 		Category:  "ENV",
-		Sensitive: boolPtr(true),
+		Sensitive: new(true),
 		Hcl:       true,
 	}
 
