@@ -12,9 +12,13 @@ jobs:
   ci:
     uses: ./.github/workflows/ci.yml
 
+  # A release is created only if the library works against a real server.
+  smoke:
+    uses: ./.github/workflows/smoke.yml
+
   release:
     name: Create Release
-    needs: ci
+    needs: [ci, smoke]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
