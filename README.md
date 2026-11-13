@@ -185,7 +185,7 @@ To move to a new Terrakube release:
 
 1. Fetch its document. Terrakube no longer publishes current documents on GitHub, so fetch it from a running server of that version (`GET /doc`, bearer token from `$TERRAKUBE_TOKEN`). `--repo`/`--ref` fetch from GitHub when an upstream file exists.
 2. Run `spec-diff` against the current version to see what changed.
-3. Run `spec-sync --to=<version>`. It updates `APIVersion`, fixes resource types and filter keys, adds new attributes and relationships, marks fields the document no longer lists with a `// DEPRECATED (...)` comment (it never deletes them), and generates new resources with their service, interfaces, and tests.
+3. Run `spec-sync --to=<version>`. It updates `APIVersion`, fixes resource types and filter keys, adds new attributes and relationships, marks fields the document no longer lists with a `// Deprecated:` doc comment (it never deletes them), and generates new resources with their service, interfaces, and tests.
 4. Review the generated code, add new resources to the table above, and run `mise run check` and `mise run spec-check -- --fail-on-missing`.
 
 CI runs the tool's tests and fails when the client no longer matches the vendored document.

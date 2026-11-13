@@ -316,15 +316,15 @@ func applyFieldChanges(lib *library, p syncPlan, mark func(*sourceFile)) error {
 				if hasMarker(st, d.JSONName) {
 					break
 				}
-				// Not Go's "Deprecated:" form: Elide hides some fields from the
-				// document that the server still serves, so this is a marker for
-				// review. A trailing comment keeps the struct's alignment.
-				marker := fmt.Sprintf("DEPRECATED (absent from the Terrakube API %s OpenAPI document; kept for compatibility).", p.Version)
-				if field.Comment == nil {
-					f.insert(f.lineEnd(f.offset(field.End())), " // "+marker)
-				} else {
-					f.insert(f.lineStart(f.offset(field.Pos())), "\t// "+marker+"\n")
+				// Go's "Deprecated:" form, which gopls, staticcheck and pkg.go.dev
+				// understand. It has to be a paragraph of the field's doc comment:
+				// a trailing comment is not read as documentation. Elide hides
+				// some fields the server still serves, so review each marker.
+				marker := fmt.Sprintf("\t// Deprecated: absent from the Terrakube API %s OpenAPI document; kept for compatibility.\n", p.Version)
+				if field.Doc != nil {
+					marker = "\t//\n" + marker
 				}
+				f.insert(f.lineStart(f.offset(field.Pos())), marker)
 				mark(f)
 			}
 		}
@@ -511,7 +511,7 @@ func snakeCase(name string) string {
 }
 
 // dropMarkedDeprecations removes from the plan the fields that already carry
-// a DEPRECATED marker, which reflection on the compiled client cannot see.
+// a deprecation marker, which reflection on the compiled client cannot see.
 func dropMarkedDeprecations(dir string, p *syncPlan) error {
 	if len(p.Deprecations) == 0 {
 		return nil
@@ -537,8 +537,11 @@ func dropMarkedDeprecations(dir string, p *syncPlan) error {
 func hasMarker(st *ast.StructType, jsonName string) bool {
 	for _, field := range st.Fields.List {
 		if kind, name := jsonapiTag(field); kind == "attr" && name == jsonName {
-			return (field.Doc != nil && strings.Contains(field.Doc.Text(), "DEPRECATED")) ||
-				(field.Comment != nil && strings.Contains(field.Comment.Text(), "DEPRECATED"))
+			// "DEPRECATED" is the form this tool wrote before it used Go's.
+			marked := func(c *ast.CommentGroup) bool {
+				return c != nil && (strings.Contains(c.Text(), "Deprecated:") || strings.Contains(c.Text(), "DEPRECATED"))
+			}
+			return marked(field.Doc) || marked(field.Comment)
 		}
 	}
 	return false

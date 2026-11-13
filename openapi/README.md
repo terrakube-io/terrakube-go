@@ -32,4 +32,4 @@ Files are normalized by `speccheck fetch`: parsed as OpenAPI 3, re-encoded as in
 
 - Every relationship's `data` is rendered as an array; cardinality comes from the `/relationships/{name}` endpoints.
 - Only some nested paths are listed, but the server serves every relationship chain. `speccheck` resolves undocumented paths hop by hop through the relationships.
-- Some fields the server returns may be hidden from the document. Fields the document does not list are kept in the client and marked `// DEPRECATED (...)` for review, never deleted.
+- Some fields the server returns may be hidden from the document. Fields the document does not list are kept in the client and marked with a `// Deprecated:` doc comment for review, never deleted.
