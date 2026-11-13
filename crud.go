@@ -144,7 +144,10 @@ func (s *crudService[T]) create(ctx context.Context, path string, entity *T) (*T
 	return created, nil
 }
 
-// update patches an existing resource at the given path.
+// update patches an existing resource at the given path and returns its new
+// state. The server answers a PATCH with 204 and no body, so the state is then
+// read with a GET of the same path. If the update made the resource unreadable
+// (a disabled organization answers 404), the entity that was sent is returned.
 func (s *crudService[T]) update(ctx context.Context, path string, entity *T) (*T, error) {
 	req, err := s.client.request(ctx, http.MethodPatch, path, entity)
 	if err != nil {
@@ -152,9 +155,16 @@ func (s *crudService[T]) update(ctx context.Context, path string, entity *T) (*T
 	}
 
 	updated := new(T)
-	_, err = s.client.do(req, updated)
+	resp, err := s.client.do(req, updated)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode == http.StatusNoContent || resp.ContentLength == 0 {
+		fresh, err := s.get(ctx, path)
+		if IsNotFound(err) {
+			return entity, nil // the update itself succeeded
+		}
+		return fresh, err
 	}
 
 	return updated, nil
