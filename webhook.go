@@ -1,15 +1,18 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Webhook represents a workspace webhook (v1 flat format).
 type Webhook struct {
 	ID           string          `jsonapi:"primary,webhook"`
 	RemoteHookID string          `jsonapi:"attr,remoteHookId"`
 	CreatedBy    *string         `jsonapi:"attr,createdBy"`
-	CreatedDate  *string         `jsonapi:"attr,createdDate"`
+	CreatedDate  *time.Time      `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy    *string         `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string         `jsonapi:"attr,updatedDate"`
+	UpdatedDate  *time.Time      `jsonapi:"attr,updatedDate,rfc3339"`
 	MigratedV2   bool            `jsonapi:"attr,migratedV2"`
 	SyncError    *string         `jsonapi:"attr,syncError"`
 	Events       []*WebhookEvent `jsonapi:"relation,events,omitempty"`
@@ -18,20 +21,20 @@ type Webhook struct {
 
 // WebhookEvent represents a webhook event entity.
 type WebhookEvent struct {
-	ID                string   `jsonapi:"primary,webhook_event"`
-	Branch            string   `jsonapi:"attr,branch"`
-	CreatedBy         string   `jsonapi:"attr,createdBy"`
-	CreatedDate       string   `jsonapi:"attr,createdDate"`
-	Event             string   `jsonapi:"attr,event"`
-	Path              string   `jsonapi:"attr,path"`
-	PathType          string   `jsonapi:"attr,pathType,omitempty"`
-	Priority          int32    `jsonapi:"attr,priority"`
-	TemplateID        string   `jsonapi:"attr,templateId"`
-	PRWorkflowEnabled bool     `jsonapi:"attr,prWorkflowEnabled,omitempty"`
-	PRApplyEnabled    bool     `jsonapi:"attr,prApplyEnabled,omitempty"`
-	UpdatedBy         string   `jsonapi:"attr,updatedBy"`
-	UpdatedDate       string   `jsonapi:"attr,updatedDate"`
-	Webhook           *Webhook `jsonapi:"relation,webhook,omitempty"`
+	ID                string     `jsonapi:"primary,webhook_event"`
+	Branch            string     `jsonapi:"attr,branch"`
+	CreatedBy         string     `jsonapi:"attr,createdBy"`
+	CreatedDate       *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	Event             string     `jsonapi:"attr,event"`
+	Path              string     `jsonapi:"attr,path"`
+	PathType          string     `jsonapi:"attr,pathType,omitempty"`
+	Priority          int32      `jsonapi:"attr,priority"`
+	TemplateID        string     `jsonapi:"attr,templateId"`
+	PRWorkflowEnabled bool       `jsonapi:"attr,prWorkflowEnabled,omitempty"`
+	PRApplyEnabled    bool       `jsonapi:"attr,prApplyEnabled,omitempty"`
+	UpdatedBy         string     `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
+	Webhook           *Webhook   `jsonapi:"relation,webhook,omitempty"`
 }
 
 // WebhookService handles communication with the webhook related methods

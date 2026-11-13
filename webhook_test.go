@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -406,13 +407,13 @@ func TestWebhookEventService_Get(t *testing.T) {
 			ID:          "evt1",
 			Branch:      "main",
 			CreatedBy:   "admin",
-			CreatedDate: "2025-01-15T10:00:00Z",
+			CreatedDate: new(time.Date(2025, 1, 15, 10, 0, 0, 0, time.UTC)),
 			Event:       "push",
 			Path:        "/src",
 			Priority:    1,
 			TemplateID:  "tpl1",
 			UpdatedBy:   "admin",
-			UpdatedDate: "2025-01-15T10:00:00Z",
+			UpdatedDate: new(time.Date(2025, 1, 15, 10, 0, 0, 0, time.UTC)),
 		})
 	})
 

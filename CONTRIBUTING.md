@@ -18,6 +18,7 @@ go mod download
 - All exported types and functions must have doc comments
 - No `omitempty` on boolean `jsonapi` struct tags (booleans must serialize `false`)
 - Use `*string` for optional string fields
+- Use `*time.Time` with the `rfc3339` tag option for date attributes: `jsonapi:"attr,createdDate,rfc3339"`
 - All service methods take `context.Context` as first parameter
 - Validate non-empty IDs before building URL paths
 - Use `google/jsonapi` for JSON:API serialization, `encoding/json` only for non-JSON:API endpoints

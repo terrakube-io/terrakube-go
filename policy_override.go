@@ -1,17 +1,20 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicyOverride represents a Terrakube policy override resource.
 type PolicyOverride struct {
 	ID            string            `jsonapi:"primary,policy_override"`
 	Justification *string           `jsonapi:"attr,justification"`
-	OverriddenAt  *string           `jsonapi:"attr,overriddenAt"`
+	OverriddenAt  *time.Time        `jsonapi:"attr,overriddenAt,rfc3339"`
 	OverriddenBy  *string           `jsonapi:"attr,overriddenBy"`
 	CreatedBy     *string           `jsonapi:"attr,createdBy"`
-	CreatedDate   *string           `jsonapi:"attr,createdDate"`
+	CreatedDate   *time.Time        `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy     *string           `jsonapi:"attr,updatedBy"`
-	UpdatedDate   *string           `jsonapi:"attr,updatedDate"`
+	UpdatedDate   *time.Time        `jsonapi:"attr,updatedDate,rfc3339"`
 	Evaluation    *PolicyEvaluation `jsonapi:"relation,evaluation,omitempty"`
 }
 

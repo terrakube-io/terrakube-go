@@ -289,6 +289,15 @@ func fieldGoType(name string, p speccheck.Property) string {
 	return t
 }
 
+// attrTag returns the jsonapi tag value of an attribute: dates carry the
+// rfc3339 option so that they are sent in the format the API expects.
+func attrTag(goType, jsonName string) string {
+	if goType == "*time.Time" {
+		return "attr," + jsonName + ",rfc3339"
+	}
+	return "attr," + jsonName
+}
+
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {

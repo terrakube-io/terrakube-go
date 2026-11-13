@@ -21,6 +21,7 @@ Single flat `terrakube` package at the repo root. No sub-packages except `testut
 - Functional options pattern for `NewClient`
 - NO `omitempty` on boolean struct tags (fixes dropped `false` values)
 - `*string` for optional string fields
+- `*time.Time` with the `rfc3339` tag option for date attributes (the server sends and accepts RFC 3339 in UTC)
 - `context.Context` on all service methods
 - HTTP status code checking on all responses (non-2xx returns `*APIError`)
 - ID validation before URL path construction

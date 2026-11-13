@@ -81,6 +81,10 @@ func ValidateModel(m ModelInfo, res *Resource) ModelReport {
 		}
 		if !TypesCompatible(name, f.Type, prop) {
 			rep.Issues = append(rep.Issues, Issue{Kind: TypeMismatch, Field: name, GoType: f.Type.String(), SpecType: prop.String()})
+		} else if isTime(f.Type) && !slices.Contains(f.Options, "rfc3339") {
+			// Without the option jsonapi reads and writes Unix numbers, and
+			// every response carrying this attribute fails to decode.
+			rep.Issues = append(rep.Issues, Issue{Kind: TypeMismatch, Field: name, GoType: f.Type.String() + " without the rfc3339 tag option", SpecType: prop.String()})
 		}
 	}
 	for name, f := range goAttrs {

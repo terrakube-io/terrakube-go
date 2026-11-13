@@ -1,14 +1,17 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicyAttachment represents a Terrakube policy attachment resource.
 type PolicyAttachment struct {
 	ID          string     `jsonapi:"primary,policy_attachment"`
 	CreatedBy   *string    `jsonapi:"attr,createdBy"`
-	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	CreatedDate *time.Time `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	UpdatedDate *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 	PolicySet   *PolicySet `jsonapi:"relation,policySet,omitempty"`
 	Project     *Project   `jsonapi:"relation,project,omitempty"`
 	Tag         *Tag       `jsonapi:"relation,tag,omitempty"`

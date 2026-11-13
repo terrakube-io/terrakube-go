@@ -1,15 +1,18 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // RunTrigger represents a Terrakube run trigger resource.
 type RunTrigger struct {
 	ID                   string     `jsonapi:"primary,runTrigger"`
 	Enabled              bool       `jsonapi:"attr,enabled"`
 	CreatedBy            *string    `jsonapi:"attr,createdBy"`
-	CreatedDate          *string    `jsonapi:"attr,createdDate"`
+	CreatedDate          *time.Time `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy            *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate          *string    `jsonapi:"attr,updatedDate"`
+	UpdatedDate          *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 	DestinationWorkspace *Workspace `jsonapi:"relation,destinationWorkspace,omitempty"`
 	SourceWorkspace      *Workspace `jsonapi:"relation,sourceWorkspace,omitempty"`
 	Template             *Template  `jsonapi:"relation,template,omitempty"`

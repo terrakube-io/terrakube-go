@@ -1,15 +1,18 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // NotificationTrigger represents a Terrakube notification trigger resource.
 type NotificationTrigger struct {
 	ID            string                     `jsonapi:"primary,notification_trigger"`
 	JobStatus     string                     `jsonapi:"attr,jobStatus"`
 	CreatedBy     *string                    `jsonapi:"attr,createdBy"`
-	CreatedDate   *string                    `jsonapi:"attr,createdDate"`
+	CreatedDate   *time.Time                 `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy     *string                    `jsonapi:"attr,updatedBy"`
-	UpdatedDate   *string                    `jsonapi:"attr,updatedDate"`
+	UpdatedDate   *time.Time                 `jsonapi:"attr,updatedDate,rfc3339"`
 	Configuration *NotificationConfiguration `jsonapi:"relation,configuration,omitempty"`
 }
 

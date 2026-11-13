@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Workspace represents a Terrakube workspace resource.
 type Workspace struct {
@@ -22,11 +25,11 @@ type Workspace struct {
 	LockDescription                 *string                      `jsonapi:"attr,lockDescription"`
 	ModuleSSHKey                    *string                      `jsonapi:"attr,moduleSshKey"`
 	LastJobStatus                   *string                      `jsonapi:"attr,lastJobStatus"`
-	LastJobDate                     *string                      `jsonapi:"attr,lastJobDate"`
+	LastJobDate                     *time.Time                   `jsonapi:"attr,lastJobDate,rfc3339"`
 	CreatedBy                       *string                      `jsonapi:"attr,createdBy"`
-	CreatedDate                     *string                      `jsonapi:"attr,createdDate"`
+	CreatedDate                     *time.Time                   `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy                       *string                      `jsonapi:"attr,updatedBy"`
-	UpdatedDate                     *string                      `jsonapi:"attr,updatedDate"`
+	UpdatedDate                     *time.Time                   `jsonapi:"attr,updatedDate,rfc3339"`
 	PolicyComplianceStatus          *string                      `jsonapi:"attr,policyComplianceStatus"`
 	RequireApproveToApply           bool                         `jsonapi:"attr,requireApproveToApply"`
 	RestrictApplyToConfiguredBranch bool                         `jsonapi:"attr,restrictApplyToConfiguredBranch"`

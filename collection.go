@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Collection represents a Terrakube collection resource.
 type Collection struct {
@@ -9,9 +12,9 @@ type Collection struct {
 	Description  *string                `jsonapi:"attr,description"`
 	Priority     int32                  `jsonapi:"attr,priority"`
 	CreatedBy    *string                `jsonapi:"attr,createdBy"`
-	CreatedDate  *string                `jsonapi:"attr,createdDate"`
+	CreatedDate  *time.Time             `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy    *string                `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string                `jsonapi:"attr,updatedDate"`
+	UpdatedDate  *time.Time             `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization *Organization          `jsonapi:"relation,organization,omitempty"`
 	Items        []*CollectionItem      `jsonapi:"relation,item,omitempty"`
 	References   []*CollectionReference `jsonapi:"relation,reference,omitempty"`

@@ -1,15 +1,18 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // WorkspaceTag represents a tag association on a workspace.
 type WorkspaceTag struct {
 	ID          string     `jsonapi:"primary,workspacetag"`
 	TagID       string     `jsonapi:"attr,tagId"`
 	CreatedBy   *string    `jsonapi:"attr,createdBy"`
-	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	CreatedDate *time.Time `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	UpdatedDate *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 	Value       *string    `jsonapi:"attr,value"`
 	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }

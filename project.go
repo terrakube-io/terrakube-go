@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Project represents a Terrakube project resource.
 type Project struct {
@@ -8,9 +11,9 @@ type Project struct {
 	Name          string           `jsonapi:"attr,name"`
 	Description   *string          `jsonapi:"attr,description"`
 	CreatedBy     *string          `jsonapi:"attr,createdBy"`
-	CreatedDate   *string          `jsonapi:"attr,createdDate"`
+	CreatedDate   *time.Time       `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy     *string          `jsonapi:"attr,updatedBy"`
-	UpdatedDate   *string          `jsonapi:"attr,updatedDate"`
+	UpdatedDate   *time.Time       `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization  *Organization    `jsonapi:"relation,organization,omitempty"`
 	ProjectAccess []*ProjectAccess `jsonapi:"relation,projectAccess,omitempty"`
 }

@@ -32,6 +32,8 @@ type sourceFile struct {
 	fset  *token.FileSet
 	file  *ast.File
 	edits []edit
+
+	timeAdded bool // importTime already queued its edit
 }
 
 func (f *sourceFile) offset(p token.Pos) int { return f.fset.Position(p).Offset }
@@ -49,6 +51,32 @@ func (f *sourceFile) lineEnd(off int) int {
 
 func (f *sourceFile) insert(off int, text string) {
 	f.edits = append(f.edits, edit{start: off, end: off, text: text})
+}
+
+// importTime makes sure the file imports "time".
+func (f *sourceFile) importTime() {
+	if f.timeAdded {
+		return
+	}
+	f.timeAdded = true
+	for _, imp := range f.file.Imports {
+		if imp.Path.Value == `"time"` && imp.Name == nil {
+			return
+		}
+	}
+	for _, decl := range f.file.Decls {
+		gd, ok := decl.(*ast.GenDecl)
+		if !ok || gd.Tok != token.IMPORT {
+			continue
+		}
+		if gd.Lparen.IsValid() {
+			f.insert(f.lineStart(f.offset(gd.Rparen)), "\t\"time\"\n")
+		} else {
+			f.insert(f.offset(gd.End()), "\nimport \"time\"")
+		}
+		return
+	}
+	f.insert(f.offset(f.file.Name.End()), "\n\nimport \"time\"")
 }
 
 // result applies the edits and formats the file with gofumpt.
@@ -302,6 +330,7 @@ func applyFieldChanges(lib *library, p syncPlan, mark func(*sourceFile)) error {
 		}
 
 		var attrs, rels strings.Builder
+		needTime := false
 		for _, nf := range byModel[model] {
 			if nf.Relation {
 				if !existing["relation:"+nf.JSONName] {
@@ -310,7 +339,8 @@ func applyFieldChanges(lib *library, p syncPlan, mark func(*sourceFile)) error {
 				continue
 			}
 			if !existing["attr:"+nf.JSONName] {
-				fmt.Fprintf(&attrs, "\n\t%s %s `jsonapi:\"attr,%s\"`", nf.GoName, nf.GoType, nf.JSONName)
+				fmt.Fprintf(&attrs, "\n\t%s %s `jsonapi:\"%s\"`", nf.GoName, nf.GoType, attrTag(nf.GoType, nf.JSONName))
+				needTime = needTime || nf.GoType == "*time.Time"
 			}
 		}
 		if attrs.Len() > 0 {
@@ -318,6 +348,9 @@ func applyFieldChanges(lib *library, p syncPlan, mark func(*sourceFile)) error {
 				return fmt.Errorf("%s has no primary or attribute field to insert after", model)
 			}
 			f.insert(f.lineEnd(f.offset(st.Fields.List[lastAttr].End())), attrs.String())
+			if needTime {
+				f.importTime()
+			}
 			mark(f)
 		}
 		if rels.Len() > 0 {

@@ -192,7 +192,7 @@ func TestPlanResource(t *testing.T) {
 		for _, a := range g.Attrs {
 			names = append(names, a.JSONName+":"+a.GoType)
 		}
-		want := []string{"enabled:bool", "name:*string", "retries:*int32", "updatedDate:*string"}
+		want := []string{"enabled:bool", "name:*string", "retries:*int32", "updatedDate:*time.Time"}
 		if !slices.Equal(names, want) {
 			t.Errorf("Attrs = %v, want %v (audit attributes last)", names, want)
 		}
@@ -240,6 +240,7 @@ func TestApplyPlan_AppliesChangesAndIsIdempotent(t *testing.T) {
 		FilterKeys: []filterKeyFix{{Service: "Workspaces", Old: "filter[workspace]", New: "filter[workspace2]"}},
 		NewFields: []newField{
 			{Model: "Organization", GoName: "Quota", GoType: "*int32", JSONName: "quota"},
+			{Model: "Organization", GoName: "ExpiresAt", GoType: "*time.Time", JSONName: "expiresAt"},
 			{Model: "Organization", GoName: "Gadgets", GoType: "[]*Workspace", JSONName: "gadget", Relation: true},
 		},
 		Deprecations: []deprecation{{Model: "Organization", GoName: "Icon", JSONName: "icon"}},
@@ -266,12 +267,13 @@ func TestApplyPlan_AppliesChangesAndIsIdempotent(t *testing.T) {
 		t.Error("client.go has no Gadgets field")
 	}
 	mustContain(t, "organization.go", files["organization.go"],
-		"Quota", `jsonapi:"attr,quota"`, `jsonapi:"relation,gadget,omitempty"`,
+		"Quota", `jsonapi:"attr,quota"`, "ExpiresAt", "*time.Time", `jsonapi:"attr,expiresAt,rfc3339"`, `"time"`, `jsonapi:"relation,gadget,omitempty"`,
 		"DEPRECATED (absent from the Terrakube API 9.9.9 OpenAPI document; kept for compatibility).")
 	mustContain(t, "tag.go", files["tag.go"], `primary,tag2`)
 	mustContain(t, "interfaces.go", files["interfaces.go"], "type GadgetLister interface", "GadgetCRUD", "_ WidgetCRUD")
 	mustContain(t, "crud_test.go", files["crud_test.go"], `"filter[workspace2]"`, `"Gadgets":`, `"Widgets":`)
-	mustContain(t, "gadget.go", files["gadget.go"], "type Gadget struct", `jsonapi:"primary,gadget"`, "func (s *GadgetService) Delete(")
+	mustContain(t, "gadget.go", files["gadget.go"], "type Gadget struct", `jsonapi:"primary,gadget"`, `jsonapi:"attr,updatedDate,rfc3339"`, `"time"`,
+		"a field left at its zero value overwrites the value on the server.", "func (s *GadgetService) Delete(")
 	mustContain(t, "gadget_test.go", files["gadget_test.go"], "func TestGadgetService_Create(", "TestGadget_BooleanFieldsSerialization")
 
 	fset := token.NewFileSet()
