@@ -6,15 +6,19 @@ import (
 )
 
 // Job represents a Terrakube job resource.
+//
+// The attributes marked omitempty are set by the server (status, approval,
+// dispatch and plan artifact data). It rejects a create request that mentions
+// any of them, even as null, so they are sent only when set.
 type Job struct {
 	ID                             string              `jsonapi:"primary,job"`
 	Output                         string              `jsonapi:"attr,output"`
-	Status                         string              `jsonapi:"attr,status"`
-	ApprovalTeam                   *string             `jsonapi:"attr,approvalTeam"`
+	Status                         string              `jsonapi:"attr,status,omitempty"`
+	ApprovalTeam                   *string             `jsonapi:"attr,approvalTeam,omitempty"`
 	Comments                       *string             `jsonapi:"attr,comments"`
 	CommitID                       *string             `jsonapi:"attr,commitId"`
 	OverrideBranch                 *string             `jsonapi:"attr,overrideBranch"`
-	OverrideSource                 *string             `jsonapi:"attr,overrideSource"`
+	OverrideSource                 *string             `jsonapi:"attr,overrideSource,omitempty"`
 	PlanChanges                    bool                `jsonapi:"attr,planChanges"`
 	Refresh                        bool                `jsonapi:"attr,refresh"`
 	RefreshOnly                    bool                `jsonapi:"attr,refreshOnly"`
@@ -29,22 +33,22 @@ type Job struct {
 	CreatedDate                    *time.Time          `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy                      *string             `jsonapi:"attr,updatedBy"`
 	UpdatedDate                    *time.Time          `jsonapi:"attr,updatedDate,rfc3339"`
-	ApprovedAt                     *time.Time          `jsonapi:"attr,approvedAt,rfc3339"`
-	ApprovedBy                     *string             `jsonapi:"attr,approvedBy"`
-	CascadeDepth                   *int32              `jsonapi:"attr,cascadeDepth"`
-	DispatchFailureCount           *int32              `jsonapi:"attr,dispatchFailureCount"`
-	DispatchFirstFailureAt         *time.Time          `jsonapi:"attr,dispatchFirstFailureAt,rfc3339"`
-	DispatchLastAttemptAt          *time.Time          `jsonapi:"attr,dispatchLastAttemptAt,rfc3339"`
-	DispatchLastError              *string             `jsonapi:"attr,dispatchLastError"`
-	DispatchNextRetryAt            *time.Time          `jsonapi:"attr,dispatchNextRetryAt,rfc3339"`
-	EncryptedVariables             *string             `jsonapi:"attr,encryptedVariables"`
-	ResolvedTerraformVersion       *string             `jsonapi:"attr,resolvedTerraformVersion"`
-	TerraformPlanArtifacts         *string             `jsonapi:"attr,terraformPlanArtifacts"`
-	TerraformPlanArtifactsChecksum *string             `jsonapi:"attr,terraformPlanArtifactsChecksum"`
-	TriggeredByJobID               *int32              `jsonapi:"attr,triggeredByJobId"`
-	VariableNames                  []string            `jsonapi:"attr,variableNames"`
+	ApprovedAt                     *time.Time          `jsonapi:"attr,approvedAt,omitempty,rfc3339"`
+	ApprovedBy                     *string             `jsonapi:"attr,approvedBy,omitempty"`
+	CascadeDepth                   *int32              `jsonapi:"attr,cascadeDepth,omitempty"`
+	DispatchFailureCount           *int32              `jsonapi:"attr,dispatchFailureCount,omitempty"`
+	DispatchFirstFailureAt         *time.Time          `jsonapi:"attr,dispatchFirstFailureAt,omitempty,rfc3339"`
+	DispatchLastAttemptAt          *time.Time          `jsonapi:"attr,dispatchLastAttemptAt,omitempty,rfc3339"`
+	DispatchLastError              *string             `jsonapi:"attr,dispatchLastError,omitempty"`
+	DispatchNextRetryAt            *time.Time          `jsonapi:"attr,dispatchNextRetryAt,omitempty,rfc3339"`
+	EncryptedVariables             *string             `jsonapi:"attr,encryptedVariables,omitempty"`
+	ResolvedTerraformVersion       *string             `jsonapi:"attr,resolvedTerraformVersion,omitempty"`
+	TerraformPlanArtifacts         *string             `jsonapi:"attr,terraformPlanArtifacts,omitempty"`
+	TerraformPlanArtifactsChecksum *string             `jsonapi:"attr,terraformPlanArtifactsChecksum,omitempty"`
+	TriggeredByJobID               *int32              `jsonapi:"attr,triggeredByJobId,omitempty"`
+	VariableNames                  []string            `jsonapi:"attr,variableNames,omitempty"`
 	Variables                      map[string]any      `jsonapi:"attr,variables"`
-	VariablesAsArguments           bool                `jsonapi:"attr,variablesAsArguments"`
+	VariablesAsArguments           bool                `jsonapi:"attr,variablesAsArguments,omitempty"`
 	Organization                   *Organization       `jsonapi:"relation,organization,omitempty"`
 	Workspace                      *Workspace          `jsonapi:"relation,workspace,omitempty"`
 	Steps                          []*Step             `jsonapi:"relation,step,omitempty"`

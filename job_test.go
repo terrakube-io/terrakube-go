@@ -2,6 +2,7 @@ package terrakube_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -313,5 +314,53 @@ func TestJobService_TargetAndReplaceAddrs(t *testing.T) {
 	}
 	if len(created.ReplaceAddrs) != 1 || created.ReplaceAddrs[0] != "aws_instance.web" {
 		t.Errorf("ReplaceAddrs = %v, want [aws_instance.web]", created.ReplaceAddrs)
+	}
+}
+
+// TestJobService_Create_OmitsServerOwnedAttributes: the server answers 403 to
+// a create request that mentions an attribute only it may set, even as null,
+// and 400 to an empty status.
+func TestJobService_Create_OmitsServerOwnedAttributes(t *testing.T) {
+	t.Parallel()
+
+	var sent map[string]any
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/organization/org-1/job", func(w http.ResponseWriter, r *http.Request) {
+		var doc struct {
+			Data struct {
+				Attributes map[string]any `json:"attributes"`
+			} `json:"data"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&doc); err != nil {
+			t.Errorf("decoding request: %v", err)
+		}
+		sent = doc.Data.Attributes
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Job{ID: "1", Status: "pending"})
+	})
+
+	tpl := "tpl-1"
+	_, err := newTestClient(t, srv).Jobs.Create(context.Background(), "org-1", &terrakube.Job{TemplateReference: &tpl})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	for _, attr := range []string{
+		"status", "approvalTeam", "approvedAt", "approvedBy", "cascadeDepth", "dispatchFailureCount",
+		"dispatchFirstFailureAt", "dispatchLastAttemptAt", "dispatchLastError", "dispatchNextRetryAt",
+		"encryptedVariables", "overrideSource", "resolvedTerraformVersion", "terraformPlanArtifacts",
+		"terraformPlanArtifactsChecksum", "triggeredByJobId", "variableNames", "variablesAsArguments",
+		"prNumber", "prCommentError",
+	} {
+		if _, ok := sent[attr]; ok {
+			t.Errorf("create request mentions %q, which only the server may set", attr)
+		}
+	}
+	if sent["templateReference"] != "tpl-1" {
+		t.Errorf("templateReference = %v, want tpl-1", sent["templateReference"])
+	}
+	// Booleans a caller controls are still always sent.
+	for _, attr := range []string{"refresh", "planChanges", "refreshOnly"} {
+		if _, ok := sent[attr]; !ok {
+			t.Errorf("create request does not mention %q", attr)
+		}
 	}
 }

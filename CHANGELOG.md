@@ -40,6 +40,8 @@ Targets Terrakube API 2.34.1.
 - `Webhooks.List` works for a workspace that has a webhook. It failed to decode the response and now returns zero or one element.
 - `Modules.List` no longer fails when a module has versions.
 - `WithHTTPClient(nil)` returns an error instead of causing a nil dereference on the first request.
+- Every `Update` returns the updated resource. The server answers an update with 204 and no body, so the methods returned an empty struct; the state is now read back from the server.
+- `Jobs.Create` works. The server rejects a create request that mentions an attribute only it may set, even as `null`, and the library sent all of them. Those `Job` attributes, and `Webhook.SyncError`, are now sent only when set.
 
 ### Documentation
 

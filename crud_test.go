@@ -1081,3 +1081,64 @@ func TestNewClient_PagedServices(t *testing.T) {
 		t.Errorf("found %d paged services, want %d", found, len(paged))
 	}
 }
+
+// TestCrudService_Update_NoContent: a Terrakube server answers PATCH with 204
+// and no body. Update must still return the resource, read with a GET.
+func TestCrudService_Update_NoContent(t *testing.T) {
+	t.Parallel()
+
+	var mu sync.Mutex
+	var methods []string
+	srv := testutil.NewServer(t)
+	record := func(r *http.Request) {
+		mu.Lock()
+		methods = append(methods, r.Method)
+		mu.Unlock()
+	}
+	srv.HandleFunc("PATCH /api/v1/organization/org-1", func(w http.ResponseWriter, r *http.Request) {
+		record(r)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	srv.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, r *http.Request) {
+		record(r)
+		testutil.WriteJSONAPI(t, w, http.StatusOK, &Organization{ID: "org-1", Name: "Updated", ExecutionMode: "remote"})
+	})
+
+	client := newCrudTestClient(t, srv)
+	got, err := client.Organizations.Update(context.Background(), &Organization{ID: "org-1", Name: "Updated"})
+	if err != nil {
+		t.Fatalf("Update: %v", err)
+	}
+	if got.ID != "org-1" || got.Name != "Updated" || got.ExecutionMode != "remote" {
+		t.Errorf("Update returned %+v, want the state the server holds", got)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if !slices.Equal(methods, []string{http.MethodPatch, http.MethodGet}) {
+		t.Errorf("requests = %v, want PATCH then GET", methods)
+	}
+}
+
+// TestCrudService_Update_NoContentThenNotFound: an update can make the resource
+// unreadable (disabling an organization). The update succeeded, so that is not
+// an error, and the caller gets back what it sent.
+func TestCrudService_Update_NoContentThenNotFound(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("PATCH /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	})
+	srv.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
+		testutil.WriteError(t, w, http.StatusNotFound, "Unknown identifier org-1 for organization")
+	})
+
+	sent := &Organization{ID: "org-1", Name: "Gone", Disabled: true}
+	got, err := newCrudTestClient(t, srv).Organizations.Update(context.Background(), sent)
+	if err != nil {
+		t.Fatalf("Update: %v", err)
+	}
+	if got != sent {
+		t.Errorf("Update returned %+v, want the entity that was sent", got)
+	}
+}
