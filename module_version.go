@@ -8,10 +8,6 @@ type ModuleVersion struct {
 	Version            string  `jsonapi:"attr,version"`
 	Commit             *string `jsonapi:"attr,commit"`
 	GitTag             *string `jsonapi:"attr,gitTag,omitempty"`
-	CreatedBy          *string `jsonapi:"attr,createdBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	CreatedDate        *string `jsonapi:"attr,createdDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	UpdatedBy          *string `jsonapi:"attr,updatedBy"`   // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
-	UpdatedDate        *string `jsonapi:"attr,updatedDate"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	DeprecationMessage *string `jsonapi:"attr,deprecationMessage"`
 	Status             *string `jsonapi:"attr,status"`
 	Module             *Module `jsonapi:"relation,module,omitempty"`

@@ -632,14 +632,12 @@ func ExampleJobService_List() {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		_, _ = w.Write(jsonapiList([]map[string]any{
 			jsonapiItem("job", "job-1", map[string]any{
-				"status":  "completed",
-				"command": "apply",
-				"output":  "Apply complete! Resources: 3 added.",
+				"status": "completed",
+				"output": "Apply complete! Resources: 3 added.",
 			}),
 			jsonapiItem("job", "job-2", map[string]any{
-				"status":  "running",
-				"command": "plan",
-				"output":  "",
+				"status": "running",
+				"output": "",
 			}),
 		}))
 	})

@@ -5,7 +5,6 @@ import "context"
 // Job represents a Terrakube job resource.
 type Job struct {
 	ID                             string              `jsonapi:"primary,job"`
-	Command                        string              `jsonapi:"attr,command"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	Output                         string              `jsonapi:"attr,output"`
 	Status                         string              `jsonapi:"attr,status"`
 	ApprovalTeam                   *string             `jsonapi:"attr,approvalTeam"`
@@ -18,7 +17,6 @@ type Job struct {
 	RefreshOnly                    bool                `jsonapi:"attr,refreshOnly"`
 	PRNumber                       *int                `jsonapi:"attr,prNumber,omitempty"`
 	PRCommentError                 *string             `jsonapi:"attr,prCommentError,omitempty"`
-	Tcl                            *string             `jsonapi:"attr,tcl"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	TemplateReference              *string             `jsonapi:"attr,templateReference"`
 	TerraformPlan                  *string             `jsonapi:"attr,terraformPlan"`
 	Via                            *string             `jsonapi:"attr,via"`

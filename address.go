@@ -6,7 +6,6 @@ import "context"
 type Address struct {
 	ID          string  `jsonapi:"primary,address"`
 	Name        string  `jsonapi:"attr,name"`
-	Type        string  `jsonapi:"attr,type"` // DEPRECATED (absent from the Terrakube API 2.34.1 OpenAPI document; kept for compatibility).
 	CreatedBy   *string `jsonapi:"attr,createdBy"`
 	CreatedDate *string `jsonapi:"attr,createdDate"`
 	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
