@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+// atomicType is the media type of the JSON:API Atomic Operations extension.
+// The server answers 415 to POST /operations with any other Content-Type.
+const atomicType = mediaType + `; ext="https://jsonapi.org/ext/atomic"`
+
 // OperationAction represents the type of atomic operation.
 type OperationAction string
 
@@ -26,7 +30,7 @@ type OperationRef struct {
 // Operation represents a single atomic operation.
 type Operation struct {
 	Op   OperationAction `json:"op"`
-	Ref  OperationRef    `json:"ref"`
+	Ref  OperationRef    `json:"ref,omitzero"` // the server rejects an operation with both ref and href
 	Href string          `json:"href,omitempty"`
 	Data map[string]any  `json:"data,omitempty"`
 	Meta map[string]any  `json:"meta,omitempty"`
@@ -62,6 +66,8 @@ func (s *OperationsService) Submit(ctx context.Context, ops *AtomicRequest) (*At
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set("Content-Type", atomicType)
+	req.Header.Set("Accept", atomicType)
 
 	result := &AtomicResponse{}
 	_, err = s.client.doRaw(req, result)

@@ -408,6 +408,16 @@ func (c *Client) parseAPIError(req *http.Request, statusCode int, body []byte) *
 	}
 	if json.Unmarshal(body, &errResp) == nil {
 		apiErr.Errors = errResp.Errors
+		return apiErr
+	}
+	// POST /operations reports errors as an array with one such object per operation.
+	var perOp []struct {
+		Errors []ErrorDetail `json:"errors"`
+	}
+	if json.Unmarshal(body, &perOp) == nil {
+		for _, e := range perOp {
+			apiErr.Errors = append(apiErr.Errors, e.Errors...)
+		}
 	}
 	return apiErr
 }
