@@ -61,4 +61,5 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`
 1. Create a feature branch from `main`
 2. Make changes with tests
 3. Ensure `mise run check` passes
-4. Open a PR against `main`
+4. Add an entry under `Unreleased` in `CHANGELOG.md` for any change a user of the library can notice
+5. Open a PR against `main`
