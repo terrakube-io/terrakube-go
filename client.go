@@ -16,38 +16,52 @@ import (
 	"github.com/google/jsonapi"
 )
 
+// pageInfo is the pagination metadata the server returns in meta.page.
+type pageInfo struct {
+	Number     int `json:"number"`
+	Limit      int `json:"limit"`
+	TotalPages int `json:"totalPages"`
+}
+
 // doList executes a request and decodes a JSON:API list response into []*T.
-// It avoids runtime reflection by leveraging Go generics.
-func (c *Client) doList[T any](req *http.Request) ([]*T, error) {
+// It also returns the response's meta.page, or nil when the server sent none.
+func (c *Client) doList[T any](req *http.Request) ([]*T, *pageInfo, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close() //nolint:errcheck // response body close errors are inconsequential
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("reading response body: %w", err)
+		return nil, nil, fmt.Errorf("reading response body: %w", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, c.parseAPIError(req, resp.StatusCode, bodyBytes)
+		return nil, nil, c.parseAPIError(req, resp.StatusCode, bodyBytes)
 	}
 
 	if len(bodyBytes) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
-		return nil, fmt.Errorf("decoding JSON:API list response: %w", err)
+		return nil, nil, fmt.Errorf("decoding JSON:API list response: %w", err)
 	}
 
 	result := make([]*T, len(items))
 	for i, item := range items {
 		result[i] = item.(*T)
 	}
-	return result, nil
+
+	var envelope struct {
+		Meta struct {
+			Page *pageInfo `json:"page"`
+		} `json:"meta"`
+	}
+	_ = json.Unmarshal(bodyBytes, &envelope) // the items decoded; missing or odd metadata just means no paging
+	return result, envelope.Meta.Page, nil
 }
 
 // APIVersion is the Terrakube OpenAPI specification version this library targets.
@@ -61,10 +75,21 @@ const (
 )
 
 // ListOptions specifies optional parameters for List methods.
+//
+// Page and PageSize request one specific page. Leave both at zero to list the
+// collection: resource types the library pages are fetched page by page until
+// the server reports no more; all others, and any type for which the server
+// refuses paging, are fetched in one request, so the result stops at any limit
+// the server applies to that type. Links in responses are never followed.
+//
+// The server accepts Page and PageSize only for some resource types: workspace,
+// workspace tag, action, federated, agent, organization variable, and workspace
+// access (verified on Terrakube 2.34.1). For every other resource type List
+// returns a *ValidationError without sending a request when either is set.
 type ListOptions struct {
 	Filter   string // Server-side filter expression (e.g. "name==production").
 	Include  string // Comma-separated relationship names to sideload (e.g. "workspace,organization").
-	Page     int    // 1-indexed page number; 0 means unset (auto-paginate all pages).
+	Page     int    // 1-indexed page number; 0 means unset.
 	PageSize int    // Items per page; 0 means unset (server default).
 }
 
@@ -215,28 +240,28 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 
 	c.Organizations = &OrganizationService{client: c}
-	c.Workspaces = &WorkspaceService{client: c, filterKey: "filter[workspace]"}
+	c.Workspaces = &WorkspaceService{client: c, paged: true, filterKey: "filter[workspace]"}
 	c.Modules = &ModuleService{client: c, filterKey: "filter[module]"}
 	c.Teams = &TeamService{client: c, filterKey: "filter[team]"}
 	c.TeamTokens = &TeamTokenService{client: c}
 	c.Variables = &VariableService{client: c, filterKey: "filter[variable]"}
-	c.OrganizationVariables = &OrganizationVariableService{client: c, filterKey: "filter[globalvar]"}
+	c.OrganizationVariables = &OrganizationVariableService{client: c, paged: true, filterKey: "filter[globalvar]"}
 	c.Templates = &TemplateService{client: c, filterKey: "filter[template]"}
 	c.Tags = &TagService{client: c, filterKey: "filter[tag]"}
 	c.VCS = &VCSService{client: c, filterKey: "filter[vcs]"}
 	c.SSH = &SSHService{client: c, filterKey: "filter[ssh]"}
-	c.Agents = &AgentService{client: c, filterKey: "filter[agent]"}
+	c.Agents = &AgentService{client: c, paged: true, filterKey: "filter[agent]"}
 	c.Collections = &CollectionService{client: c, filterKey: "filter[collection]"}
 	c.CollectionItems = &CollectionItemService{client: c, filterKey: "filter[item]"}
 	c.CollectionReferences = &CollectionReferenceService{client: c, filterKey: "filter[reference]"}
-	c.WorkspaceTags = &WorkspaceTagService{client: c, filterKey: "filter[workspacetag]"}
-	c.WorkspaceAccess = &WorkspaceAccessService{client: c, filterKey: "filter[access]"}
+	c.WorkspaceTags = &WorkspaceTagService{client: c, paged: true, filterKey: "filter[workspacetag]"}
+	c.WorkspaceAccess = &WorkspaceAccessService{client: c, paged: true, filterKey: "filter[access]"}
 	c.WorkspaceSchedules = &WorkspaceScheduleService{client: c, filterKey: "filter[schedule]"}
 	c.Webhooks = &WebhookService{client: c, filterKey: "filter[webhook]"}
 	c.WebhookEvents = &WebhookEventService{client: c, filterKey: "filter[webhook_event]"}
 	c.History = &HistoryService{client: c, filterKey: "filter[history]"}
 	c.Jobs = &JobService{client: c, filterKey: "filter[job]"}
-	c.Actions = &ActionService{client: c}
+	c.Actions = &ActionService{client: c, paged: true}
 	c.Steps = &StepService{client: c, filterKey: "filter[step]"}
 	c.Providers = &ProviderService{client: c, filterKey: "filter[provider]"}
 	c.ProviderVersions = &ProviderVersionService{client: c, filterKey: "filter[version]"}
@@ -246,7 +271,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.Addresses = &AddressService{client: c, filterKey: "filter[address]"}
 	c.Projects = &ProjectService{client: c, filterKey: "filter[project]"}
 	c.ProjectAccess = &ProjectAccessService{client: c, filterKey: "filter[project_access]"}
-	c.Federated = &FederatedService{client: c, filterKey: "filter[federated]"}
+	c.Federated = &FederatedService{client: c, paged: true, filterKey: "filter[federated]"}
 	c.FederatedClaims = &FederatedClaimService{client: c, filterKey: "filter[federated_claim]"}
 	c.Operations = &OperationsService{client: c}
 	c.NotificationConfigurations = &NotificationConfigurationService{client: c, filterKey: "filter[notification_configuration]"}
