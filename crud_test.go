@@ -631,10 +631,11 @@ func TestNewClient_FilterKeys(t *testing.T) {
 
 	// Private fields on Client that aren't services.
 	privateFields := map[string]bool{
-		"baseURL":    true,
-		"token":      true,
-		"httpClient": true,
-		"userAgent":  true,
+		"baseURL":     true,
+		"token":       true,
+		"httpClient":  true,
+		"userAgent":   true,
+		"insecureTLS": true,
 	}
 
 	client, err := NewClient(WithEndpoint("https://example.com"), WithToken("test"))
