@@ -62,6 +62,8 @@ func (s *SSHService) Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 
 // Update modifies an existing SSH key. The SSH key's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *SSHService) Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

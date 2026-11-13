@@ -63,6 +63,8 @@ func (s *PolicyOverrideService) Create(ctx context.Context, orgID, jobID, policy
 
 // Update modifies an existing policy override. The policy override's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, policyEvaluationID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *PolicyOverrideService) Update(ctx context.Context, orgID, jobID, policyEvaluationID string, entity *PolicyOverride) (*PolicyOverride, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

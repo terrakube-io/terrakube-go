@@ -63,6 +63,8 @@ func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID strin
 
 // Update modifies an existing workspace schedule. The schedule's ID field must be set.
 // It returns a *ValidationError if workspaceID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err

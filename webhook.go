@@ -96,6 +96,8 @@ func (s *WebhookService) Create(ctx context.Context, orgID, workspaceID string, 
 
 // Update modifies an existing webhook. The webhook's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WebhookService) Update(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -184,6 +186,8 @@ func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, we
 
 // Update modifies an existing webhook event. The webhook event's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, webhookID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

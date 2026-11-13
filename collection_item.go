@@ -67,6 +67,8 @@ func (s *CollectionItemService) Create(ctx context.Context, orgID, collectionID 
 
 // Update modifies an existing collection item. The item's ID field must be set.
 // It returns a *ValidationError if orgID, collectionID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *CollectionItemService) Update(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

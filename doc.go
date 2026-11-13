@@ -99,6 +99,23 @@
 //	// Delete a workspace.
 //	err = client.Workspaces.Delete(ctx, orgID, ws.ID)
 //
+// # Updating
+//
+// Update sends a JSON:API PATCH with every attribute of the struct, not only
+// the ones that changed. A field left at its zero value therefore overwrites
+// the value on the server: an empty string for a string, false for a bool.
+// Fetch the resource, change it, and pass it back:
+//
+//	ws, err := client.Workspaces.Get(ctx, orgID, wsID)
+//	if err != nil {
+//		return err
+//	}
+//	ws.Description = new("managed by automation")
+//	ws, err = client.Workspaces.Update(ctx, orgID, ws)
+//
+// Relationships are different: a nil or empty relationship is not sent and is
+// left unchanged.
+//
 // # List Filtering
 //
 // List methods accept an optional [ListOptions] parameter for server-side

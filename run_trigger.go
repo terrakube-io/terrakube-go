@@ -71,6 +71,8 @@ func (s *RunTriggerService) Create(ctx context.Context, orgID, workspaceID strin
 
 // Update modifies an existing run trigger. The run trigger's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *RunTriggerService) Update(ctx context.Context, orgID, workspaceID string, entity *RunTrigger) (*RunTrigger, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

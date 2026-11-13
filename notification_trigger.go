@@ -69,6 +69,8 @@ func (s *NotificationTriggerService) Create(ctx context.Context, orgID, configID
 
 // Update modifies an existing notification trigger. The trigger's ID field must be set.
 // It returns a *ValidationError if orgID, configID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *NotificationTriggerService) Update(ctx context.Context, orgID, configID string, trigger *NotificationTrigger) (*NotificationTrigger, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

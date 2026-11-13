@@ -56,6 +56,8 @@ func (s *ActionService) Create(ctx context.Context, action *Action) (*Action, er
 
 // Update modifies an existing action. The action's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, error) {
 	if err := validateID("actionID", action.ID); err != nil {
 		return nil, err

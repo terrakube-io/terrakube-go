@@ -70,6 +70,8 @@ func (s *WorkspaceTagService) Create(ctx context.Context, orgID, workspaceID str
 
 // Update modifies an existing workspace tag. The workspace tag's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WorkspaceTagService) Update(ctx context.Context, orgID, workspaceID string, tag *WorkspaceTag) (*WorkspaceTag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
