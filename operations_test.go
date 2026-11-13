@@ -3,6 +3,7 @@ package terrakube_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"testing"
@@ -16,8 +17,12 @@ func TestOperationsService_Submit(t *testing.T) {
 	srv := testutil.NewServer(t)
 
 	srv.HandleFunc("POST /api/v1/operations", func(w http.ResponseWriter, r *http.Request) {
-		if ct := r.Header.Get("Content-Type"); ct != "application/json" {
-			t.Errorf("Content-Type = %q, want %q", ct, "application/json")
+		const atomic = `application/vnd.api+json; ext="https://jsonapi.org/ext/atomic"`
+		if ct := r.Header.Get("Content-Type"); ct != atomic {
+			t.Errorf("Content-Type = %q, want %q", ct, atomic)
+		}
+		if got := r.Header.Get("Accept"); got != atomic {
+			t.Errorf("Accept = %q, want %q", got, atomic)
 		}
 
 		body, err := io.ReadAll(r.Body)
@@ -129,25 +134,46 @@ func TestOperationsService_Submit_ServerError(t *testing.T) {
 	}
 }
 
-// TestOperation_ZeroRefIsSerialized pins that "ref" is always sent, even for a
-// zero OperationRef: encoding/json ignores omitempty on struct-typed fields.
-func TestOperation_ZeroRefIsSerialized(t *testing.T) {
+// TestOperation_ZeroRefIsOmitted: the server rejects an operation that has both
+// "ref" and "href", so an unset Ref must not be serialized.
+func TestOperation_ZeroRefIsOmitted(t *testing.T) {
 	t.Parallel()
 
-	b, err := json.Marshal(terrakube.Operation{Op: terrakube.OperationAdd, Href: "/x"})
+	b, err := json.Marshal(terrakube.Operation{Op: terrakube.OperationRemove, Href: "/organization/o1"})
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
+	if want := `{"op":"remove","href":"/organization/o1"}`; string(b) != want {
+		t.Errorf("got %s, want %s", b, want)
+	}
 
-	var got map[string]any
-	if err := json.Unmarshal(b, &got); err != nil {
-		t.Fatalf("unmarshal: %v", err)
+	b, err = json.Marshal(terrakube.Operation{Op: terrakube.OperationRemove, Ref: terrakube.OperationRef{Type: "organization", ID: "o1"}})
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
 	}
-	ref, ok := got["ref"].(map[string]any)
+	if want := `{"op":"remove","ref":{"type":"organization","id":"o1"}}`; string(b) != want {
+		t.Errorf("got %s, want %s", b, want)
+	}
+}
+
+// TestOperations_Submit_ErrorArray: the server reports operation errors as an
+// array of error objects; their details must reach APIError.
+func TestOperations_Submit_ErrorArray(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/operations", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`[{"errors":[{"detail":"Unknown identifier x for organization","status":"404"}]}]`))
+	})
+
+	client := newTestClient(t, srv)
+	_, err := client.Operations.Submit(context.Background(), &terrakube.AtomicRequest{})
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
 	if !ok {
-		t.Fatalf("ref missing or not an object in %s", b)
+		t.Fatalf("err = %v, want *APIError", err)
 	}
-	if typ, ok := ref["type"]; !ok || typ != "" {
-		t.Errorf("ref = %v, want {\"type\":\"\"}", ref)
+	if len(apiErr.Errors) != 1 || apiErr.Errors[0].Detail != "Unknown identifier x for organization" {
+		t.Errorf("Errors = %+v, want the server's detail", apiErr.Errors)
 	}
 }
