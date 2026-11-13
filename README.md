@@ -10,7 +10,7 @@ Go client library for the [Terrakube](https://terrakube.io) API.
 go get github.com/terrakube-io/terrakube-go
 ```
 
-Requires Go 1.27 or later.
+Requires Go 1.27 or later; see [Compatibility](#compatibility).
 
 ## Usage
 
@@ -119,6 +119,17 @@ The `APIVersion` constant tracks which Terrakube OpenAPI specification version t
 ```go
 fmt.Println(terrakube.APIVersion) // "2.34.1"
 ```
+
+## Compatibility
+
+From v1.0.0 the library follows [Semantic Versioning](https://semver.org/). Within a major version the exported API of the `terrakube` package does not change incompatibly.
+
+- **Terrakube.** A release targets exactly one Terrakube API version, the one in `APIVersion`. Support for a newer Terrakube version ships as a minor release. Other server versions may work but are not tested.
+- **Removed attributes.** When Terrakube drops an attribute, the struct field stays and is marked deprecated; it is removed only in the next major version.
+- **Go.** The library requires the latest stable Go release, and only that release is tested. Moving to a newer Go release is a minor release, not a breaking change.
+- **Not covered.** Behavior that only mirrors the server, such as which resource types it can paginate; the `testutil` package, which exists for this library's own tests; and `tools/speccheck`, a separate module.
+
+Changes are listed in [CHANGELOG.md](CHANGELOG.md). To report a security problem, see [SECURITY.md](SECURITY.md).
 
 ## Configuration
 
