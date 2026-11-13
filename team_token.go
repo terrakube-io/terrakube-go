@@ -43,13 +43,13 @@ func (s *TeamTokenService) Create(ctx context.Context, token *TeamToken) (*TeamT
 
 // List returns all team tokens.
 // It returns a *APIError on server errors.
-func (s *TeamTokenService) List(ctx context.Context) ([]TeamToken, error) {
+func (s *TeamTokenService) List(ctx context.Context) ([]*TeamToken, error) {
 	req, err := s.client.requestRaw(ctx, http.MethodGet, teamTokenBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var tokens []TeamToken
+	var tokens []*TeamToken
 	_, err = s.client.doRaw(req, &tokens)
 	if err != nil {
 		return nil, err

@@ -140,7 +140,7 @@ type TeamCRUD interface {
 
 // TeamTokenLister lists team tokens.
 type TeamTokenLister interface {
-	List(ctx context.Context) ([]TeamToken, error)
+	List(ctx context.Context) ([]*TeamToken, error)
 }
 
 // TeamTokenCreator creates team tokens.
