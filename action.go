@@ -1,23 +1,26 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Action represents a Terrakube action resource.
 type Action struct {
-	ID              string  `jsonapi:"primary,action"`
-	Action          string  `jsonapi:"attr,action"`
-	Active          bool    `jsonapi:"attr,active"`
-	Category        string  `jsonapi:"attr,category"`
-	Description     *string `jsonapi:"attr,description"`
-	DisplayCriteria *string `jsonapi:"attr,displayCriteria"`
-	Label           string  `jsonapi:"attr,label"`
-	Name            string  `jsonapi:"attr,name"`
-	Type            string  `jsonapi:"attr,type"`
-	Version         *string `jsonapi:"attr,version"`
-	CreatedBy       *string `jsonapi:"attr,createdBy"`
-	CreatedDate     *string `jsonapi:"attr,createdDate"`
-	UpdatedBy       *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string `jsonapi:"attr,updatedDate"`
+	ID              string     `jsonapi:"primary,action"`
+	Action          string     `jsonapi:"attr,action"`
+	Active          bool       `jsonapi:"attr,active"`
+	Category        string     `jsonapi:"attr,category"`
+	Description     *string    `jsonapi:"attr,description"`
+	DisplayCriteria *string    `jsonapi:"attr,displayCriteria"`
+	Label           string     `jsonapi:"attr,label"`
+	Name            string     `jsonapi:"attr,name"`
+	Type            string     `jsonapi:"attr,type"`
+	Version         *string    `jsonapi:"attr,version"`
+	CreatedBy       *string    `jsonapi:"attr,createdBy"`
+	CreatedDate     *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy       *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate     *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 }
 
 // ActionService handles communication with the action related methods of the
@@ -53,8 +56,10 @@ func (s *ActionService) Create(ctx context.Context, action *Action) (*Action, er
 
 // Update modifies an existing action. The action's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, error) {
-	if err := validateID("action ID", action.ID); err != nil {
+	if err := validateID("actionID", action.ID); err != nil {
 		return nil, err
 	}
 

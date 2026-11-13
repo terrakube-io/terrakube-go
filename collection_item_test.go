@@ -14,12 +14,11 @@ import (
 )
 
 func newTestCollectionItem() *terrakube.CollectionItem {
-	desc := "test item"
 	return &terrakube.CollectionItem{
 		ID:          "item-1",
 		Key:         "DB_HOST",
 		Value:       "localhost",
-		Description: &desc,
+		Description: new("test item"),
 		Category:    "ENV",
 		Sensitive:   false,
 		Hcl:         false,

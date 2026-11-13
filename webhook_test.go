@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"slices"
 	"testing"
+	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -20,8 +22,8 @@ func TestWebhookService_List(t *testing.T) {
 
 	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Webhook{
-			{ID: "wh1", Path: "/src", Branch: "main", TemplateID: "tpl1", Event: "push"},
-			{ID: "wh2", Path: "/lib", Branch: "dev", TemplateID: "tpl2", Event: "tag"},
+			{ID: "wh1", RemoteHookID: "rh1"},
+			{ID: "wh2", RemoteHookID: "rh2"},
 		})
 	})
 
@@ -36,8 +38,8 @@ func TestWebhookService_List(t *testing.T) {
 	if webhooks[0].ID != "wh1" {
 		t.Errorf("webhooks[0].ID = %q, want %q", webhooks[0].ID, "wh1")
 	}
-	if webhooks[1].Branch != "dev" {
-		t.Errorf("webhooks[1].Branch = %q, want %q", webhooks[1].Branch, "dev")
+	if webhooks[1].RemoteHookID != "rh2" {
+		t.Errorf("webhooks[1].RemoteHookID = %q, want %q", webhooks[1].RemoteHookID, "rh2")
 	}
 }
 
@@ -51,12 +53,12 @@ func TestWebhookService_List_WithFilter(t *testing.T) {
 			t.Error("expected filter query parameter")
 		}
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Webhook{
-			{ID: "wh1", Path: "/src", Branch: "main"},
+			{ID: "wh1", RemoteHookID: "rh1"},
 		})
 	})
 
 	client := newTestClient(t, srv)
-	webhooks, err := client.Webhooks.List(context.Background(), "org1", "ws1", &terrakube.ListOptions{Filter: "branch==main"})
+	webhooks, err := client.Webhooks.List(context.Background(), "org1", "ws1", &terrakube.ListOptions{Filter: "remoteHookId==rh1"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -85,7 +87,7 @@ func TestWebhookService_Get(t *testing.T) {
 
 	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Webhook{
-			ID: "wh1", Path: "/src", Branch: "main", TemplateID: "tpl1", RemoteHookID: "rh1", Event: "push",
+			ID: "wh1", RemoteHookID: "rh1",
 		})
 	})
 
@@ -97,20 +99,8 @@ func TestWebhookService_Get(t *testing.T) {
 	if wh.ID != "wh1" {
 		t.Errorf("ID = %q, want %q", wh.ID, "wh1")
 	}
-	if wh.Path != "/src" {
-		t.Errorf("Path = %q, want %q", wh.Path, "/src")
-	}
-	if wh.Branch != "main" {
-		t.Errorf("Branch = %q, want %q", wh.Branch, "main")
-	}
-	if wh.TemplateID != "tpl1" {
-		t.Errorf("TemplateID = %q, want %q", wh.TemplateID, "tpl1")
-	}
 	if wh.RemoteHookID != "rh1" {
 		t.Errorf("RemoteHookID = %q, want %q", wh.RemoteHookID, "rh1")
-	}
-	if wh.Event != "push" {
-		t.Errorf("Event = %q, want %q", wh.Event, "push")
 	}
 }
 
@@ -162,13 +152,13 @@ func TestWebhookService_Create(t *testing.T) {
 			t.Errorf("Content-Type = %q, want %q", r.Header.Get("Content-Type"), "application/vnd.api+json")
 		}
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Webhook{
-			ID: "wh-new", Path: "/app", Branch: "main", TemplateID: "tpl1", Event: "push",
+			ID: "wh-new", RemoteHookID: "rh-new",
 		})
 	})
 
 	client := newTestClient(t, srv)
 	wh, err := client.Webhooks.Create(context.Background(), "org1", "ws1", &terrakube.Webhook{
-		Path: "/app", Branch: "main", TemplateID: "tpl1", Event: "push",
+		RemoteHookID: "rh-new",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -176,22 +166,22 @@ func TestWebhookService_Create(t *testing.T) {
 	if wh.ID != "wh-new" {
 		t.Errorf("ID = %q, want %q", wh.ID, "wh-new")
 	}
-	if wh.Path != "/app" {
-		t.Errorf("Path = %q, want %q", wh.Path, "/app")
+	if wh.RemoteHookID != "rh-new" {
+		t.Errorf("RemoteHookID = %q, want %q", wh.RemoteHookID, "rh-new")
 	}
 }
 
 func TestWebhookService_Create_EmptyOrgID(t *testing.T) {
 	t.Parallel()
 	client := newTestClientFromURL(t, "https://example.com")
-	_, err := client.Webhooks.Create(context.Background(), "", "ws1", &terrakube.Webhook{Path: "/app"})
+	_, err := client.Webhooks.Create(context.Background(), "", "ws1", &terrakube.Webhook{RemoteHookID: "rh-new"})
 	assertValidationError(t, err, "organizationID")
 }
 
 func TestWebhookService_Create_EmptyWorkspaceID(t *testing.T) {
 	t.Parallel()
 	client := newTestClientFromURL(t, "https://example.com")
-	_, err := client.Webhooks.Create(context.Background(), "org1", "", &terrakube.Webhook{Path: "/app"})
+	_, err := client.Webhooks.Create(context.Background(), "org1", "", &terrakube.Webhook{RemoteHookID: "rh-new"})
 	assertValidationError(t, err, "workspaceID")
 }
 
@@ -204,12 +194,12 @@ func TestWebhookService_Create_ServerError(t *testing.T) {
 	})
 
 	client := newTestClient(t, srv)
-	_, err := client.Webhooks.Create(context.Background(), "org1", "ws1", &terrakube.Webhook{Path: "/app"})
+	_, err := client.Webhooks.Create(context.Background(), "org1", "ws1", &terrakube.Webhook{RemoteHookID: "rh-new"})
 	if err == nil {
 		t.Fatal("expected error for 500 response")
 	}
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {
@@ -223,22 +213,19 @@ func TestWebhookService_Update(t *testing.T) {
 
 	srv.HandleFunc("PATCH /api/v1/organization/org1/workspace/ws1/webhook/wh1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Webhook{
-			ID: "wh1", Path: "/updated", Branch: "release", TemplateID: "tpl2", Event: "tag",
+			ID: "wh1", RemoteHookID: "rh-updated",
 		})
 	})
 
 	client := newTestClient(t, srv)
 	wh, err := client.Webhooks.Update(context.Background(), "org1", "ws1", &terrakube.Webhook{
-		ID: "wh1", Path: "/updated", Branch: "release", TemplateID: "tpl2", Event: "tag",
+		ID: "wh1", RemoteHookID: "rh-updated",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if wh.Path != "/updated" {
-		t.Errorf("Path = %q, want %q", wh.Path, "/updated")
-	}
-	if wh.Branch != "release" {
-		t.Errorf("Branch = %q, want %q", wh.Branch, "release")
+	if wh.RemoteHookID != "rh-updated" {
+		t.Errorf("RemoteHookID = %q, want %q", wh.RemoteHookID, "rh-updated")
 	}
 }
 
@@ -416,18 +403,18 @@ func TestWebhookEventService_Get(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.WebhookEvent{
 			ID:          "evt1",
 			Branch:      "main",
 			CreatedBy:   "admin",
-			CreatedDate: "2025-01-15T10:00:00Z",
+			CreatedDate: new(time.Date(2025, 1, 15, 10, 0, 0, 0, time.UTC)),
 			Event:       "push",
 			Path:        "/src",
 			Priority:    1,
 			TemplateID:  "tpl1",
 			UpdatedBy:   "admin",
-			UpdatedDate: "2025-01-15T10:00:00Z",
+			UpdatedDate: new(time.Date(2025, 1, 15, 10, 0, 0, 0, time.UTC)),
 		})
 	})
 
@@ -463,7 +450,7 @@ func TestWebhookEventService_Get_NotFound(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/missing", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/missing", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusNotFound, "event not found")
 	})
 
@@ -509,7 +496,7 @@ func TestWebhookEventService_Create(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Content-Type") != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", r.Header.Get("Content-Type"), "application/vnd.api+json")
 		}
@@ -558,7 +545,7 @@ func TestWebhookEventService_Create_ServerError(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/event", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusInternalServerError, "internal error")
 	})
 
@@ -567,8 +554,8 @@ func TestWebhookEventService_Create_ServerError(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for 500 response")
 	}
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {
@@ -580,7 +567,7 @@ func TestWebhookEventService_Update(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("PATCH /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("PATCH /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.WebhookEvent{
 			ID: "evt1", Branch: "release", Event: "tag", Priority: 5,
 		})
@@ -633,7 +620,7 @@ func TestWebhookEventService_Delete(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
@@ -676,7 +663,7 @@ func TestWebhookEventService_Delete_NotFound(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/missing", func(w http.ResponseWriter, _ *http.Request) {
+	srv.HandleFunc("DELETE /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/missing", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteError(t, w, http.StatusNotFound, "event not found")
 	})
 
@@ -694,7 +681,7 @@ func TestWebhookEventService_AuthHeader(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/event/evt1", func(w http.ResponseWriter, r *http.Request) {
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook/wh1/events/evt1", func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth != "Bearer test-token" {
 			t.Errorf("Authorization = %q, want %q", auth, "Bearer test-token")
@@ -709,3 +696,90 @@ func TestWebhookEventService_AuthHeader(t *testing.T) {
 	}
 }
 
+func TestWebhookEventService_PRFlagsAndPathType(t *testing.T) {
+	t.Parallel()
+	srv := testutil.NewServer(t)
+
+	srv.HandleFunc("POST /api/v1/organization/org1/workspace/ws1/webhook/wh1/events", func(w http.ResponseWriter, _ *http.Request) {
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.WebhookEvent{
+			ID:                "evt1",
+			Path:              "/terraform/dev/.*",
+			PathType:          "REGEX",
+			PRWorkflowEnabled: true,
+			PRApplyEnabled:    true,
+		})
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.WebhookEvents.Create(context.Background(), "org1", "ws1", "wh1", &terrakube.WebhookEvent{
+		Path:              "/terraform/dev/.*",
+		PathType:          "REGEX",
+		PRWorkflowEnabled: true,
+		PRApplyEnabled:    true,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if created.PathType != "REGEX" {
+		t.Errorf("PathType = %q, want %q", created.PathType, "REGEX")
+	}
+	if !created.PRWorkflowEnabled {
+		t.Errorf("PRWorkflowEnabled = false, want true")
+	}
+	if !created.PRApplyEnabled {
+		t.Errorf("PRApplyEnabled = false, want true")
+	}
+}
+
+// TestWebhookService_List_ToOne: the server addresses a workspace's webhook as
+// a to-one relationship, so the response is one resource object, or null.
+func TestWebhookService_List_ToOne(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name, body string
+		wantIDs    []string
+	}{
+		{"one webhook", `{"data":{"type":"webhook","id":"wh1","attributes":{"remoteHookId":"rh1","createdDate":"2026-11-13T23:01:23Z"},"relationships":{"events":{"data":[]}}}}`, []string{"wh1"}},
+		{"no webhook", `{"data":null}`, []string{}},
+		{"array, as other servers may answer", `{"data":[{"type":"webhook","id":"wh1","attributes":{"remoteHookId":"rh1"}}]}`, []string{"wh1"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook", func(w http.ResponseWriter, _ *http.Request) {
+				_, _ = w.Write([]byte(tt.body))
+			})
+
+			webhooks, err := newTestClient(t, srv).Webhooks.List(context.Background(), "org1", "ws1", nil)
+			if err != nil {
+				t.Fatalf("List: %v", err)
+			}
+			ids := make([]string, 0, len(webhooks))
+			for _, w := range webhooks {
+				ids = append(ids, w.ID)
+			}
+			if !slices.Equal(ids, tt.wantIDs) {
+				t.Errorf("ids = %q, want %q", ids, tt.wantIDs)
+			}
+			if len(webhooks) == 1 && webhooks[0].RemoteHookID != "rh1" {
+				t.Errorf("RemoteHookID = %q, want rh1", webhooks[0].RemoteHookID)
+			}
+		})
+	}
+}
+
+// TestWebhookService_List_UndecodableBody: the single-object fallback must not
+// hide a response that is neither a list nor a webhook.
+func TestWebhookService_List_UndecodableBody(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /api/v1/organization/org1/workspace/ws1/webhook", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`{"data":{"type":"workspace","id":"ws1","attributes":{}}}`))
+	})
+	if _, err := newTestClient(t, srv).Webhooks.List(context.Background(), "org1", "ws1", nil); err == nil {
+		t.Fatal("expected a decoding error for a resource of another type")
+	}
+}

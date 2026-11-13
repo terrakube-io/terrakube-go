@@ -1,15 +1,19 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Tag represents a Terrakube tag resource.
 type Tag struct {
-	ID          string  `jsonapi:"primary,tag"`
-	Name        string  `jsonapi:"attr,name"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,tag"`
+	Name         string        `jsonapi:"attr,name"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // TagService handles communication with the tag-related endpoints.
@@ -55,6 +59,8 @@ func (s *TagService) Create(ctx context.Context, orgID string, tag *Tag) (*Tag, 
 
 // Update modifies an existing tag in the given organization. The tag's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *TagService) Update(ctx context.Context, orgID string, tag *Tag) (*Tag, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

@@ -232,7 +232,7 @@ func TestVCSService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.VCS{
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.VCS{ //nolint:gosec
 			ID:             "vcs-new",
 			Name:           "new-vcs",
 			Description:    "freshly created",
@@ -249,7 +249,7 @@ func TestVCSService_Create(t *testing.T) {
 
 	c := newTestClient(t, srv)
 
-	vcs, err := c.VCS.Create(context.Background(), "org-1", &terrakube.VCS{
+	vcs, err := c.VCS.Create(context.Background(), "org-1", &terrakube.VCS{ //nolint:gosec
 		Name:           "new-vcs",
 		Description:    "freshly created",
 		VcsType:        "GITHUB",
@@ -397,8 +397,8 @@ func TestVCSService_Delete_ServerError(t *testing.T) {
 		t.Fatal("expected error for 500 response")
 	}
 
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {
