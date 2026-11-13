@@ -14,7 +14,7 @@ type Webhook struct {
 	UpdatedBy    *string         `jsonapi:"attr,updatedBy"`
 	UpdatedDate  *time.Time      `jsonapi:"attr,updatedDate,rfc3339"`
 	MigratedV2   bool            `jsonapi:"attr,migratedV2"`
-	SyncError    *string         `jsonapi:"attr,syncError"`
+	SyncError    *string         `jsonapi:"attr,syncError,omitempty"` // set by the server; a create request must not mention it
 	Events       []*WebhookEvent `jsonapi:"relation,events,omitempty"`
 	Workspace    *Workspace      `jsonapi:"relation,workspace,omitempty"`
 }
