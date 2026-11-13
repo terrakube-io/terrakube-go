@@ -3,7 +3,7 @@
 // Terrakube is an open-source platform for managing Terraform and OpenTofu
 // infrastructure as code. It provides workspaces, modules, providers, team
 // access control, and job execution through a JSON:API interface. This library
-// covers the full Terrakube API surface as of OpenAPI version 2.27.0.
+// targets one Terrakube API version, reported by [APIVersion].
 //
 // # Authentication
 //
@@ -31,12 +31,15 @@
 // Organization (top-level):
 //   - [WorkspaceService], [ModuleService], [TeamService], [VariableService] (org-scoped),
 //     [TemplateService], [TagService], [VCSService], [SSHService], [AgentService],
-//     [CollectionService], [ProviderService], [JobService], [WebhookService],
-//     [OrganizationVariableService]
+//     [CollectionService], [ProviderService], [JobService],
+//     [OrganizationVariableService], [ProjectService],
+//     [NotificationConfigurationService], [PolicySetService],
+//     [PolicyExemptionService]
 //
 // Workspace children:
 //   - [WorkspaceTagService], [WorkspaceAccessService], [WorkspaceScheduleService],
-//     [HistoryService], [VariableService] (workspace-scoped)
+//     [HistoryService], [VariableService] (workspace-scoped), [WebhookService],
+//     [RunTriggerService]
 //
 // Module children:
 //   - [ModuleVersionService]
@@ -48,7 +51,20 @@
 //   - [CollectionItemService], [CollectionReferenceService]
 //
 // Job children:
-//   - [StepService], [AddressService]
+//   - [StepService], [AddressService], [PolicyEvaluationService] (read-only)
+//     -> [PolicyOverrideService]
+//
+// Project children:
+//   - [ProjectAccessService]
+//
+// Policy set children:
+//   - [PolicySetParameterService], [PolicyAttachmentService]
+//
+// Notification configuration children:
+//   - [NotificationTriggerService]
+//
+// Federated children:
+//   - [FederatedClaimService]
 //
 // Team children:
 //   - [TeamTokenService] (non-JSON:API, uses standard JSON)
@@ -57,7 +73,10 @@
 //   - [WebhookEventService]
 //
 // Standalone resources (no organization parent):
-//   - [GithubAppTokenService], [ActionService]
+//   - [GithubAppTokenService], [ActionService], [FederatedService]
+//
+// [OperationsService] submits JSON:API atomic operations: several changes in
+// one request that the server applies together or not at all.
 //
 // # CRUD Operations
 //
@@ -91,6 +110,10 @@
 //
 // Pass nil for no filtering.
 //
+// A List call with no page options returns the whole collection where the
+// server can page it and whatever one request returns otherwise; see
+// [ListOptions] for the details and for requesting a single page.
+//
 // # Error Handling
 //
 // Server errors are returned as [APIError], which includes the HTTP status
@@ -98,8 +121,8 @@
 // error details. Client-side validation failures (such as empty IDs) are
 // returned as [ValidationError].
 //
-// Use the helper functions [IsNotFound], [IsConflict], and [IsUnauthorized]
-// to check for common HTTP error conditions:
+// Use the helper functions [IsNotFound], [IsConflict], [IsUnauthorized], and
+// [IsForbidden] to check for common HTTP error conditions:
 //
 //	ws, err := client.Workspaces.Get(ctx, orgID, wsID)
 //	if terrakube.IsNotFound(err) {
