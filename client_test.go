@@ -145,8 +145,7 @@ func TestClient_NonOKStatusReturnsAPIError(t *testing.T) {
 		t.Fatal("expected error for 500 response")
 	}
 
-	var apiErr *terrakube.APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*terrakube.APIError](err); ok {
 		if apiErr.StatusCode != 500 {
 			t.Errorf("StatusCode = %d, want 500", apiErr.StatusCode)
 		}

@@ -33,7 +33,7 @@ func (s *crudService[T]) list(ctx context.Context, path string, opts *ListOption
 		if err != nil {
 			return nil, err
 		}
-		return doList[T](s.client, req)
+		return s.client.doList[T](req)
 	}
 
 	// Auto-paginate: fetch all pages.
@@ -77,7 +77,7 @@ func (s *crudService[T]) fetchAllPages(ctx context.Context, path string, params 
 	}
 
 	for {
-		items, nextURL, err := doListWithLinks[T](s.client, req)
+		items, nextURL, err := s.client.doListWithLinks[T](req)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func (s *crudService[T]) fetchAllPages(ctx context.Context, path string, params 
 
 // doListWithLinks executes a request and decodes a JSON:API list response,
 // returning both the items and the next page URL (if present).
-func doListWithLinks[T any](c *Client, req *http.Request) ([]*T, string, error) {
+func (c *Client) doListWithLinks[T any](req *http.Request) ([]*T, string, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, "", err
@@ -122,7 +122,7 @@ func doListWithLinks[T any](c *Client, req *http.Request) ([]*T, string, error) 
 		return nil, "", nil
 	}
 
-	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeOf((*T)(nil)))
+	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
 		return nil, "", fmt.Errorf("decoding JSON:API list response: %w", err)
 	}

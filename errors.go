@@ -42,8 +42,7 @@ func (e *ValidationError) Error() string {
 
 // IsNotFound returns true if the error is a 404 API error.
 func IsNotFound(err error) bool {
-	var apiErr *APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*APIError](err); ok {
 		return apiErr.StatusCode == 404
 	}
 	return false
@@ -51,8 +50,7 @@ func IsNotFound(err error) bool {
 
 // IsConflict returns true if the error is a 409 API error.
 func IsConflict(err error) bool {
-	var apiErr *APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*APIError](err); ok {
 		return apiErr.StatusCode == 409
 	}
 	return false
@@ -60,8 +58,7 @@ func IsConflict(err error) bool {
 
 // IsUnauthorized returns true if the error is a 401 API error.
 func IsUnauthorized(err error) bool {
-	var apiErr *APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*APIError](err); ok {
 		return apiErr.StatusCode == 401
 	}
 	return false
@@ -69,8 +66,7 @@ func IsUnauthorized(err error) bool {
 
 // IsForbidden returns true if the error is a 403 API error.
 func IsForbidden(err error) bool {
-	var apiErr *APIError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*APIError](err); ok {
 		return apiErr.StatusCode == 403
 	}
 	return false

@@ -14,9 +14,8 @@ func TestModuleVersionService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "abc123"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.ModuleVersion{
-			{ID: "ver-1", Version: "1.0.0", Commit: &commit},
+			{ID: "ver-1", Version: "1.0.0", Commit: new("abc123")},
 			{ID: "ver-2", Version: "2.0.0"},
 		})
 	})
@@ -89,10 +88,8 @@ func TestModuleVersionService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "abc123"
-		createdBy := "admin"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ModuleVersion{
-			ID: "ver-1", Version: "1.0.0", Commit: &commit, CreatedBy: &createdBy,
+			ID: "ver-1", Version: "1.0.0", Commit: new("abc123"), CreatedBy: new("admin"),
 		})
 	})
 
@@ -205,9 +202,8 @@ func TestModuleVersionService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/module/mod-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "def456"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ModuleVersion{
-			ID: "ver-1", Version: "1.1.0", Commit: &commit,
+			ID: "ver-1", Version: "1.1.0", Commit: new("def456"),
 		})
 	})
 

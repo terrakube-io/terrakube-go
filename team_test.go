@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/google/jsonapi"
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
-	"github.com/google/jsonapi"
 )
 
 func TestTeamService_List(t *testing.T) {
@@ -90,8 +90,8 @@ func TestTeamService_List_EmptyOrgID(t *testing.T) {
 		t.Fatal("expected validation error for empty orgID")
 	}
 
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -117,8 +117,8 @@ func TestTeamService_List_ServerError(t *testing.T) {
 		t.Fatal("expected error for 500 response")
 	}
 
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {
@@ -187,8 +187,8 @@ func TestTeamService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -208,8 +208,8 @@ func TestTeamService_Get_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty id")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "id" {
@@ -287,8 +287,8 @@ func TestTeamService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -361,8 +361,8 @@ func TestTeamService_Update_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -382,8 +382,8 @@ func TestTeamService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty id")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "id" {
@@ -422,8 +422,8 @@ func TestTeamService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -443,8 +443,8 @@ func TestTeamService_Delete_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty id")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "id" {
@@ -504,7 +504,7 @@ func TestTeam_BooleanFieldsSerialization(t *testing.T) {
 	}
 
 	var data struct {
-		Attributes map[string]interface{} `json:"attributes"`
+		Attributes map[string]any `json:"attributes"`
 	}
 	if err := json.Unmarshal(payload["data"], &data); err != nil {
 		t.Fatalf("failed to unmarshal data: %v", err)

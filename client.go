@@ -18,7 +18,7 @@ import (
 
 // doList executes a request and decodes a JSON:API list response into []*T.
 // It avoids runtime reflection by leveraging Go generics.
-func doList[T any](c *Client, req *http.Request) ([]*T, error) {
+func (c *Client) doList[T any](req *http.Request) ([]*T, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func doList[T any](c *Client, req *http.Request) ([]*T, error) {
 		return nil, nil
 	}
 
-	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeOf((*T)(nil)))
+	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
 	if err != nil {
 		return nil, fmt.Errorf("decoding JSON:API list response: %w", err)
 	}
@@ -207,43 +207,43 @@ func NewClient(opts ...Option) (*Client, error) {
 		return nil, fmt.Errorf("token is required: use WithToken()")
 	}
 
-	c.Organizations = &OrganizationService{crudService[Organization]{client: c}}
-	c.Workspaces = &WorkspaceService{crudService[Workspace]{client: c, filterKey: "filter[workspace]"}}
-	c.Modules = &ModuleService{crudService[Module]{client: c, filterKey: "filter[module]"}}
-	c.Teams = &TeamService{crudService[Team]{client: c, filterKey: "filter[team]"}}
+	c.Organizations = &OrganizationService{client: c}
+	c.Workspaces = &WorkspaceService{client: c, filterKey: "filter[workspace]"}
+	c.Modules = &ModuleService{client: c, filterKey: "filter[module]"}
+	c.Teams = &TeamService{client: c, filterKey: "filter[team]"}
 	c.TeamTokens = &TeamTokenService{client: c}
-	c.Variables = &VariableService{crudService[Variable]{client: c, filterKey: "filter[variable]"}}
-	c.OrganizationVariables = &OrganizationVariableService{crudService[OrganizationVariable]{client: c, filterKey: "filter[globalvar]"}}
-	c.Templates = &TemplateService{crudService[Template]{client: c, filterKey: "filter[template]"}}
-	c.Tags = &TagService{crudService[Tag]{client: c, filterKey: "filter[tag]"}}
-	c.VCS = &VCSService{crudService[VCS]{client: c, filterKey: "filter[vcs]"}}
-	c.SSH = &SSHService{crudService[SSH]{client: c, filterKey: "filter[ssh]"}}
-	c.Agents = &AgentService{crudService[Agent]{client: c, filterKey: "filter[agent]"}}
-	c.Collections = &CollectionService{crudService[Collection]{client: c, filterKey: "filter[collection]"}}
-	c.CollectionItems = &CollectionItemService{crudService[CollectionItem]{client: c, filterKey: "filter[item]"}}
-	c.CollectionReferences = &CollectionReferenceService{crudService[CollectionReference]{client: c, filterKey: "filter[reference]"}}
-	c.WorkspaceTags = &WorkspaceTagService{crudService[WorkspaceTag]{client: c, filterKey: "filter[workspacetag]"}}
-	c.WorkspaceAccess = &WorkspaceAccessService{crudService[WorkspaceAccess]{client: c, filterKey: "filter[access]"}}
-	c.WorkspaceSchedules = &WorkspaceScheduleService{crudService[WorkspaceSchedule]{client: c, filterKey: "filter[schedule]"}}
-	c.Webhooks = &WebhookService{crudService[Webhook]{client: c, filterKey: "filter[webhook]"}}
-	c.WebhookEvents = &WebhookEventService{crudService[WebhookEvent]{client: c, filterKey: "filter[webhook_event]"}}
-	c.History = &HistoryService{crudService[History]{client: c, filterKey: "filter[history]"}}
-	c.Jobs = &JobService{crudService[Job]{client: c, filterKey: "filter[job]"}}
-	c.Actions = &ActionService{crudService[Action]{client: c}}
-	c.Steps = &StepService{crudService[Step]{client: c, filterKey: "filter[step]"}}
-	c.Providers = &ProviderService{crudService[Provider]{client: c, filterKey: "filter[provider]"}}
-	c.ProviderVersions = &ProviderVersionService{crudService[ProviderVersion]{client: c, filterKey: "filter[version]"}}
-	c.Implementations = &ImplementationService{crudService[Implementation]{client: c, filterKey: "filter[implementation]"}}
-	c.ModuleVersions = &ModuleVersionService{crudService[ModuleVersion]{client: c, filterKey: "filter[version]"}}
-	c.GithubAppTokens = &GithubAppTokenService{crudService[GithubAppToken]{client: c}}
-	c.Addresses = &AddressService{crudService[Address]{client: c, filterKey: "filter[address]"}}
-	c.Projects = &ProjectService{crudService[Project]{client: c, filterKey: "filter[project]"}}
-	c.ProjectAccess = &ProjectAccessService{crudService[ProjectAccess]{client: c, filterKey: "filter[projectAccess]"}}
-	c.Federated = &FederatedService{crudService[Federated]{client: c, filterKey: "filter[federated]"}}
-	c.FederatedClaims = &FederatedClaimService{crudService[FederatedClaim]{client: c, filterKey: "filter[claims]"}}
+	c.Variables = &VariableService{client: c, filterKey: "filter[variable]"}
+	c.OrganizationVariables = &OrganizationVariableService{client: c, filterKey: "filter[globalvar]"}
+	c.Templates = &TemplateService{client: c, filterKey: "filter[template]"}
+	c.Tags = &TagService{client: c, filterKey: "filter[tag]"}
+	c.VCS = &VCSService{client: c, filterKey: "filter[vcs]"}
+	c.SSH = &SSHService{client: c, filterKey: "filter[ssh]"}
+	c.Agents = &AgentService{client: c, filterKey: "filter[agent]"}
+	c.Collections = &CollectionService{client: c, filterKey: "filter[collection]"}
+	c.CollectionItems = &CollectionItemService{client: c, filterKey: "filter[item]"}
+	c.CollectionReferences = &CollectionReferenceService{client: c, filterKey: "filter[reference]"}
+	c.WorkspaceTags = &WorkspaceTagService{client: c, filterKey: "filter[workspacetag]"}
+	c.WorkspaceAccess = &WorkspaceAccessService{client: c, filterKey: "filter[access]"}
+	c.WorkspaceSchedules = &WorkspaceScheduleService{client: c, filterKey: "filter[schedule]"}
+	c.Webhooks = &WebhookService{client: c, filterKey: "filter[webhook]"}
+	c.WebhookEvents = &WebhookEventService{client: c, filterKey: "filter[webhook_event]"}
+	c.History = &HistoryService{client: c, filterKey: "filter[history]"}
+	c.Jobs = &JobService{client: c, filterKey: "filter[job]"}
+	c.Actions = &ActionService{client: c}
+	c.Steps = &StepService{client: c, filterKey: "filter[step]"}
+	c.Providers = &ProviderService{client: c, filterKey: "filter[provider]"}
+	c.ProviderVersions = &ProviderVersionService{client: c, filterKey: "filter[version]"}
+	c.Implementations = &ImplementationService{client: c, filterKey: "filter[implementation]"}
+	c.ModuleVersions = &ModuleVersionService{client: c, filterKey: "filter[version]"}
+	c.GithubAppTokens = &GithubAppTokenService{client: c}
+	c.Addresses = &AddressService{client: c, filterKey: "filter[address]"}
+	c.Projects = &ProjectService{client: c, filterKey: "filter[project]"}
+	c.ProjectAccess = &ProjectAccessService{client: c, filterKey: "filter[projectAccess]"}
+	c.Federated = &FederatedService{client: c, filterKey: "filter[federated]"}
+	c.FederatedClaims = &FederatedClaimService{client: c, filterKey: "filter[claims]"}
 	c.Operations = &OperationsService{client: c}
-	c.NotificationConfigurations = &NotificationConfigurationService{crudService[NotificationConfiguration]{client: c, filterKey: "filter[notification_configuration]"}}
-	c.NotificationTriggers = &NotificationTriggerService{crudService[NotificationTrigger]{client: c, filterKey: "filter[notification_trigger]"}}
+	c.NotificationConfigurations = &NotificationConfigurationService{client: c, filterKey: "filter[notification_configuration]"}
+	c.NotificationTriggers = &NotificationTriggerService{client: c, filterKey: "filter[notification_trigger]"}
 
 	return c, nil
 }
@@ -258,12 +258,12 @@ func (c *Client) apiPath(segments ...string) string {
 }
 
 // request builds an authenticated JSON:API HTTP request.
-func (c *Client) request(ctx context.Context, method, reqPath string, body interface{}) (*http.Request, error) {
+func (c *Client) request(ctx context.Context, method, reqPath string, body any) (*http.Request, error) {
 	return c.requestWithQuery(ctx, method, reqPath, nil, body)
 }
 
 // requestWithQuery builds an authenticated JSON:API HTTP request with query parameters.
-func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, params url.Values, body interface{}) (*http.Request, error) {
+func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, params url.Values, body any) (*http.Request, error) {
 	rel := &url.URL{Path: reqPath}
 	u := c.baseURL.ResolveReference(rel)
 
@@ -297,8 +297,8 @@ func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, p
 
 // do executes a request and decodes a single JSON:API resource response.
 // If v is nil, no response body decoding is performed (used for DELETE).
-// For list responses, use the generic doList[T] function instead.
-func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+// For list responses, use the generic doList[T] method instead.
+func (c *Client) do(req *http.Request, v any) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -325,7 +325,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { 
 
 // requestRaw builds an authenticated HTTP request with standard JSON content type.
 // Used for non-JSON:API endpoints like TeamToken.
-func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body interface{}) (*http.Request, error) {
+func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body any) (*http.Request, error) {
 	rel := &url.URL{Path: rawPath}
 	u := c.baseURL.ResolveReference(rel)
 
@@ -355,7 +355,7 @@ func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body in
 
 // doRaw executes a request and decodes the response using encoding/json.
 // Used for non-JSON:API endpoints.
-func (c *Client) doRaw(req *http.Request, v interface{}) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
+func (c *Client) doRaw(req *http.Request, v any) (*http.Response, error) { //nolint:unparam // Response returned for future use by callers
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err

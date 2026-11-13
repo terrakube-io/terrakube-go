@@ -86,8 +86,8 @@ func TestVariableService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty org ID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "organizationID" {
@@ -107,8 +107,8 @@ func TestVariableService_List_EmptyWorkspaceID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty workspace ID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
 	if valErr.Field != "workspaceID" {
@@ -168,8 +168,8 @@ func TestVariableService_Get_EmptyIDs(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error")
 			}
-			var valErr *terrakube.ValidationError
-			if !errors.As(err, &valErr) {
+			valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+			if !ok {
 				t.Fatalf("expected *ValidationError, got %T", err)
 			}
 			if valErr.Field != tt.field {

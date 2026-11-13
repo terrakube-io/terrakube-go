@@ -14,9 +14,8 @@ func TestProviderService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "AWS provider"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Provider{
-			{ID: "prov-1", Name: "aws", Description: &desc},
+			{ID: "prov-1", Name: "aws", Description: new("AWS provider")},
 			{ID: "prov-2", Name: "gcp"},
 		})
 	})
@@ -76,9 +75,8 @@ func TestProviderService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "AWS provider"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Provider{
-			ID: "prov-1", Name: "aws", Description: &desc,
+			ID: "prov-1", Name: "aws", Description: new("AWS provider"),
 		})
 	})
 
@@ -152,16 +150,14 @@ func TestProviderService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		desc := "New provider"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Provider{
-			ID: "prov-new", Name: "azure", Description: &desc,
+			ID: "prov-new", Name: "azure", Description: new("New provider"),
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "New provider"
 	provider, err := client.Providers.Create(context.Background(), "org-1", &terrakube.Provider{
-		Name: "azure", Description: &desc,
+		Name: "azure", Description: new("New provider"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -192,16 +188,14 @@ func TestProviderService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/provider/prov-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Updated"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Provider{
-			ID: "prov-1", Name: "aws-updated", Description: &desc,
+			ID: "prov-1", Name: "aws-updated", Description: new("Updated"),
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "Updated"
 	provider, err := client.Providers.Update(context.Background(), "org-1", &terrakube.Provider{
-		ID: "prov-1", Name: "aws-updated", Description: &desc,
+		ID: "prov-1", Name: "aws-updated", Description: new("Updated"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

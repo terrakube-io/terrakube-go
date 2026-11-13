@@ -14,9 +14,8 @@ func TestProjectService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/project", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Default project"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Project{
-			{ID: "proj-1", Name: "Default", Description: &desc},
+			{ID: "proj-1", Name: "Default", Description: new("Default project")},
 			{ID: "proj-2", Name: "Staging"},
 		})
 	})
@@ -52,9 +51,8 @@ func TestProjectService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/project/proj-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Test project"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Project{
-			ID: "proj-1", Name: "Production", Description: &desc,
+			ID: "proj-1", Name: "Production", Description: new("Test project"),
 		})
 	})
 
@@ -96,16 +94,14 @@ func TestProjectService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		desc := "New proj"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Project{
-			ID: "proj-new", Name: "NewProj", Description: &desc,
+			ID: "proj-new", Name: "NewProj", Description: new("New proj"),
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "New proj"
 	proj, err := client.Projects.Create(context.Background(), "org-1", &terrakube.Project{
-		Name: "NewProj", Description: &desc,
+		Name: "NewProj", Description: new("New proj"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

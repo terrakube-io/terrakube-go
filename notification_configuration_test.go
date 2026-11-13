@@ -14,9 +14,8 @@ func TestNotificationConfigurationService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/notificationConfiguration", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Slack notifications"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.NotificationConfiguration{
-			{ID: "cfg-1", Name: "slack-alerts", Description: &desc, ChannelType: "SLACK", DestinationURL: "https://hooks.slack.com/services/1", Active: true, MessageStyle: "DETAILED"},
+			{ID: "cfg-1", Name: "slack-alerts", Description: new("Slack notifications"), ChannelType: "SLACK", DestinationURL: "https://hooks.slack.com/services/1", Active: true, MessageStyle: "DETAILED"},
 			{ID: "cfg-2", Name: "teams-alerts", ChannelType: "TEAMS", DestinationURL: "https://outlook.office.com/webhook/2", Active: false, MessageStyle: "SIMPLE"},
 		})
 	})

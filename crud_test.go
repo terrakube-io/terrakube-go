@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"reflect"
+	"sync/atomic"
 	"testing"
 
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -152,8 +153,8 @@ func TestCrudService_List_ErrorType(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 
-	var apiErr *APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T: %v", err, err)
 	}
 	if apiErr.StatusCode != http.StatusInternalServerError {
@@ -174,9 +175,8 @@ func TestCrudService_Get(t *testing.T) {
 		{
 			name: "success",
 			handler: func(w http.ResponseWriter, _ *http.Request) {
-				desc := "Test org"
 				testutil.WriteJSONAPI(t, w, http.StatusOK, &Organization{
-					ID: "org-1", Name: "Alpha", Description: &desc, ExecutionMode: "remote",
+					ID: "org-1", Name: "Alpha", Description: new("Test org"), ExecutionMode: "remote",
 				})
 			},
 			wantID: "org-1",
@@ -214,8 +214,8 @@ func TestCrudService_Get(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -237,13 +237,12 @@ func TestCrudService_Get_FieldValues(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	desc := "Full details"
 	icon := "icon-url"
 	srv.HandleFunc("GET /api/v1/organization/org-full", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &Organization{
 			ID:            "org-full",
 			Name:          "FullOrg",
-			Description:   &desc,
+			Description:   new("Full details"),
 			ExecutionMode: "remote",
 			Disabled:      false,
 			Icon:          &icon,
@@ -321,8 +320,8 @@ func TestCrudService_Create(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -426,8 +425,8 @@ func TestCrudService_Update(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -528,8 +527,8 @@ func TestCrudService_Del(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -633,9 +632,7 @@ func TestNewClient_FilterKeys(t *testing.T) {
 	v := reflect.ValueOf(client).Elem()
 	typ := v.Type()
 
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-
+	for field, fieldValue := range v.Fields() {
 		if privateFields[field.Name] || skipFields[field.Name] {
 			continue
 		}
@@ -646,7 +643,7 @@ func TestNewClient_FilterKeys(t *testing.T) {
 			continue
 		}
 
-		svc := v.Field(i).Elem()
+		svc := fieldValue.Elem()
 		fk := svc.FieldByName("filterKey")
 		if !fk.IsValid() {
 			t.Errorf("Client.%s: no filterKey field found (missing crudService embed?)", field.Name)
@@ -691,5 +688,37 @@ func TestCrudService_List_CustomFilterKey(t *testing.T) {
 	}
 	if len(items) != 1 {
 		t.Fatalf("got %d items, want 1", len(items))
+	}
+}
+
+// TestCrudService_List_SinglePage covers listing one requested page, which
+// sends the caller's page parameters in a single request.
+func TestCrudService_List_SinglePage(t *testing.T) {
+	t.Parallel()
+
+	var hits atomic.Int32
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		q := r.URL.Query()
+		if got := q.Get("page[number]"); got != "2" {
+			t.Errorf("page[number] = %q, want %q", got, "2")
+		}
+		if got := q.Get("page[size]"); got != "1" {
+			t.Errorf("page[size] = %q, want %q", got, "1")
+		}
+		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*Organization{{ID: "org-1", Name: "Alpha"}})
+	})
+
+	client := newCrudTestClient(t, srv)
+	items, err := client.Organizations.List(context.Background(), &ListOptions{Page: 2, PageSize: 1})
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if len(items) != 1 || items[0].ID != "org-1" {
+		t.Fatalf("got %d items, want org-1", len(items))
+	}
+	if n := hits.Load(); n != 1 {
+		t.Errorf("got %d requests, want 1", n)
 	}
 }

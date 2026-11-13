@@ -101,11 +101,9 @@ func TestImplementationService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version/ver-1/implementation/impl-1", func(w http.ResponseWriter, _ *http.Request) {
-		dl := "https://example.com/download"
-		shasum := "abc123"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Implementation{
 			ID: "impl-1", Os: "linux", Arch: "amd64", Filename: "provider.zip",
-			DownloadURL: &dl, Shasum: &shasum,
+			DownloadURL: new("https://example.com/download"), Shasum: new("abc123"),
 		})
 	})
 
