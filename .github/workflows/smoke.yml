@@ -72,8 +72,9 @@ jobs:
             sleep 5
           done
           echo "The API did not become healthy in 5 minutes"
-          docker compose ps
-          docker compose logs --tail=80 terrakube-api
+          docker compose ps --all
+          # The start of the log holds the reason; the end is the JVM's exit report.
+          docker compose logs --no-log-prefix terrakube-api | head -n 250
           exit 1
 
       # Nobody can log in here, so the test signs its own personal access token.
@@ -99,5 +100,5 @@ jobs:
         if: failure()
         working-directory: ${{ env.COMPOSE_DIR }}
         run: |
-          docker compose ps
-          docker compose logs --tail=200 terrakube-api
+          docker compose ps --all
+          docker compose logs --no-log-prefix terrakube-api | grep -vE '^\s*$' | tail -n 200
