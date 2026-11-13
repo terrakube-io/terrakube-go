@@ -2,9 +2,11 @@ package terrakube_test
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -338,4 +340,87 @@ func TestWorkspaceService_AuthHeader(t *testing.T) {
 
 	client := newTestClient(t, srv)
 	_, _ = client.Workspaces.Get(context.Background(), "org-1", "ws-1")
+}
+
+func TestWorkspaceService_CreatedDateWireFormat(t *testing.T) {
+	t.Parallel()
+
+	instant := time.Date(2026, 11, 13, 19, 36, 48, 0, time.UTC)
+	cases := []struct {
+		name  string
+		attrs string
+		want  *time.Time
+	}{
+		{"rfc3339", `"createdDate":"2026-11-13T19:36:48Z",`, &instant},
+		{"null", `"createdDate":null,`, nil},
+		{"absent", ``, nil},
+		{
+			"fraction and offset", `"createdDate":"2026-11-13T19:36:48.123+02:00",`,
+			new(time.Date(2026, 11, 13, 17, 36, 48, 123_000_000, time.UTC)),
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "application/vnd.api+json")
+				_, _ = io.WriteString(w, `{"data":{"type":"workspace","id":"ws-1","attributes":{`+tc.attrs+`"name":"Dev"}}}`)
+			})
+
+			ws, err := newTestClient(t, srv).Workspaces.Get(context.Background(), "org-1", "ws-1")
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			switch {
+			case tc.want == nil && ws.CreatedDate != nil:
+				t.Errorf("CreatedDate = %v, want nil", ws.CreatedDate)
+			case tc.want != nil && (ws.CreatedDate == nil || !ws.CreatedDate.Equal(*tc.want)):
+				t.Errorf("CreatedDate = %v, want %v", ws.CreatedDate, tc.want)
+			}
+		})
+	}
+
+	for _, tc := range []struct {
+		name string
+		date *time.Time
+		want any
+	}{
+		{"set", &instant, "2026-11-13T19:36:48Z"},
+		{"nil", nil, nil},
+	} {
+		t.Run("update "+tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			var body []byte
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, r *http.Request) {
+				body, _ = io.ReadAll(r.Body)
+				testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Workspace{ID: "ws-1", Name: "Dev"})
+			})
+
+			_, err := newTestClient(t, srv).Workspaces.Update(context.Background(), "org-1", &terrakube.Workspace{
+				ID: "ws-1", Name: "Dev", CreatedDate: tc.date,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			var doc struct {
+				Data struct {
+					Attributes map[string]any `json:"attributes"`
+				} `json:"data"`
+			}
+			if err := json.Unmarshal(body, &doc); err != nil {
+				t.Fatalf("decode request body %s: %v", body, err)
+			}
+			got, ok := doc.Data.Attributes["createdDate"]
+			if !ok {
+				t.Fatalf("createdDate missing from request attributes: %s", body)
+			}
+			if got != tc.want {
+				t.Errorf("createdDate = %#v, want %#v", got, tc.want)
+			}
+		})
+	}
 }

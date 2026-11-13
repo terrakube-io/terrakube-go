@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // VCS represents a version control system connection in Terrakube.
 type VCS struct {
@@ -19,9 +22,9 @@ type VCS struct {
 	AccessToken    *string       `jsonapi:"attr,accessToken"`
 	RedirectURL    *string       `jsonapi:"attr,redirectUrl"`
 	CreatedBy      *string       `jsonapi:"attr,createdBy"`
-	CreatedDate    *string       `jsonapi:"attr,createdDate"`
+	CreatedDate    *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy      *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate    *string       `jsonapi:"attr,updatedDate"`
+	UpdatedDate    *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization   *Organization `jsonapi:"relation,organization,omitempty"`
 	Workspaces     []*Workspace  `jsonapi:"relation,workspace,omitempty"`
 }

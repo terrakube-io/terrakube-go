@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // NotificationConfiguration represents a Terrakube notification configuration resource.
 type NotificationConfiguration struct {
@@ -13,9 +16,9 @@ type NotificationConfiguration struct {
 	Active         bool                   `jsonapi:"attr,active"`
 	MessageStyle   string                 `jsonapi:"attr,messageStyle,omitempty"`
 	CreatedBy      *string                `jsonapi:"attr,createdBy"`
-	CreatedDate    *string                `jsonapi:"attr,createdDate"`
+	CreatedDate    *time.Time             `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy      *string                `jsonapi:"attr,updatedBy"`
-	UpdatedDate    *string                `jsonapi:"attr,updatedDate"`
+	UpdatedDate    *time.Time             `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization   *Organization          `jsonapi:"relation,organization,omitempty"`
 	Workspace      *Workspace             `jsonapi:"relation,workspace,omitempty"`
 	Triggers       []*NotificationTrigger `jsonapi:"relation,triggers,omitempty"`

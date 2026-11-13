@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // History represents a Terrakube workspace history resource.
 type History struct {
@@ -11,9 +14,9 @@ type History struct {
 	Md5          *string    `jsonapi:"attr,md5"`
 	Lineage      *string    `jsonapi:"attr,lineage"`
 	CreatedBy    *string    `jsonapi:"attr,createdBy"`
-	CreatedDate  *string    `jsonapi:"attr,createdDate"`
+	CreatedDate  *time.Time `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy    *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string    `jsonapi:"attr,updatedDate"`
+	UpdatedDate  *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 	Workspace    *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 

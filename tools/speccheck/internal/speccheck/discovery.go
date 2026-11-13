@@ -23,6 +23,7 @@ type Field struct {
 	GoName   string       // struct field name
 	JSONName string       // name in the jsonapi tag
 	Type     reflect.Type // Go type of the field
+	Options  []string     // tag options after the name (omitempty, rfc3339)
 }
 
 // crudEmbedName is the name of the generic CRUD base embedded by services.
@@ -113,7 +114,7 @@ func ParseModel(t reflect.Type) (resourceType string, attrs, rels []Field, err e
 		if len(parts) < 2 {
 			continue
 		}
-		field := Field{GoName: f.Name, JSONName: parts[1], Type: f.Type}
+		field := Field{GoName: f.Name, JSONName: parts[1], Type: f.Type, Options: parts[2:]}
 		switch parts[0] {
 		case "primary":
 			resourceType = parts[1]

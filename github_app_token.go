@@ -1,19 +1,22 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // GithubAppToken represents a Terrakube GitHub App token resource.
 type GithubAppToken struct {
-	ID             string  `jsonapi:"primary,github_app_token"`
-	AppID          string  `jsonapi:"attr,appId"`
-	InstallationID string  `jsonapi:"attr,installationId"`
-	Owner          string  `jsonapi:"attr,owner"`
-	Token          *string `jsonapi:"attr,token"`
-	ExpiresAt      *string `jsonapi:"attr,expiresAt,omitempty"`
-	CreatedBy      *string `jsonapi:"attr,createdBy"`
-	CreatedDate    *string `jsonapi:"attr,createdDate"`
-	UpdatedBy      *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate    *string `jsonapi:"attr,updatedDate"`
+	ID             string     `jsonapi:"primary,github_app_token"`
+	AppID          string     `jsonapi:"attr,appId"`
+	InstallationID string     `jsonapi:"attr,installationId"`
+	Owner          string     `jsonapi:"attr,owner"`
+	Token          *string    `jsonapi:"attr,token"`
+	ExpiresAt      *time.Time `jsonapi:"attr,expiresAt,omitempty,rfc3339"`
+	CreatedBy      *string    `jsonapi:"attr,createdBy"`
+	CreatedDate    *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy      *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate    *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 }
 
 // GithubAppTokenService handles communication with the GitHub App token endpoints.

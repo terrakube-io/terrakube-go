@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Job represents a Terrakube job resource.
 type Job struct {
@@ -23,17 +26,17 @@ type Job struct {
 	TargetAddrs                    []string            `jsonapi:"attr,targetAddrs,omitempty"`
 	ReplaceAddrs                   []string            `jsonapi:"attr,replaceAddrs,omitempty"`
 	CreatedBy                      *string             `jsonapi:"attr,createdBy"`
-	CreatedDate                    *string             `jsonapi:"attr,createdDate"`
+	CreatedDate                    *time.Time          `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy                      *string             `jsonapi:"attr,updatedBy"`
-	UpdatedDate                    *string             `jsonapi:"attr,updatedDate"`
-	ApprovedAt                     *string             `jsonapi:"attr,approvedAt"`
+	UpdatedDate                    *time.Time          `jsonapi:"attr,updatedDate,rfc3339"`
+	ApprovedAt                     *time.Time          `jsonapi:"attr,approvedAt,rfc3339"`
 	ApprovedBy                     *string             `jsonapi:"attr,approvedBy"`
 	CascadeDepth                   *int32              `jsonapi:"attr,cascadeDepth"`
 	DispatchFailureCount           *int32              `jsonapi:"attr,dispatchFailureCount"`
-	DispatchFirstFailureAt         *string             `jsonapi:"attr,dispatchFirstFailureAt"`
-	DispatchLastAttemptAt          *string             `jsonapi:"attr,dispatchLastAttemptAt"`
+	DispatchFirstFailureAt         *time.Time          `jsonapi:"attr,dispatchFirstFailureAt,rfc3339"`
+	DispatchLastAttemptAt          *time.Time          `jsonapi:"attr,dispatchLastAttemptAt,rfc3339"`
 	DispatchLastError              *string             `jsonapi:"attr,dispatchLastError"`
-	DispatchNextRetryAt            *string             `jsonapi:"attr,dispatchNextRetryAt"`
+	DispatchNextRetryAt            *time.Time          `jsonapi:"attr,dispatchNextRetryAt,rfc3339"`
 	EncryptedVariables             *string             `jsonapi:"attr,encryptedVariables"`
 	ResolvedTerraformVersion       *string             `jsonapi:"attr,resolvedTerraformVersion"`
 	TerraformPlanArtifacts         *string             `jsonapi:"attr,terraformPlanArtifacts"`

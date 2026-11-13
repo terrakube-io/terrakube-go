@@ -1,18 +1,21 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicyExemption represents a Terrakube policy exemption resource.
 type PolicyExemption struct {
 	ID              string        `jsonapi:"primary,policy_exemption"`
-	ExpiresAt       *string       `jsonapi:"attr,expiresAt"`
+	ExpiresAt       *time.Time    `jsonapi:"attr,expiresAt,rfc3339"`
 	Justification   *string       `jsonapi:"attr,justification"`
 	RuleID          *string       `jsonapi:"attr,ruleId"`
 	TicketReference *string       `jsonapi:"attr,ticketReference"`
 	CreatedBy       *string       `jsonapi:"attr,createdBy"`
-	CreatedDate     *string       `jsonapi:"attr,createdDate"`
+	CreatedDate     *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy       *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string       `jsonapi:"attr,updatedDate"`
+	UpdatedDate     *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization    *Organization `jsonapi:"relation,organization,omitempty"`
 	PolicySet       *PolicySet    `jsonapi:"relation,policySet,omitempty"`
 	Project         *Project      `jsonapi:"relation,project,omitempty"`

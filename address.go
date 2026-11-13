@@ -1,16 +1,19 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Address represents a Terrakube job address resource.
 type Address struct {
-	ID          string  `jsonapi:"primary,address"`
-	Name        string  `jsonapi:"attr,name"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
-	Job         *Job    `jsonapi:"relation,job,omitempty"`
+	ID          string     `jsonapi:"primary,address"`
+	Name        string     `jsonapi:"attr,name"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy"`
+	CreatedDate *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
+	Job         *Job       `jsonapi:"relation,job,omitempty"`
 }
 
 // AddressService handles communication with the job address endpoints.

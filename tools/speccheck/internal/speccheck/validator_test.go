@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"slices"
 	"testing"
+	"time"
 )
 
 type valTarget struct {
@@ -214,5 +215,25 @@ func TestExpectedFilterKey(t *testing.T) {
 
 	if got := ExpectedFilterKey("module_version"); got != "filter[module_version]" {
 		t.Errorf("ExpectedFilterKey = %q", got)
+	}
+}
+
+func TestValidateModel_TimeWithoutRFC3339Option(t *testing.T) {
+	t.Parallel()
+
+	res := &Resource{Attributes: map[string]Property{"createdDate": {Type: "object"}}}
+	model := func(options ...string) ModelInfo {
+		return ModelInfo{
+			ModelType:  reflect.TypeFor[valModel](),
+			Attributes: []Field{{GoName: "CreatedDate", JSONName: "createdDate", Type: reflect.TypeFor[*time.Time](), Options: options}},
+		}
+	}
+
+	if rep := ValidateModel(model("rfc3339"), res); len(rep.Issues) != 0 {
+		t.Errorf("with rfc3339: issues = %+v, want none", rep.Issues)
+	}
+	rep := ValidateModel(model("omitempty"), res)
+	if len(rep.Issues) != 1 || rep.Issues[0].Kind != TypeMismatch || rep.Issues[0].Field != "createdDate" {
+		t.Errorf("without rfc3339: issues = %+v, want one TypeMismatch on createdDate", rep.Issues)
 	}
 }

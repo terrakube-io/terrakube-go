@@ -1,15 +1,18 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Tag represents a Terrakube tag resource.
 type Tag struct {
 	ID           string        `jsonapi:"primary,tag"`
 	Name         string        `jsonapi:"attr,name"`
 	CreatedBy    *string       `jsonapi:"attr,createdBy"`
-	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	CreatedDate  *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	UpdatedDate  *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 

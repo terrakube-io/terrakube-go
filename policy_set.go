@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicySet represents a Terrakube policy set resource.
 type PolicySet struct {
@@ -16,9 +19,9 @@ type PolicySet struct {
 	Repository                *string                    `jsonapi:"attr,repository"`
 	ShadowEnforcementLevel    *string                    `jsonapi:"attr,shadowEnforcementLevel"`
 	CreatedBy                 *string                    `jsonapi:"attr,createdBy"`
-	CreatedDate               *string                    `jsonapi:"attr,createdDate"`
+	CreatedDate               *time.Time                 `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy                 *string                    `jsonapi:"attr,updatedBy"`
-	UpdatedDate               *string                    `jsonapi:"attr,updatedDate"`
+	UpdatedDate               *time.Time                 `jsonapi:"attr,updatedDate,rfc3339"`
 	Attachments               []*PolicyAttachment        `jsonapi:"relation,attachments,omitempty"`
 	Exemptions                []*PolicyExemption         `jsonapi:"relation,exemptions,omitempty"`
 	NotificationConfiguration *NotificationConfiguration `jsonapi:"relation,notificationConfiguration,omitempty"`

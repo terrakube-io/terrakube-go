@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Module represents a Terrakube module resource.
 type Module struct {
@@ -15,9 +18,9 @@ type Module struct {
 	LatestVersion    *string          `jsonapi:"attr,latestVersion,omitempty"`
 	RegistryPath     *string          `jsonapi:"attr,registryPath,omitempty"`
 	CreatedBy        *string          `jsonapi:"attr,createdBy"`
-	CreatedDate      *string          `jsonapi:"attr,createdDate"`
+	CreatedDate      *time.Time       `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy        *string          `jsonapi:"attr,updatedBy"`
-	UpdatedDate      *string          `jsonapi:"attr,updatedDate"`
+	UpdatedDate      *time.Time       `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization     *Organization    `jsonapi:"relation,organization,omitempty"`
 	Vcs              *VCS             `jsonapi:"relation,vcs,omitempty"`
 	SSH              *SSH             `jsonapi:"relation,ssh,omitempty"`

@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicySetParameter represents a Terrakube policy set parameter resource.
 type PolicySetParameter struct {
@@ -9,9 +12,9 @@ type PolicySetParameter struct {
 	Key         *string    `jsonapi:"attr,key"`
 	Value       *string    `jsonapi:"attr,value"`
 	CreatedBy   *string    `jsonapi:"attr,createdBy"`
-	CreatedDate *string    `jsonapi:"attr,createdDate"`
+	CreatedDate *time.Time `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string    `jsonapi:"attr,updatedDate"`
+	UpdatedDate *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
 	PolicySet   *PolicySet `jsonapi:"relation,policySet,omitempty"`
 }
 

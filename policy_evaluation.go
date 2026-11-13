@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PolicyEvaluation represents a Terrakube policy evaluation resource.
 type PolicyEvaluation struct {
@@ -14,9 +17,9 @@ type PolicyEvaluation struct {
 	StorageURI              *string         `jsonapi:"attr,storageUri"`
 	WarningRules            *int32          `jsonapi:"attr,warningRules"`
 	CreatedBy               *string         `jsonapi:"attr,createdBy"`
-	CreatedDate             *string         `jsonapi:"attr,createdDate"`
+	CreatedDate             *time.Time      `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy               *string         `jsonapi:"attr,updatedBy"`
-	UpdatedDate             *string         `jsonapi:"attr,updatedDate"`
+	UpdatedDate             *time.Time      `jsonapi:"attr,updatedDate,rfc3339"`
 	Job                     *Job            `jsonapi:"relation,job,omitempty"`
 	Override                *PolicyOverride `jsonapi:"relation,override,omitempty"`
 	Step                    *Step           `jsonapi:"relation,step,omitempty"`

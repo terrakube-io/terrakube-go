@@ -80,6 +80,14 @@ type genField struct {
 	JSONName string
 }
 
+// Tag is the jsonapi tag value of the attribute.
+func (f genField) Tag() string { return attrTag(f.GoType, f.JSONName) }
+
+// NeedsTime reports whether an attribute is a *time.Time.
+func (g genResource) NeedsTime() bool {
+	return slices.ContainsFunc(g.Attrs, func(a genField) bool { return a.GoType == "*time.Time" })
+}
+
 type methodSet struct {
 	List, Get, Create, Update, Delete bool
 }
@@ -416,13 +424,20 @@ func render(name, text string, data any) ([]byte, error) {
 
 const resourceTemplate = `package terrakube
 
+{{if .NeedsTime -}}
+import (
+	"context"
+	"time"
+)
+{{- else -}}
 import "context"
+{{- end}}
 
 // {{.Name}} represents a Terrakube {{.Human}} resource.
 type {{.Name}} struct {
 	ID string ` + "`" + `jsonapi:"primary,{{.Type}}"` + "`" + `
 {{- range .Attrs}}
-	{{.GoName}} {{.GoType}} ` + "`" + `jsonapi:"attr,{{.JSONName}}"` + "`" + `
+	{{.GoName}} {{.GoType}} ` + "`" + `jsonapi:"{{.Tag}}"` + "`" + `
 {{- end}}
 {{- range .Rels}}
 	{{.GoName}} {{.GoType}} ` + "`" + `jsonapi:"relation,{{.JSONName}},omitempty"` + "`" + `
@@ -494,6 +509,8 @@ func (s *{{.Name}}Service) Create(ctx context.Context, {{.ParentParams}}entity *
 
 // Update modifies an existing {{.Human}}. The {{.Human}}'s ID field must be set.
 // It returns a *ValidationError if {{.WithEntityID}} is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *{{.Name}}Service) Update(ctx context.Context, {{.ParentParams}}entity *{{.Name}}) (*{{.Name}}, error) {
 {{- range .Parents}}
 	if err := validateID("{{.Label}}", {{.Var}}); err != nil {

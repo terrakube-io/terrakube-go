@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -13,7 +14,7 @@ import (
 func newTestPolicyExemption() *terrakube.PolicyExemption {
 	return &terrakube.PolicyExemption{
 		ID:        "policyexemption-1",
-		ExpiresAt: new("test-expiresAt"),
+		ExpiresAt: new(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)),
 	}
 }
 
@@ -106,8 +107,8 @@ func TestPolicyExemptionService_Get(t *testing.T) {
 	if item.ID != "policyexemption-1" {
 		t.Errorf("ID = %q, want %q", item.ID, "policyexemption-1")
 	}
-	if item.ExpiresAt == nil || *item.ExpiresAt != "test-expiresAt" {
-		t.Errorf("ExpiresAt = %v, want %q", item.ExpiresAt, "test-expiresAt")
+	if item.ExpiresAt == nil || !item.ExpiresAt.Equal(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)) {
+		t.Errorf("ExpiresAt = %v, want 2026-01-02T03:04:05Z", item.ExpiresAt)
 	}
 }
 

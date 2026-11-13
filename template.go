@@ -1,6 +1,9 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Template represents a Terrakube template resource.
 type Template struct {
@@ -10,9 +13,9 @@ type Template struct {
 	Version      *string       `jsonapi:"attr,version"`
 	Content      string        `jsonapi:"attr,tcl"`
 	CreatedBy    *string       `jsonapi:"attr,createdBy"`
-	CreatedDate  *string       `jsonapi:"attr,createdDate"`
+	CreatedDate  *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
 	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string       `jsonapi:"attr,updatedDate"`
+	UpdatedDate  *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
 	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
