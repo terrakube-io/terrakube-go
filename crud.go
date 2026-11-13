@@ -1,17 +1,11 @@
 package terrakube
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
+	"errors"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strconv"
-
-	"github.com/google/jsonapi"
 )
 
 // crudService is a generic base for JSON:API CRUD operations.
@@ -19,25 +13,22 @@ import (
 type crudService[T any] struct {
 	client    *Client
 	filterKey string // query param key for list filtering; defaults to "filter" when empty
+	paged     bool   // the server accepts page parameters for this resource type
 }
 
 // list retrieves a collection of resources at the given path, optionally filtered.
-// When ListOptions.Page and ListOptions.PageSize are both zero, all pages are
-// fetched automatically. Otherwise a single page is returned.
+// With ListOptions.Page or ListOptions.PageSize set, that one page is returned.
+// Otherwise the collection is listed: completely and page by page for resource
+// types the server can page, and in a single request for all others. Every
+// request goes to the configured endpoint; links in responses are not followed.
 func (s *crudService[T]) list(ctx context.Context, path string, opts *ListOptions) ([]*T, error) {
 	params := s.buildListParams(opts)
 
-	// Manual pagination: fetch a single page.
-	if opts != nil && (opts.Page > 0 || opts.PageSize > 0) {
-		req, err := s.client.requestWithQuery(ctx, http.MethodGet, path, params, nil)
-		if err != nil {
-			return nil, err
-		}
-		return s.client.doList[T](req)
+	if !s.paged || (opts != nil && (opts.Page > 0 || opts.PageSize > 0)) {
+		items, _, err := s.listPage(ctx, path, params)
+		return items, err
 	}
-
-	// Auto-paginate: fetch all pages.
-	return s.fetchAllPages(ctx, path, params)
+	return s.listAll(ctx, path, params)
 }
 
 // buildListParams converts ListOptions into URL query parameters.
@@ -67,82 +58,47 @@ func (s *crudService[T]) buildListParams(opts *ListOptions) url.Values {
 	return params
 }
 
-// fetchAllPages iterates through all pages by following JSON:API links.next.
-func (s *crudService[T]) fetchAllPages(ctx context.Context, path string, params url.Values) ([]*T, error) {
-	var allItems []*T
-
+// listPage sends one list request and returns its items and meta.page.
+func (s *crudService[T]) listPage(ctx context.Context, path string, params url.Values) ([]*T, *pageInfo, error) {
 	req, err := s.client.requestWithQuery(ctx, http.MethodGet, path, params, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	return s.client.doList[T](req)
+}
+
+// listAll fetches every page of a collection using the server's meta.page.
+// The first request asks only for totals, so the server picks the page size;
+// later pages repeat that size.
+func (s *crudService[T]) listAll(ctx context.Context, path string, params url.Values) ([]*T, error) {
+	params.Set("page[totals]", "")
+	all, page, err := s.listPage(ctx, path, params)
+	if apiErr, ok := errors.AsType[*APIError](err); ok && apiErr.StatusCode == http.StatusBadRequest {
+		// Which resource types a server can page depends on its version.
+		// If it refuses page parameters, list the collection in one request.
+		params.Del("page[totals]")
+		all, _, err = s.listPage(ctx, path, params)
+		return all, err
+	}
 	if err != nil {
 		return nil, err
 	}
 
-	for {
-		items, nextURL, err := s.client.doListWithLinks[T](req)
+	for n := 2; page != nil && page.Limit > 0 && n <= page.TotalPages; n++ {
+		params.Set("page[number]", strconv.Itoa(n))
+		params.Set("page[size]", strconv.Itoa(page.Limit))
+
+		var items []*T
+		items, page, err = s.listPage(ctx, path, params)
 		if err != nil {
 			return nil, err
 		}
-		allItems = append(allItems, items...)
-
-		if nextURL == "" {
+		if len(items) == 0 {
 			break
 		}
-
-		// Build request for the next page using the absolute URL from links.next.
-		req, err = http.NewRequestWithContext(ctx, http.MethodGet, nextURL, nil)
-		if err != nil {
-			return nil, fmt.Errorf("building next page request: %w", err)
-		}
-		req.Header.Set("Authorization", "Bearer "+s.client.token)
-		req.Header.Set("User-Agent", s.client.userAgent)
-		req.Header.Set("Accept", mediaType)
+		all = append(all, items...)
 	}
-
-	return allItems, nil
-}
-
-// doListWithLinks executes a request and decodes a JSON:API list response,
-// returning both the items and the next page URL (if present).
-func (c *Client) doListWithLinks[T any](req *http.Request) ([]*T, string, error) {
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, "", err
-	}
-	defer resp.Body.Close() //nolint:errcheck // response body close errors are inconsequential
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, "", fmt.Errorf("reading response body: %w", err)
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, "", c.parseAPIError(req, resp.StatusCode, bodyBytes)
-	}
-
-	if len(bodyBytes) == 0 {
-		return nil, "", nil
-	}
-
-	items, err := jsonapi.UnmarshalManyPayload(bytes.NewReader(bodyBytes), reflect.TypeFor[*T]())
-	if err != nil {
-		return nil, "", fmt.Errorf("decoding JSON:API list response: %w", err)
-	}
-
-	result := make([]*T, len(items))
-	for i, item := range items {
-		result[i] = item.(*T)
-	}
-
-	// Extract links.next for pagination.
-	var links struct {
-		Links struct {
-			Next string `json:"next"`
-		} `json:"links"`
-	}
-	if json.Unmarshal(bodyBytes, &links) == nil {
-		return result, links.Links.Next, nil
-	}
-
-	return result, "", nil
+	return all, nil
 }
 
 // get retrieves a single resource at the given path.

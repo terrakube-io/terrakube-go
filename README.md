@@ -45,6 +45,12 @@ func main() {
 }
 ```
 
+### Listing
+
+`List` with no page options lists the collection and never follows links found in responses. Workspaces, workspace tags, actions, federated, agents, organization variables, and workspace access are fetched page by page until the server reports no more. Every other resource type, and any type for which the server refuses paging, is fetched in one request, so the result stops at any limit the server applies to it.
+
+`ListOptions.Page` and `PageSize` return one page. On Terrakube 2.34.1 the server accepts them for those seven types and answers 400 `Cannot paginate` for most others.
+
 ## Supported Resources
 
 | Resource | Service Field | Scope |
