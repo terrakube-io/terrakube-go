@@ -123,8 +123,8 @@ func TestBuildCheckReport_WebhooksPathMismatchIsKnownIssue(t *testing.T) {
 			}
 			if i.Kind == speccheck.KnownIssue {
 				found = true
-				if !strings.Contains(i.Detail, "terrakube-go#38") {
-					t.Errorf("Detail = %q, want the tracking reference", i.Detail)
+				if !strings.Contains(i.Detail, "zero or one element") {
+					t.Errorf("Detail = %q, want the explanation", i.Detail)
 				}
 			}
 		}

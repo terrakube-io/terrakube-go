@@ -23,7 +23,7 @@ type knownIssue struct {
 
 var knownIssues = []knownIssue{
 	// workspace.webhook is to-one; Webhooks.List decodes a collection.
-	{"Webhooks", speccheck.PathTypeMismatch, "/organization/id0/workspace/id1/webhook", "tracked in terrakube-io/terrakube-go#38"},
+	{"Webhooks", speccheck.PathTypeMismatch, "/organization/id0/workspace/id1/webhook", "a workspace has one webhook; List returns zero or one element"},
 }
 
 func matchKnownIssue(service string, i speccheck.Issue) (string, bool) {
