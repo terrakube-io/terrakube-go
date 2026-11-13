@@ -14,9 +14,8 @@ func TestStepService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/step", func(w http.ResponseWriter, _ *http.Request) {
-		out := "done"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Step{
-			{ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: &out},
+			{ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: new("done")},
 			{ID: "step-2", Name: "apply", Status: "pending", StepNumber: 2},
 		})
 	})
@@ -89,9 +88,8 @@ func TestStepService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/step/step-1", func(w http.ResponseWriter, _ *http.Request) {
-		out := "Terraform plan output"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Step{
-			ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: &out,
+			ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: new("Terraform plan output"),
 		})
 	})
 

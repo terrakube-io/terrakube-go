@@ -3,7 +3,9 @@ package terrakube_test
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
@@ -89,18 +91,29 @@ func TestClient_ContextCancellation_Delete(t *testing.T) {
 func TestClient_ContextTimeout(t *testing.T) {
 	t.Parallel()
 
-	srv := testutil.NewServer(t)
-	srv.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
-		time.Sleep(5 * time.Second)
-		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Organization{ID: "org-1", Name: "test"})
+	// synctest runs the test on a fake clock, so the server's five-second delay
+	// costs no real time; the in-memory test server keeps it inside the bubble.
+	synctest.Test(t, func(t *testing.T) {
+		srv := httptest.NewTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			time.Sleep(5 * time.Second)
+			testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Organization{ID: "org-1", Name: "test"})
+		}))
+
+		client, err := terrakube.NewClient(
+			terrakube.WithEndpoint("http://example.com"),
+			terrakube.WithToken("test-token"),
+			terrakube.WithHTTPClient(srv.Client()),
+		)
+		if err != nil {
+			t.Fatalf("failed to create client: %v", err)
+		}
+
+		ctx, cancel := context.WithTimeout(t.Context(), 10*time.Millisecond)
+		defer cancel()
+
+		_, err = client.Organizations.Get(ctx, "org-1")
+		if err == nil {
+			t.Fatal("expected error from context timeout")
+		}
 	})
-
-	client := newTestClient(t, srv)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
-	defer cancel()
-
-	_, err := client.Organizations.Get(ctx, "org-1")
-	if err == nil {
-		t.Fatal("expected error from context timeout")
-	}
 }

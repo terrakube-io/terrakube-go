@@ -153,8 +153,8 @@ func TestCrudService_List_ErrorType(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 
-	var apiErr *APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T: %v", err, err)
 	}
 	if apiErr.StatusCode != http.StatusInternalServerError {
@@ -175,9 +175,8 @@ func TestCrudService_Get(t *testing.T) {
 		{
 			name: "success",
 			handler: func(w http.ResponseWriter, _ *http.Request) {
-				desc := "Test org"
 				testutil.WriteJSONAPI(t, w, http.StatusOK, &Organization{
-					ID: "org-1", Name: "Alpha", Description: &desc, ExecutionMode: "remote",
+					ID: "org-1", Name: "Alpha", Description: new("Test org"), ExecutionMode: "remote",
 				})
 			},
 			wantID: "org-1",
@@ -215,8 +214,8 @@ func TestCrudService_Get(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -238,13 +237,12 @@ func TestCrudService_Get_FieldValues(t *testing.T) {
 	t.Parallel()
 
 	srv := testutil.NewServer(t)
-	desc := "Full details"
 	icon := "icon-url"
 	srv.HandleFunc("GET /api/v1/organization/org-full", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &Organization{
 			ID:            "org-full",
 			Name:          "FullOrg",
-			Description:   &desc,
+			Description:   new("Full details"),
 			ExecutionMode: "remote",
 			Disabled:      false,
 			Icon:          &icon,
@@ -322,8 +320,8 @@ func TestCrudService_Create(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -427,8 +425,8 @@ func TestCrudService_Update(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -529,8 +527,8 @@ func TestCrudService_Del(t *testing.T) {
 				if err == nil {
 					t.Fatal("expected error, got nil")
 				}
-				var apiErr *APIError
-				if !errors.As(err, &apiErr) {
+				apiErr, ok := errors.AsType[*APIError](err)
+				if !ok {
 					t.Fatalf("expected *APIError, got %T: %v", err, err)
 				}
 				if apiErr.StatusCode != tt.errCode {
@@ -634,9 +632,7 @@ func TestNewClient_FilterKeys(t *testing.T) {
 	v := reflect.ValueOf(client).Elem()
 	typ := v.Type()
 
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-
+	for field, fieldValue := range v.Fields() {
 		if privateFields[field.Name] || skipFields[field.Name] {
 			continue
 		}
@@ -647,7 +643,7 @@ func TestNewClient_FilterKeys(t *testing.T) {
 			continue
 		}
 
-		svc := v.Field(i).Elem()
+		svc := fieldValue.Elem()
 		fk := svc.FieldByName("filterKey")
 		if !fk.IsValid() {
 			t.Errorf("Client.%s: no filterKey field found (missing crudService embed?)", field.Name)

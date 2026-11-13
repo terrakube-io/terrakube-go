@@ -88,9 +88,8 @@ func TestAddressService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/address/addr-1", func(w http.ResponseWriter, _ *http.Request) {
-		createdBy := "admin"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Address{
-			ID: "addr-1", Name: "aws_instance.web", Type: "resource", CreatedBy: &createdBy,
+			ID: "addr-1", Name: "aws_instance.web", Type: "resource", CreatedBy: new("admin"),
 		})
 	})
 

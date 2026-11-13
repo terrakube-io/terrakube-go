@@ -17,21 +17,17 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity any) {
 	if rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
-	rt := rv.Type()
-
 	typeName := ""
 	id := ""
 	attrs := map[string]any{}
 	rels := map[string]any{}
 
-	for i := range rt.NumField() {
-		field := rt.Field(i)
+	for field, val := range rv.Fields() {
 		tag := field.Tag.Get("jsonapi")
 		if tag == "" {
 			continue
 		}
 
-		val := rv.Field(i)
 		parts := splitTag(tag)
 
 		switch parts[0] {
@@ -64,15 +60,13 @@ func WriteJSONAPI(t testing.TB, w http.ResponseWriter, status int, entity any) {
 				if relRV.Kind() == reflect.Pointer {
 					relRV = relRV.Elem()
 				}
-				relRT := relRV.Type()
-
 				relData := map[string]any{}
-				for j := range relRT.NumField() {
-					relTag := relRT.Field(j).Tag.Get("jsonapi")
+				for relField, relVal := range relRV.Fields() {
+					relTag := relField.Tag.Get("jsonapi")
 					relParts := splitTag(relTag)
 					if len(relParts) > 1 && relParts[0] == "primary" {
 						relData["type"] = relParts[1]
-						relData["id"] = fmt.Sprintf("%v", relRV.Field(j).Interface())
+						relData["id"] = fmt.Sprintf("%v", relVal.Interface())
 						break
 					}
 				}
@@ -119,20 +113,16 @@ func WriteJSONAPIList(t testing.TB, w http.ResponseWriter, status int, entities 
 		if elem.Kind() == reflect.Pointer {
 			elem = elem.Elem()
 		}
-		rt := elem.Type()
-
 		typeName := ""
 		id := ""
 		attrs := map[string]any{}
 
-		for j := range rt.NumField() {
-			field := rt.Field(j)
+		for field, val := range elem.Fields() {
 			tag := field.Tag.Get("jsonapi")
 			if tag == "" {
 				continue
 			}
 
-			val := elem.Field(j)
 			parts := splitTag(tag)
 
 			switch parts[0] {

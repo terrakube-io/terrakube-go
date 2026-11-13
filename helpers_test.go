@@ -42,8 +42,8 @@ func assertValidationError(t *testing.T, err error, field string) {
 	if err == nil {
 		t.Fatalf("expected validation error for %q, got nil", field)
 	}
-	var ve *terrakube.ValidationError
-	if !errors.As(err, &ve) {
+	ve, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T: %v", err, err)
 	}
 	if ve.Field != field {

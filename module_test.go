@@ -75,11 +75,9 @@ func TestModuleService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1", func(w http.ResponseWriter, _ *http.Request) {
-		folder := "modules/vpc"
-		tagPrefix := "v"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Module{
 			ID: "mod-1", Name: "vpc", Description: "VPC module", Provider: "aws",
-			Source: "https://github.com/ex/vpc", Folder: &folder, TagPrefix: &tagPrefix,
+			Source: "https://github.com/ex/vpc", Folder: new("modules/vpc"), TagPrefix: new("v"),
 		})
 	})
 
