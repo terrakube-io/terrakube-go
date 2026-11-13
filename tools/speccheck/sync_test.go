@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
@@ -268,7 +269,7 @@ func TestApplyPlan_AppliesChangesAndIsIdempotent(t *testing.T) {
 	}
 	mustContain(t, "organization.go", files["organization.go"],
 		"Quota", `jsonapi:"attr,quota"`, "ExpiresAt", "*time.Time", `jsonapi:"attr,expiresAt,rfc3339"`, `"time"`, `jsonapi:"relation,gadget,omitempty"`,
-		"DEPRECATED (absent from the Terrakube API 9.9.9 OpenAPI document; kept for compatibility).")
+		"// Deprecated: absent from the Terrakube API 9.9.9 OpenAPI document; kept for compatibility.")
 	mustContain(t, "tag.go", files["tag.go"], `primary,tag2`)
 	mustContain(t, "interfaces.go", files["interfaces.go"], "type GadgetLister interface", "GadgetCRUD", "_ WidgetCRUD")
 	mustContain(t, "crud_test.go", files["crud_test.go"], `"filter[workspace2]"`, `"Gadgets":`, `"Widgets":`)
@@ -296,8 +297,8 @@ func TestApplyPlan_AppliesChangesAndIsIdempotent(t *testing.T) {
 			t.Errorf("%s changed on the second apply", name)
 		}
 	}
-	if n := strings.Count(after["organization.go"], "DEPRECATED"); n != 1 {
-		t.Errorf("organization.go has %d DEPRECATED markers, want 1", n)
+	if n := strings.Count(after["organization.go"], "Deprecated:"); n != 1 {
+		t.Errorf("organization.go has %d Deprecated markers, want 1", n)
 	}
 }
 
@@ -314,7 +315,8 @@ type Thing struct {
 	Legacy *string ` + "`" + `jsonapi:"attr,legacy"` + "`" + ` // keeps its own comment
 	Gone   *string ` + "`" + `jsonapi:"attr,gone"` + "`" + `
 	// Marked is already marked.
-	// DEPRECATED (absent from the Terrakube API 0.9 OpenAPI document; kept for compatibility).
+	//
+	// Deprecated: absent from the Terrakube API 0.9 OpenAPI document; kept for compatibility.
 	Marked *string ` + "`" + `jsonapi:"attr,marked"` + "`" + `
 	Tail   *string ` + "`" + `jsonapi:"attr,tail"` + "`" + ` // DEPRECATED already
 }
@@ -342,16 +344,37 @@ func TestApplyPlan_DeprecationMarkers(t *testing.T) {
 		t.Fatalf("applyPlan: %v", err)
 	}
 	src := readDir(t, dir)["thing.go"]
-	if n := strings.Count(src, "DEPRECATED"); n != 4 { // two new markers, two existing
-		t.Errorf("got %d DEPRECATED markers, want 4:\n%s", n, src)
+	// Two new markers in Go's form; Marked keeps its own, and Tail keeps the
+	// old-style marker this tool used to write.
+	if n := strings.Count(src, "// Deprecated: absent from the Terrakube API"); n != 3 {
+		t.Errorf("got %d Deprecated markers, want 3:\n%s", n, src)
 	}
-	// A field with its own trailing comment gets the marker on a line above.
-	if !strings.Contains(src, "kept for compatibility).\n\tLegacy") {
-		t.Errorf("Legacy marker not placed above the field:\n%s", src)
+	if n := strings.Count(src, "DEPRECATED"); n != 1 {
+		t.Errorf("got %d old-style markers, want the 1 that was already there:\n%s", n, src)
 	}
-	// A field without a comment gets a trailing one.
-	if !regexp.MustCompile("`jsonapi:\"attr,gone\"`\\s+// DEPRECATED").MatchString(src) {
-		t.Errorf("Gone marker not trailing:\n%s", src)
+	// The marker is a doc comment above the field, where Go tools read it.
+	for _, field := range []string{"Legacy", "Gone"} {
+		if !regexp.MustCompile(`kept for compatibility\.\n\t` + field + `\s`).MatchString(src) {
+			t.Errorf("%s marker is not the doc comment of the field:\n%s", field, src)
+		}
+	}
+	// go/doc must see it: parse the result and check the field's doc text.
+	fset := token.NewFileSet()
+	parsed, err := parser.ParseFile(fset, "thing.go", src, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("parsing result: %v", err)
+	}
+	deprecated := map[string]bool{}
+	ast.Inspect(parsed, func(n ast.Node) bool {
+		if f, ok := n.(*ast.Field); ok && len(f.Names) == 1 && f.Doc != nil {
+			deprecated[f.Names[0].Name] = strings.Contains(f.Doc.Text(), "Deprecated: ")
+		}
+		return true
+	})
+	for _, field := range []string{"Legacy", "Gone", "Marked"} {
+		if !deprecated[field] {
+			t.Errorf("%s has no Deprecated paragraph in its doc comment:\n%s", field, src)
+		}
 	}
 }
 
