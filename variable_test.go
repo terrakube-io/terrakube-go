@@ -86,12 +86,12 @@ func TestVariableService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty org ID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "organization ID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "organization ID")
+	if valErr.Field != "organizationID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "organizationID")
 	}
 }
 
@@ -107,12 +107,12 @@ func TestVariableService_List_EmptyWorkspaceID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for empty workspace ID")
 	}
-	var valErr *terrakube.ValidationError
-	if !errors.As(err, &valErr) {
+	valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+	if !ok {
 		t.Fatalf("expected *ValidationError, got %T", err)
 	}
-	if valErr.Field != "workspace ID" {
-		t.Errorf("Field = %q, want %q", valErr.Field, "workspace ID")
+	if valErr.Field != "workspaceID" {
+		t.Errorf("Field = %q, want %q", valErr.Field, "workspaceID")
 	}
 }
 
@@ -150,15 +150,15 @@ func TestVariableService_Get_EmptyIDs(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		orgID  string
-		wsID   string
-		varID  string
-		field  string
+		name  string
+		orgID string
+		wsID  string
+		varID string
+		field string
 	}{
-		{"empty org ID", "", "ws-1", "var-1", "organization ID"},
-		{"empty workspace ID", "org-1", "", "var-1", "workspace ID"},
-		{"empty variable ID", "org-1", "ws-1", "", "variable ID"},
+		{"empty org ID", "", "ws-1", "var-1", "organizationID"},
+		{"empty workspace ID", "org-1", "", "var-1", "workspaceID"},
+		{"empty variable ID", "org-1", "ws-1", "", "variableID"},
 	}
 
 	for _, tt := range tests {
@@ -168,8 +168,8 @@ func TestVariableService_Get_EmptyIDs(t *testing.T) {
 			if err == nil {
 				t.Fatal("expected error")
 			}
-			var valErr *terrakube.ValidationError
-			if !errors.As(err, &valErr) {
+			valErr, ok := errors.AsType[*terrakube.ValidationError](err)
+			if !ok {
 				t.Fatalf("expected *ValidationError, got %T", err)
 			}
 			if valErr.Field != tt.field {
@@ -444,5 +444,28 @@ func TestVariableService_AuthHeader(t *testing.T) {
 	_, err = client.Variables.Get(context.Background(), "org-1", "ws-1", "var-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestVariable_OmitEmptyFields(t *testing.T) {
+	t.Parallel()
+
+	v := &terrakube.Variable{
+		ID:       "var-1",
+		Key:      "MY_VAR",
+		Category: "ENV",
+	}
+
+	var buf bytes.Buffer
+	if err := jsonapi.MarshalPayload(&buf, v); err != nil {
+		t.Fatalf("failed to marshal: %v", err)
+	}
+
+	payload := buf.String()
+
+	for _, field := range []string{`"description"`, `"incomplete"`, `"createdBy"`, `"createdDate"`, `"updatedBy"`, `"updatedDate"`} {
+		if bytes.Contains([]byte(payload), []byte(field)) {
+			t.Errorf("empty field %s should be omitted from JSON:API payload, but was found", field)
+		}
 	}
 }

@@ -1,18 +1,22 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // WorkspaceSchedule represents a scheduled job for a workspace.
 type WorkspaceSchedule struct {
-	ID          string  `jsonapi:"primary,schedule"`
-	// Schedule is the cron expression for the schedule (JSON:API attr: "cron").
-	Schedule string `jsonapi:"attr,cron"`
-	// TemplateID is the template reference (JSON:API attr: "templateReference").
-	TemplateID string `jsonapi:"attr,templateReference"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string     `jsonapi:"primary,schedule"`
+	Schedule    string     `jsonapi:"attr,cron"`
+	TemplateID  string     `jsonapi:"attr,templateReference"`
+	Description *string    `jsonapi:"attr,description,omitempty"`
+	Enabled     bool       `jsonapi:"attr,enabled"`
+	CreatedBy   *string    `jsonapi:"attr,createdBy"`
+	CreatedDate *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy   *string    `jsonapi:"attr,updatedBy"`
+	UpdatedDate *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
+	Workspace   *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WorkspaceScheduleService handles communication with the workspace schedule
@@ -59,6 +63,8 @@ func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID strin
 
 // Update modifies an existing workspace schedule. The schedule's ID field must be set.
 // It returns a *ValidationError if workspaceID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error) {
 	if err := validateID("workspaceID", workspaceID); err != nil {
 		return nil, err

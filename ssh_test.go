@@ -14,10 +14,9 @@ func TestSSHService_List(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	desc := "my ssh key"
 	srv.HandleFunc("GET /api/v1/organization/org-1/ssh", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.SSH{
-			{ID: "ssh-1", Name: "key-one", Description: &desc, PrivateKey: "pk1", SSHType: "rsa"},
+			{ID: "ssh-1", Name: "key-one", Description: new("my ssh key"), PrivateKey: "pk1", SSHType: "rsa"},
 			{ID: "ssh-2", Name: "key-two", PrivateKey: "pk2", SSHType: "ed25519"},
 		})
 	})
@@ -82,12 +81,11 @@ func TestSSHService_Get(t *testing.T) {
 	t.Parallel()
 	srv := testutil.NewServer(t)
 
-	desc := "test key"
 	srv.HandleFunc("GET /api/v1/organization/org-1/ssh/ssh-1", func(w http.ResponseWriter, _ *http.Request) {
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.SSH{
 			ID:          "ssh-1",
 			Name:        "key-one",
-			Description: &desc,
+			Description: new("test key"),
 			PrivateKey:  "pk1",
 			SSHType:     "rsa",
 		})
@@ -287,8 +285,8 @@ func TestSSHService_Delete_ServerError(t *testing.T) {
 		t.Fatal("expected error for 500 response")
 	}
 
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {

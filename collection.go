@@ -1,17 +1,23 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Collection represents a Terrakube collection resource.
 type Collection struct {
-	ID          string  `jsonapi:"primary,collection"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	Priority    int32   `jsonapi:"attr,priority"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string                 `jsonapi:"primary,collection"`
+	Name         string                 `jsonapi:"attr,name"`
+	Description  *string                `jsonapi:"attr,description"`
+	Priority     int32                  `jsonapi:"attr,priority"`
+	CreatedBy    *string                `jsonapi:"attr,createdBy"`
+	CreatedDate  *time.Time             `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy    *string                `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *time.Time             `jsonapi:"attr,updatedDate,rfc3339"`
+	Organization *Organization          `jsonapi:"relation,organization,omitempty"`
+	Items        []*CollectionItem      `jsonapi:"relation,item,omitempty"`
+	References   []*CollectionReference `jsonapi:"relation,reference,omitempty"`
 }
 
 // CollectionService handles communication with the collection related methods
@@ -58,6 +64,8 @@ func (s *CollectionService) Create(ctx context.Context, orgID string, collection
 
 // Update modifies an existing collection. The collection's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *CollectionService) Update(ctx context.Context, orgID string, collection *Collection) (*Collection, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

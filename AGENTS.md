@@ -4,6 +4,8 @@
 
 Single flat `terrakube` package at the repo root. No sub-packages except `testutil/`.
 
+`tools/speccheck/` is a separate Go module (own `go.mod`, `replace` to the library) holding the OpenAPI tracking tool: `check`, `fetch`, `diff`, `sync`. Its dependencies (kin-openapi, oasdiff, gofumpt) never enter the library's `go.mod`. `openapi/v{APIVersion}.json` is the vendored Terrakube OpenAPI document the client targets; only the current API version is supported. Use `mise run spec-sync -- --to=<version>` to move to a new version, then review the generated code.
+
 ### Four layers
 
 1. **Client** (`client.go`): HTTP transport, authentication, JSON:API serialization
@@ -19,6 +21,7 @@ Single flat `terrakube` package at the repo root. No sub-packages except `testut
 - Functional options pattern for `NewClient`
 - NO `omitempty` on boolean struct tags (fixes dropped `false` values)
 - `*string` for optional string fields
+- `*time.Time` with the `rfc3339` tag option for date attributes (the server sends and accepts RFC 3339 in UTC)
 - `context.Context` on all service methods
 - HTTP status code checking on all responses (non-2xx returns `*APIError`)
 - ID validation before URL path construction

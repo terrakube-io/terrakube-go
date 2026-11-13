@@ -1,27 +1,32 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // VCS represents a version control system connection in Terrakube.
 type VCS struct {
-	ID             string  `jsonapi:"primary,vcs"`
-	Name           string  `jsonapi:"attr,name"`
-	Description    string  `jsonapi:"attr,description"`
-	VcsType        string  `jsonapi:"attr,vcsType"`
-	ConnectionType string  `jsonapi:"attr,connectionType"`
-	ClientID       string  `jsonapi:"attr,clientId"`
-	ClientSecret   string  `jsonapi:"attr,clientSecret"`
-	PrivateKey     string  `jsonapi:"attr,privateKey"`
-	Endpoint       string  `jsonapi:"attr,endpoint"`
-	APIURL         string  `jsonapi:"attr,apiUrl"`
-	Status         string  `jsonapi:"attr,status"`
-	Callback       *string `jsonapi:"attr,callback"`
-	AccessToken    *string `jsonapi:"attr,accessToken"`
-	RedirectURL    *string `jsonapi:"attr,redirectUrl"`
-	CreatedBy      *string `jsonapi:"attr,createdBy"`
-	CreatedDate    *string `jsonapi:"attr,createdDate"`
-	UpdatedBy      *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate    *string `jsonapi:"attr,updatedDate"`
+	ID             string        `jsonapi:"primary,vcs"`
+	Name           string        `jsonapi:"attr,name"`
+	Description    string        `jsonapi:"attr,description"`
+	VcsType        string        `jsonapi:"attr,vcsType"`
+	ConnectionType string        `jsonapi:"attr,connectionType"`
+	ClientID       string        `jsonapi:"attr,clientId"`
+	ClientSecret   string        `jsonapi:"attr,clientSecret"`
+	PrivateKey     string        `jsonapi:"attr,privateKey"`
+	Endpoint       string        `jsonapi:"attr,endpoint"`
+	APIURL         string        `jsonapi:"attr,apiUrl"`
+	Status         string        `jsonapi:"attr,status"`
+	Callback       *string       `jsonapi:"attr,callback"`
+	AccessToken    *string       `jsonapi:"attr,accessToken"`
+	RedirectURL    *string       `jsonapi:"attr,redirectUrl"`
+	CreatedBy      *string       `jsonapi:"attr,createdBy"`
+	CreatedDate    *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy      *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate    *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
+	Organization   *Organization `jsonapi:"relation,organization,omitempty"`
+	Workspaces     []*Workspace  `jsonapi:"relation,workspace,omitempty"`
 }
 
 // VCSService handles communication with the VCS related methods of the Terrakube API.
@@ -67,6 +72,8 @@ func (s *VCSService) Create(ctx context.Context, orgID string, vcs *VCS) (*VCS, 
 
 // Update modifies an existing VCS connection. The VCS connection's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *VCSService) Update(ctx context.Context, orgID string, vcs *VCS) (*VCS, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

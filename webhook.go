@@ -1,34 +1,40 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Webhook represents a workspace webhook (v1 flat format).
 type Webhook struct {
-	ID           string  `jsonapi:"primary,webhook"`
-	Path         string  `jsonapi:"attr,path"`
-	Branch       string  `jsonapi:"attr,branch"`
-	TemplateID   string  `jsonapi:"attr,templateId"`
-	RemoteHookID string  `jsonapi:"attr,remoteHookId"`
-	Event        string  `jsonapi:"attr,event"`
-	CreatedBy    *string `jsonapi:"attr,createdBy"`
-	CreatedDate  *string `jsonapi:"attr,createdDate"`
-	UpdatedBy    *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate  *string `jsonapi:"attr,updatedDate"`
+	ID           string          `jsonapi:"primary,webhook"`
+	RemoteHookID string          `jsonapi:"attr,remoteHookId"`
+	CreatedBy    *string         `jsonapi:"attr,createdBy"`
+	CreatedDate  *time.Time      `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy    *string         `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *time.Time      `jsonapi:"attr,updatedDate,rfc3339"`
+	MigratedV2   bool            `jsonapi:"attr,migratedV2"`
+	SyncError    *string         `jsonapi:"attr,syncError"`
+	Events       []*WebhookEvent `jsonapi:"relation,events,omitempty"`
+	Workspace    *Workspace      `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WebhookEvent represents a webhook event entity.
 type WebhookEvent struct {
-	ID          string   `jsonapi:"primary,webhook_event"`
-	Branch      string   `jsonapi:"attr,branch"`
-	CreatedBy   string   `jsonapi:"attr,createdBy"`
-	CreatedDate string   `jsonapi:"attr,createdDate"`
-	Event       string   `jsonapi:"attr,event"`
-	Path        string   `jsonapi:"attr,path"`
-	Priority    int32    `jsonapi:"attr,priority"`
-	TemplateID  string   `jsonapi:"attr,templateId"`
-	UpdatedBy   string   `jsonapi:"attr,updatedBy"`
-	UpdatedDate string   `jsonapi:"attr,updatedDate"`
-	Webhook     *Webhook `jsonapi:"relation,webhook,omitempty"`
+	ID                string     `jsonapi:"primary,webhook_event"`
+	Branch            string     `jsonapi:"attr,branch"`
+	CreatedBy         string     `jsonapi:"attr,createdBy"`
+	CreatedDate       *time.Time `jsonapi:"attr,createdDate,rfc3339"`
+	Event             string     `jsonapi:"attr,event"`
+	Path              string     `jsonapi:"attr,path"`
+	PathType          string     `jsonapi:"attr,pathType,omitempty"`
+	Priority          int32      `jsonapi:"attr,priority"`
+	TemplateID        string     `jsonapi:"attr,templateId"`
+	PRWorkflowEnabled bool       `jsonapi:"attr,prWorkflowEnabled,omitempty"`
+	PRApplyEnabled    bool       `jsonapi:"attr,prApplyEnabled,omitempty"`
+	UpdatedBy         string     `jsonapi:"attr,updatedBy"`
+	UpdatedDate       *time.Time `jsonapi:"attr,updatedDate,rfc3339"`
+	Webhook           *Webhook   `jsonapi:"relation,webhook,omitempty"`
 }
 
 // WebhookService handles communication with the webhook related methods
@@ -43,7 +49,8 @@ type WebhookEventService struct {
 	crudService[WebhookEvent]
 }
 
-// List returns all webhooks for a workspace.
+// List returns the webhook of a workspace. A workspace has at most one, so the
+// result holds zero or one element, and the server ignores opts.Filter here.
 // It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *WebhookService) List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
@@ -90,6 +97,8 @@ func (s *WebhookService) Create(ctx context.Context, orgID, workspaceID string, 
 
 // Update modifies an existing webhook. The webhook's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WebhookService) Update(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -155,7 +164,7 @@ func (s *WebhookEventService) Get(ctx context.Context, orgID, workspaceID, webho
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", eventID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", eventID)
 	return s.get(ctx, path)
 }
 
@@ -172,12 +181,14 @@ func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, we
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event")
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events")
 	return s.create(ctx, path, event)
 }
 
 // Update modifies an existing webhook event. The webhook event's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, webhookID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
@@ -192,7 +203,7 @@ func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, we
 		return nil, err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", event.ID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", event.ID)
 	return s.update(ctx, path, event)
 }
 
@@ -212,6 +223,6 @@ func (s *WebhookEventService) Delete(ctx context.Context, orgID, workspaceID, we
 		return err
 	}
 
-	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "event", eventID)
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", eventID)
 	return s.del(ctx, path)
 }

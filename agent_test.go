@@ -289,8 +289,8 @@ func TestAgentService_Delete_ServerError(t *testing.T) {
 		t.Fatal("expected error for 500 response")
 	}
 
-	var apiErr *terrakube.APIError
-	if !errors.As(err, &apiErr) {
+	apiErr, ok := errors.AsType[*terrakube.APIError](err)
+	if !ok {
 		t.Fatalf("expected *APIError, got %T", err)
 	}
 	if apiErr.StatusCode != 500 {

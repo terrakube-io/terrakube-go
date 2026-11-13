@@ -1,6 +1,7 @@
 [tools]
-go = "1.24"
-"go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint" = "latest"
+go = "1.27"
+"go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint" = "2.15.0"
+gofumpt = "0.12.0"
 
 [tasks.test]
 run = "go test -race -count=1 ./..."
@@ -17,5 +18,24 @@ run = "go vet ./..."
 [tasks.coverage]
 run = "go test -race -coverprofile=coverage.out ./... && go tool cover -func=coverage.out"
 
+[tasks.fix]
+run = "go fix -diff ./..."
+
 [tasks.check]
-depends = ["vet", "lint", "test"]
+depends = ["vet", "lint", "fix", "test"]
+
+[tasks.spec-check]
+description = "Compare the client with the vendored OpenAPI document"
+run = "go -C tools/speccheck run . check"
+
+[tasks.spec-fetch]
+description = "Download an OpenAPI document into openapi/"
+run = "go -C tools/speccheck run . fetch"
+
+[tasks.spec-diff]
+description = "Compare two vendored OpenAPI documents"
+run = "go -C tools/speccheck run . diff"
+
+[tasks.spec-sync]
+description = "Update the client's source to match an OpenAPI document"
+run = "go -C tools/speccheck run . sync"

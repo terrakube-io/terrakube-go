@@ -67,7 +67,7 @@ func TestImplementationService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestImplementationService_List_EmptyProviderID(t *testing.T) {
@@ -80,7 +80,7 @@ func TestImplementationService_List_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty providerID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestImplementationService_List_EmptyVersionID(t *testing.T) {
@@ -93,7 +93,7 @@ func TestImplementationService_List_EmptyVersionID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty versionID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestImplementationService_Get(t *testing.T) {
@@ -101,11 +101,9 @@ func TestImplementationService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version/ver-1/implementation/impl-1", func(w http.ResponseWriter, _ *http.Request) {
-		dl := "https://example.com/download"
-		shasum := "abc123"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Implementation{
 			ID: "impl-1", Os: "linux", Arch: "amd64", Filename: "provider.zip",
-			DownloadURL: &dl, Shasum: &shasum,
+			DownloadURL: new("https://example.com/download"), Shasum: new("abc123"),
 		})
 	})
 
@@ -144,7 +142,7 @@ func TestImplementationService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestImplementationService_Get_EmptyProviderID(t *testing.T) {
@@ -157,7 +155,7 @@ func TestImplementationService_Get_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty providerID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestImplementationService_Get_EmptyVersionID(t *testing.T) {
@@ -170,7 +168,7 @@ func TestImplementationService_Get_EmptyVersionID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty versionID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestImplementationService_Get_EmptyID(t *testing.T) {
@@ -183,7 +181,7 @@ func TestImplementationService_Get_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "implementation ID")
+	assertValidationError(t, err, "implementationID")
 }
 
 func TestImplementationService_Get_NotFound(t *testing.T) {
@@ -267,7 +265,7 @@ func TestImplementationService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "implementation ID")
+	assertValidationError(t, err, "implementationID")
 }
 
 func TestImplementationService_Delete(t *testing.T) {
@@ -295,7 +293,7 @@ func TestImplementationService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestImplementationService_Delete_EmptyProviderID(t *testing.T) {
@@ -308,7 +306,7 @@ func TestImplementationService_Delete_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty providerID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestImplementationService_Delete_EmptyVersionID(t *testing.T) {
@@ -321,7 +319,7 @@ func TestImplementationService_Delete_EmptyVersionID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty versionID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestImplementationService_Delete_EmptyID(t *testing.T) {
@@ -334,7 +332,7 @@ func TestImplementationService_Delete_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "implementation ID")
+	assertValidationError(t, err, "implementationID")
 }
 
 func TestImplementationService_Delete_ServerError(t *testing.T) {

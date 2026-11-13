@@ -4,15 +4,16 @@ import "context"
 
 // WorkspaceAccess represents access control settings for a workspace.
 type WorkspaceAccess struct {
-	ID              string  `jsonapi:"primary,access"`
-	ManageState     bool    `jsonapi:"attr,manageState"`
-	ManageWorkspace bool    `jsonapi:"attr,manageWorkspace"`
-	ManageJob       bool    `jsonapi:"attr,manageJob"`
-	Name            string  `jsonapi:"attr,name"`
-	CreatedBy       *string `jsonapi:"attr,createdBy"`
-	CreatedDate     *string `jsonapi:"attr,createdDate"`
-	UpdatedBy       *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate     *string `jsonapi:"attr,updatedDate"`
+	ID              string     `jsonapi:"primary,access"`
+	ManageState     bool       `jsonapi:"attr,manageState"`
+	ManageWorkspace bool       `jsonapi:"attr,manageWorkspace"`
+	ManageJob       bool       `jsonapi:"attr,manageJob"`
+	PlanJob         bool       `jsonapi:"attr,planJob"`
+	ApproveJob      bool       `jsonapi:"attr,approveJob"`
+	Role            string     `jsonapi:"attr,role,omitempty"`
+	Name            string     `jsonapi:"attr,name"`
+	DestroyJob      bool       `jsonapi:"attr,destroyJob"`
+	Workspace       *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WorkspaceAccessService handles communication with the workspace access related
@@ -68,6 +69,8 @@ func (s *WorkspaceAccessService) Create(ctx context.Context, orgID, workspaceID 
 
 // Update modifies an existing workspace access entry. The access entry's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *WorkspaceAccessService) Update(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

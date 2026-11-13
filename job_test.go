@@ -11,10 +11,9 @@ import (
 
 func newTestJob() *terrakube.Job {
 	return &terrakube.Job{
-		ID:      "job-1",
-		Command: "terraform apply",
-		Output:  "Apply complete!",
-		Status:  "completed",
+		ID:     "job-1",
+		Output: "Apply complete!",
+		Status: "completed",
 	}
 }
 
@@ -36,8 +35,8 @@ func TestJobService_List(t *testing.T) {
 	if len(jobs) != 1 {
 		t.Fatalf("got %d jobs, want 1", len(jobs))
 	}
-	if jobs[0].Command != "terraform apply" {
-		t.Errorf("Command = %q, want %q", jobs[0].Command, "terraform apply")
+	if jobs[0].Output != "Apply complete!" {
+		t.Errorf("Output = %q, want %q", jobs[0].Output, "Apply complete!")
 	}
 }
 
@@ -87,8 +86,8 @@ func TestJobService_Get(t *testing.T) {
 	if job.ID != "job-1" {
 		t.Errorf("ID = %q, want %q", job.ID, "job-1")
 	}
-	if job.Command != "terraform apply" {
-		t.Errorf("Command = %q, want %q", job.Command, "terraform apply")
+	if job.Output != "Apply complete!" {
+		t.Errorf("Output = %q, want %q", job.Output, "Apply complete!")
 	}
 }
 
@@ -150,7 +149,7 @@ func TestJobService_Create(t *testing.T) {
 	client := newTestClient(t, srv)
 
 	input := &terrakube.Job{
-		Command: "terraform apply",
+		Status: "pending",
 	}
 	job, err := client.Jobs.Create(context.Background(), "org-1", input)
 	if err != nil {
@@ -286,5 +285,33 @@ func TestJobService_AuthHeader(t *testing.T) {
 	_, err := client.Jobs.Get(context.Background(), "org-1", "job-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestJobService_TargetAndReplaceAddrs(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("POST /api/v1/organization/org-1/job", func(w http.ResponseWriter, _ *http.Request) {
+		job := newTestJob()
+		job.TargetAddrs = []string{"module.vpc.aws_subnet.public[0]"}
+		job.ReplaceAddrs = []string{"aws_instance.web"}
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, job)
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.Jobs.Create(context.Background(), "org-1", &terrakube.Job{
+		Status:       "pending",
+		TargetAddrs:  []string{"module.vpc.aws_subnet.public[0]"},
+		ReplaceAddrs: []string{"aws_instance.web"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(created.TargetAddrs) != 1 || created.TargetAddrs[0] != "module.vpc.aws_subnet.public[0]" {
+		t.Errorf("TargetAddrs = %v, want [module.vpc.aws_subnet.public[0]]", created.TargetAddrs)
+	}
+	if len(created.ReplaceAddrs) != 1 || created.ReplaceAddrs[0] != "aws_instance.web" {
+		t.Errorf("ReplaceAddrs = %v, want [aws_instance.web]", created.ReplaceAddrs)
 	}
 }

@@ -1,18 +1,22 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // SSH represents an SSH key in Terrakube.
 type SSH struct {
-	ID          string  `jsonapi:"primary,ssh"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	PrivateKey  string  `jsonapi:"attr,privateKey"`
-	SSHType     string  `jsonapi:"attr,sshType"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,ssh"`
+	Name         string        `jsonapi:"attr,name"`
+	Description  *string       `jsonapi:"attr,description"`
+	PrivateKey   string        `jsonapi:"attr,privateKey"`
+	SSHType      string        `jsonapi:"attr,sshType"`
+	CreatedBy    *string       `jsonapi:"attr,createdBy"`
+	CreatedDate  *time.Time    `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy    *string       `jsonapi:"attr,updatedBy"`
+	UpdatedDate  *time.Time    `jsonapi:"attr,updatedDate,rfc3339"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // SSHService handles communication with the SSH related methods of the Terrakube API.
@@ -58,6 +62,8 @@ func (s *SSHService) Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 
 // Update modifies an existing SSH key. The SSH key's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *SSHService) Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

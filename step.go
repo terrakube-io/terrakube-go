@@ -4,16 +4,16 @@ import "context"
 
 // Step represents a Terrakube step resource within a job.
 type Step struct {
-	ID          string  `jsonapi:"primary,step"`
-	Name        string  `jsonapi:"attr,name"`
-	Output      *string `jsonapi:"attr,output"`
-	Status      string  `jsonapi:"attr,status"`
-	StepNumber  int     `jsonapi:"attr,stepNumber"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
-	Job         *Job    `jsonapi:"relation,job,omitempty"`
+	ID                string              `jsonapi:"primary,step"`
+	Name              string              `jsonapi:"attr,name"`
+	Output            *string             `jsonapi:"attr,output"`
+	Status            string              `jsonapi:"attr,status"`
+	StepNumber        int                 `jsonapi:"attr,stepNumber"`
+	DeliveryRevision  *int64              `jsonapi:"attr,deliveryRevision"`
+	DeliveryState     *string             `jsonapi:"attr,deliveryState"`
+	DeliveryTimestamp *int64              `jsonapi:"attr,deliveryTimestamp"`
+	Job               *Job                `jsonapi:"relation,job,omitempty"`
+	PolicyEvaluation  []*PolicyEvaluation `jsonapi:"relation,policyEvaluation,omitempty"`
 }
 
 // StepService handles communication with the step related methods of the
@@ -25,10 +25,10 @@ type StepService struct {
 // List returns all steps for the given job within an organization.
 // It returns a *ValidationError if orgID or jobID is empty and a *APIError on server errors.
 func (s *StepService) List(ctx context.Context, orgID, jobID string, opts *ListOptions) ([]*Step, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("job ID", jobID); err != nil {
+	if err := validateID("jobID", jobID); err != nil {
 		return nil, err
 	}
 
@@ -39,13 +39,13 @@ func (s *StepService) List(ctx context.Context, orgID, jobID string, opts *ListO
 // Get returns a single step by ID.
 // It returns a *ValidationError if orgID, jobID, or id is empty and a *APIError on server errors.
 func (s *StepService) Get(ctx context.Context, orgID, jobID, id string) (*Step, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("job ID", jobID); err != nil {
+	if err := validateID("jobID", jobID); err != nil {
 		return nil, err
 	}
-	if err := validateID("step ID", id); err != nil {
+	if err := validateID("stepID", id); err != nil {
 		return nil, err
 	}
 
@@ -56,10 +56,10 @@ func (s *StepService) Get(ctx context.Context, orgID, jobID, id string) (*Step, 
 // Create creates a new step in the given job.
 // It returns a *ValidationError if orgID or jobID is empty and a *APIError on server errors.
 func (s *StepService) Create(ctx context.Context, orgID, jobID string, step *Step) (*Step, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("job ID", jobID); err != nil {
+	if err := validateID("jobID", jobID); err != nil {
 		return nil, err
 	}
 
@@ -69,14 +69,16 @@ func (s *StepService) Create(ctx context.Context, orgID, jobID string, step *Ste
 
 // Update modifies an existing step. The step's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *StepService) Update(ctx context.Context, orgID, jobID string, step *Step) (*Step, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("job ID", jobID); err != nil {
+	if err := validateID("jobID", jobID); err != nil {
 		return nil, err
 	}
-	if err := validateID("step ID", step.ID); err != nil {
+	if err := validateID("stepID", step.ID); err != nil {
 		return nil, err
 	}
 
@@ -87,13 +89,13 @@ func (s *StepService) Update(ctx context.Context, orgID, jobID string, step *Ste
 // Delete removes a step by ID.
 // It returns a *ValidationError if orgID, jobID, or id is empty and a *APIError on server errors.
 func (s *StepService) Delete(ctx context.Context, orgID, jobID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("job ID", jobID); err != nil {
+	if err := validateID("jobID", jobID); err != nil {
 		return err
 	}
-	if err := validateID("step ID", id); err != nil {
+	if err := validateID("stepID", id); err != nil {
 		return err
 	}
 

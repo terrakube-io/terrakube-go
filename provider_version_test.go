@@ -14,9 +14,8 @@ func TestProviderVersionService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version", func(w http.ResponseWriter, _ *http.Request) {
-		proto := "5.0"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.ProviderVersion{
-			{ID: "ver-1", VersionNumber: "1.0.0", Protocols: &proto},
+			{ID: "ver-1", VersionNumber: "1.0.0", Protocols: new("5.0")},
 			{ID: "ver-2", VersionNumber: "2.0.0"},
 		})
 	})
@@ -68,7 +67,7 @@ func TestProviderVersionService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestProviderVersionService_List_EmptyProviderID(t *testing.T) {
@@ -81,7 +80,7 @@ func TestProviderVersionService_List_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty provider ID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestProviderVersionService_Get(t *testing.T) {
@@ -89,15 +88,8 @@ func TestProviderVersionService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/provider/prov-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		proto := "5.0"
-		createdBy := "admin"
-		createdDate := "2024-01-01"
-		updatedBy := "admin"
-		updatedDate := "2024-06-01"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ProviderVersion{
-			ID: "ver-1", VersionNumber: "1.0.0", Protocols: &proto,
-			CreatedBy: &createdBy, CreatedDate: &createdDate,
-			UpdatedBy: &updatedBy, UpdatedDate: &updatedDate,
+			ID: "ver-1", VersionNumber: "1.0.0", Protocols: new("5.0"),
 		})
 	})
 
@@ -115,18 +107,6 @@ func TestProviderVersionService_Get(t *testing.T) {
 	if version.Protocols == nil || *version.Protocols != "5.0" {
 		t.Errorf("Protocols = %v, want %q", version.Protocols, "5.0")
 	}
-	if version.CreatedBy == nil || *version.CreatedBy != "admin" {
-		t.Errorf("CreatedBy = %v, want %q", version.CreatedBy, "admin")
-	}
-	if version.CreatedDate == nil || *version.CreatedDate != "2024-01-01" {
-		t.Errorf("CreatedDate = %v, want %q", version.CreatedDate, "2024-01-01")
-	}
-	if version.UpdatedBy == nil || *version.UpdatedBy != "admin" {
-		t.Errorf("UpdatedBy = %v, want %q", version.UpdatedBy, "admin")
-	}
-	if version.UpdatedDate == nil || *version.UpdatedDate != "2024-06-01" {
-		t.Errorf("UpdatedDate = %v, want %q", version.UpdatedDate, "2024-06-01")
-	}
 }
 
 func TestProviderVersionService_Get_EmptyIDs(t *testing.T) {
@@ -142,9 +122,9 @@ func TestProviderVersionService_Get_EmptyIDs(t *testing.T) {
 		id         string
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", "ver-1", "organization ID"},
-		{"empty provider ID", "org-1", "", "ver-1", "provider ID"},
-		{"empty version ID", "org-1", "prov-1", "", "version ID"},
+		{"empty org ID", "", "prov-1", "ver-1", "organizationID"},
+		{"empty provider ID", "org-1", "", "ver-1", "providerID"},
+		{"empty version ID", "org-1", "prov-1", "", "versionID"},
 	}
 
 	for _, tt := range tests {
@@ -185,16 +165,14 @@ func TestProviderVersionService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		proto := "5.0"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.ProviderVersion{
-			ID: "ver-new", VersionNumber: "3.0.0", Protocols: &proto,
+			ID: "ver-new", VersionNumber: "3.0.0", Protocols: new("5.0"),
 		})
 	})
 
 	client := newTestClient(t, srv)
-	proto := "5.0"
 	version, err := client.ProviderVersions.Create(context.Background(), "org-1", "prov-1", &terrakube.ProviderVersion{
-		VersionNumber: "3.0.0", Protocols: &proto,
+		VersionNumber: "3.0.0", Protocols: new("5.0"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -217,7 +195,7 @@ func TestProviderVersionService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestProviderVersionService_Create_EmptyProviderID(t *testing.T) {
@@ -230,7 +208,7 @@ func TestProviderVersionService_Create_EmptyProviderID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty provider ID")
 	}
-	assertValidationError(t, err, "provider ID")
+	assertValidationError(t, err, "providerID")
 }
 
 func TestProviderVersionService_Update(t *testing.T) {
@@ -238,16 +216,14 @@ func TestProviderVersionService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/provider/prov-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		proto := "6.0"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ProviderVersion{
-			ID: "ver-1", VersionNumber: "1.1.0", Protocols: &proto,
+			ID: "ver-1", VersionNumber: "1.1.0", Protocols: new("6.0"),
 		})
 	})
 
 	client := newTestClient(t, srv)
-	proto := "6.0"
 	version, err := client.ProviderVersions.Update(context.Background(), "org-1", "prov-1", &terrakube.ProviderVersion{
-		ID: "ver-1", VersionNumber: "1.1.0", Protocols: &proto,
+		ID: "ver-1", VersionNumber: "1.1.0", Protocols: new("6.0"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -270,9 +246,9 @@ func TestProviderVersionService_Update_EmptyIDs(t *testing.T) {
 		version    *terrakube.ProviderVersion
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", &terrakube.ProviderVersion{ID: "ver-1"}, "organization ID"},
-		{"empty provider ID", "org-1", "", &terrakube.ProviderVersion{ID: "ver-1"}, "provider ID"},
-		{"empty version ID", "org-1", "prov-1", &terrakube.ProviderVersion{ID: ""}, "version ID"},
+		{"empty org ID", "", "prov-1", &terrakube.ProviderVersion{ID: "ver-1"}, "organizationID"},
+		{"empty provider ID", "org-1", "", &terrakube.ProviderVersion{ID: "ver-1"}, "providerID"},
+		{"empty version ID", "org-1", "prov-1", &terrakube.ProviderVersion{ID: ""}, "versionID"},
 	}
 
 	for _, tt := range tests {
@@ -315,9 +291,9 @@ func TestProviderVersionService_Delete_EmptyIDs(t *testing.T) {
 		id         string
 		field      string
 	}{
-		{"empty org ID", "", "prov-1", "ver-1", "organization ID"},
-		{"empty provider ID", "org-1", "", "ver-1", "provider ID"},
-		{"empty version ID", "org-1", "prov-1", "", "version ID"},
+		{"empty org ID", "", "prov-1", "ver-1", "organizationID"},
+		{"empty provider ID", "org-1", "", "ver-1", "providerID"},
+		{"empty version ID", "org-1", "prov-1", "", "versionID"},
 	}
 
 	for _, tt := range tests {

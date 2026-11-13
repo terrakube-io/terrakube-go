@@ -12,9 +12,9 @@ import (
 )
 
 // jsonapiOne builds a single-resource JSON:API response body.
-func jsonapiOne(typeName, id string, attrs map[string]interface{}) []byte {
-	resp := map[string]interface{}{
-		"data": map[string]interface{}{
+func jsonapiOne(typeName, id string, attrs map[string]any) []byte {
+	resp := map[string]any{
+		"data": map[string]any{
 			"type":       typeName,
 			"id":         id,
 			"attributes": attrs,
@@ -25,15 +25,15 @@ func jsonapiOne(typeName, id string, attrs map[string]interface{}) []byte {
 }
 
 // jsonapiList builds a multi-resource JSON:API response body.
-func jsonapiList(items []map[string]interface{}) []byte {
-	resp := map[string]interface{}{"data": items}
+func jsonapiList(items []map[string]any) []byte {
+	resp := map[string]any{"data": items}
 	b, _ := json.Marshal(resp)
 	return b
 }
 
 // jsonapiItem is a shorthand for building one item in a list payload.
-func jsonapiItem(typeName, id string, attrs map[string]interface{}) map[string]interface{} {
-	return map[string]interface{}{
+func jsonapiItem(typeName, id string, attrs map[string]any) map[string]any {
+	return map[string]any{
 		"type":       typeName,
 		"id":         id,
 		"attributes": attrs,
@@ -51,8 +51,8 @@ func ExampleNewClient() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("organization", "org-1", map[string]interface{}{"name": "my-org"}),
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("organization", "org-1", map[string]any{"name": "my-org"}),
 		}))
 	})
 	srv := httptest.NewServer(mux)
@@ -78,12 +78,12 @@ func ExampleOrganizationService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("organization", "org-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("organization", "org-1", map[string]any{
 				"name":          "Alpha",
 				"executionMode": "remote",
 			}),
-			jsonapiItem("organization", "org-2", map[string]interface{}{
+			jsonapiItem("organization", "org-2", map[string]any{
 				"name":          "Beta",
 				"executionMode": "local",
 			}),
@@ -116,7 +116,7 @@ func ExampleOrganizationService_Get() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiOne("organization", "org-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("organization", "org-1", map[string]any{
 			"name":          "Alpha",
 			"description":   "Primary organization",
 			"executionMode": "remote",
@@ -146,7 +146,7 @@ func ExampleOrganizationService_Create() {
 	mux.HandleFunc("POST /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		w.WriteHeader(http.StatusCreated)
-		_, _ = w.Write(jsonapiOne("organization", "org-new", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("organization", "org-new", map[string]any{
 			"name":          "NewOrg",
 			"executionMode": "remote",
 		}))
@@ -182,8 +182,8 @@ func ExampleOrganizationService_List_filtered() {
 			return
 		}
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("organization", "org-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("organization", "org-1", map[string]any{
 				"name":          "Alpha",
 				"executionMode": "remote",
 			}),
@@ -214,8 +214,8 @@ func ExampleWorkspaceService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/workspace", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("workspace", "ws-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("workspace", "ws-1", map[string]any{
 				"name":             "production",
 				"source":           "https://github.com/example/infra",
 				"branch":           "main",
@@ -224,7 +224,7 @@ func ExampleWorkspaceService_List() {
 				"terraformVersion": "1.5.0",
 				"executionMode":    "remote",
 			}),
-			jsonapiItem("workspace", "ws-2", map[string]interface{}{
+			jsonapiItem("workspace", "ws-2", map[string]any{
 				"name":             "staging",
 				"source":           "https://github.com/example/infra",
 				"branch":           "develop",
@@ -262,7 +262,7 @@ func ExampleWorkspaceService_Get() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiOne("workspace", "ws-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("workspace", "ws-1", map[string]any{
 			"name":             "production",
 			"source":           "https://github.com/example/infra",
 			"branch":           "main",
@@ -296,7 +296,7 @@ func ExampleWorkspaceService_Create() {
 	mux.HandleFunc("POST /api/v1/organization/org-1/workspace", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		w.WriteHeader(http.StatusCreated)
-		_, _ = w.Write(jsonapiOne("workspace", "ws-new", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("workspace", "ws-new", map[string]any{
 			"name":             "dev",
 			"source":           "https://github.com/example/infra",
 			"branch":           "feature-x",
@@ -337,7 +337,7 @@ func ExampleWorkspaceService_Update() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiOne("workspace", "ws-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("workspace", "ws-1", map[string]any{
 			"name":             "production",
 			"source":           "https://github.com/example/infra",
 			"branch":           "main",
@@ -397,15 +397,15 @@ func ExampleModuleService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/module", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("module", "mod-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("module", "mod-1", map[string]any{
 				"name":             "vpc",
 				"description":      "AWS VPC module",
 				"provider":         "aws",
 				"source":           "https://github.com/example/terraform-aws-vpc",
 				"downloadQuantity": 42,
 			}),
-			jsonapiItem("module", "mod-2", map[string]interface{}{
+			jsonapiItem("module", "mod-2", map[string]any{
 				"name":             "storage",
 				"description":      "GCP storage module",
 				"provider":         "google",
@@ -441,7 +441,7 @@ func ExampleModuleService_Get() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/module/mod-1", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiOne("module", "mod-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("module", "mod-1", map[string]any{
 			"name":             "vpc",
 			"description":      "AWS VPC module",
 			"provider":         "aws",
@@ -472,13 +472,13 @@ func ExampleTeamService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/team", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("team", "team-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("team", "team-1", map[string]any{
 				"name":            "admins",
 				"manageWorkspace": true,
 				"manageModule":    true,
 			}),
-			jsonapiItem("team", "team-2", map[string]interface{}{
+			jsonapiItem("team", "team-2", map[string]any{
 				"name":            "developers",
 				"manageWorkspace": false,
 				"manageModule":    false,
@@ -512,15 +512,15 @@ func ExampleVariableService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1/variable", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("variable", "var-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("variable", "var-1", map[string]any{
 				"key":       "AWS_REGION",
 				"value":     "us-east-1",
 				"category":  "ENV",
 				"sensitive": false,
 				"hcl":       false,
 			}),
-			jsonapiItem("variable", "var-2", map[string]interface{}{
+			jsonapiItem("variable", "var-2", map[string]any{
 				"key":       "DB_PASSWORD",
 				"value":     "",
 				"category":  "ENV",
@@ -557,7 +557,7 @@ func ExampleVariableService_Create() {
 	mux.HandleFunc("POST /api/v1/organization/org-1/workspace/ws-1/variable", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		w.WriteHeader(http.StatusCreated)
-		_, _ = w.Write(jsonapiOne("variable", "var-new", map[string]interface{}{
+		_, _ = w.Write(jsonapiOne("variable", "var-new", map[string]any{
 			"key":       "TF_VAR_region",
 			"value":     "eu-west-1",
 			"category":  "TERRAFORM",
@@ -592,12 +592,12 @@ func ExampleTemplateService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/template", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("template", "tmpl-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("template", "tmpl-1", map[string]any{
 				"name": "Plan",
 				"tcl":  "flow:\n- type: terraformPlan",
 			}),
-			jsonapiItem("template", "tmpl-2", map[string]interface{}{
+			jsonapiItem("template", "tmpl-2", map[string]any{
 				"name": "Apply",
 				"tcl":  "flow:\n- type: terraformApply",
 			}),
@@ -630,16 +630,14 @@ func ExampleJobService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/job", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("job", "job-1", map[string]interface{}{
-				"status":  "completed",
-				"command": "apply",
-				"output":  "Apply complete! Resources: 3 added.",
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("job", "job-1", map[string]any{
+				"status": "completed",
+				"output": "Apply complete! Resources: 3 added.",
 			}),
-			jsonapiItem("job", "job-2", map[string]interface{}{
-				"status":  "running",
-				"command": "plan",
-				"output":  "",
+			jsonapiItem("job", "job-2", map[string]any{
+				"status": "running",
+				"output": "",
 			}),
 		}))
 	})
@@ -719,17 +717,18 @@ func ExampleIsNotFound() {
 	// Output: true
 }
 
+//nolint:gosec
 func ExampleSSHService_List() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/organization/org-1/ssh", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
-		_, _ = w.Write(jsonapiList([]map[string]interface{}{
-			jsonapiItem("ssh", "ssh-1", map[string]interface{}{
+		_, _ = w.Write(jsonapiList([]map[string]any{
+			jsonapiItem("ssh", "ssh-1", map[string]any{
 				"name":       "deploy-key",
 				"sshType":    "rsa",
-				"privateKey": "-----BEGIN RSA PRIVATE KEY-----\nexample\n-----END RSA PRIVATE KEY-----",
+				"privateKey": "-----BEGIN RSA PRIVATE KEY-----\nexample\n-----END RSA PRIVATE KEY-----", //nolint:gosec
 			}),
-			jsonapiItem("ssh", "ssh-2", map[string]interface{}{
+			jsonapiItem("ssh", "ssh-2", map[string]any{
 				"name":       "module-key",
 				"sshType":    "ed25519",
 				"privateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nexample\n-----END OPENSSH PRIVATE KEY-----",

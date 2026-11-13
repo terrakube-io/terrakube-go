@@ -14,9 +14,8 @@ func TestModuleVersionService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "abc123"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.ModuleVersion{
-			{ID: "ver-1", Version: "1.0.0", Commit: &commit},
+			{ID: "ver-1", Version: "1.0.0", Commit: new("abc123")},
 			{ID: "ver-2", Version: "2.0.0"},
 		})
 	})
@@ -39,7 +38,7 @@ func TestModuleVersionService_List_WithFilter(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version", func(w http.ResponseWriter, r *http.Request) {
-		filter := r.URL.Query().Get("filter[version]")
+		filter := r.URL.Query().Get("filter[module_version]")
 		if filter == "" {
 			t.Error("expected filter query parameter")
 		}
@@ -68,7 +67,7 @@ func TestModuleVersionService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_List_EmptyModuleID(t *testing.T) {
@@ -81,7 +80,7 @@ func TestModuleVersionService_List_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Get(t *testing.T) {
@@ -89,10 +88,8 @@ func TestModuleVersionService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/module/mod-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "abc123"
-		createdBy := "admin"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ModuleVersion{
-			ID: "ver-1", Version: "1.0.0", Commit: &commit, CreatedBy: &createdBy,
+			ID: "ver-1", Version: "1.0.0", Commit: new("abc123"), Status: new("active"),
 		})
 	})
 
@@ -110,8 +107,8 @@ func TestModuleVersionService_Get(t *testing.T) {
 	if ver.Commit == nil || *ver.Commit != "abc123" {
 		t.Errorf("Commit = %v, want %q", ver.Commit, "abc123")
 	}
-	if ver.CreatedBy == nil || *ver.CreatedBy != "admin" {
-		t.Errorf("CreatedBy = %v, want %q", ver.CreatedBy, "admin")
+	if ver.Status == nil || *ver.Status != "active" {
+		t.Errorf("Status = %v, want %q", ver.Status, "active")
 	}
 }
 
@@ -125,7 +122,7 @@ func TestModuleVersionService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_Get_EmptyModuleID(t *testing.T) {
@@ -138,7 +135,7 @@ func TestModuleVersionService_Get_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Get_EmptyID(t *testing.T) {
@@ -151,7 +148,7 @@ func TestModuleVersionService_Get_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Get_NotFound(t *testing.T) {
@@ -205,9 +202,8 @@ func TestModuleVersionService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/module/mod-1/version/ver-1", func(w http.ResponseWriter, _ *http.Request) {
-		commit := "def456"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.ModuleVersion{
-			ID: "ver-1", Version: "1.1.0", Commit: &commit,
+			ID: "ver-1", Version: "1.1.0", Commit: new("def456"),
 		})
 	})
 
@@ -233,7 +229,7 @@ func TestModuleVersionService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Delete(t *testing.T) {
@@ -261,7 +257,7 @@ func TestModuleVersionService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestModuleVersionService_Delete_EmptyModuleID(t *testing.T) {
@@ -274,7 +270,7 @@ func TestModuleVersionService_Delete_EmptyModuleID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty moduleID")
 	}
-	assertValidationError(t, err, "module ID")
+	assertValidationError(t, err, "moduleID")
 }
 
 func TestModuleVersionService_Delete_EmptyID(t *testing.T) {
@@ -287,7 +283,7 @@ func TestModuleVersionService_Delete_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "version ID")
+	assertValidationError(t, err, "versionID")
 }
 
 func TestModuleVersionService_Delete_ServerError(t *testing.T) {
@@ -319,4 +315,30 @@ func TestModuleVersionService_AuthHeader(t *testing.T) {
 
 	client := newTestClient(t, srv)
 	_, _ = client.ModuleVersions.Get(context.Background(), "org-1", "mod-1", "ver-1")
+}
+
+func TestModuleVersionService_GitTag(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	tag := "v1.2.3"
+	srv.HandleFunc("POST /api/v1/organization/org-1/module/mod-1/version", func(w http.ResponseWriter, _ *http.Request) {
+		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.ModuleVersion{
+			ID:      "ver-1",
+			Version: "1.2.3",
+			GitTag:  &tag,
+		})
+	})
+
+	client := newTestClient(t, srv)
+	created, err := client.ModuleVersions.Create(context.Background(), "org-1", "mod-1", &terrakube.ModuleVersion{
+		Version: "1.2.3",
+		GitTag:  &tag,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if created.GitTag == nil || *created.GitTag != "v1.2.3" {
+		t.Errorf("GitTag = %v, want %q", created.GitTag, "v1.2.3")
+	}
 }

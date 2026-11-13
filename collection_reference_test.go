@@ -10,10 +10,9 @@ import (
 )
 
 func newTestCollectionReference() *terrakube.CollectionReference {
-	desc := "test reference"
 	return &terrakube.CollectionReference{
 		ID:          "ref-1",
-		Description: &desc,
+		Description: new("test reference"),
 	}
 }
 
@@ -144,9 +143,8 @@ func TestCollectionReferenceService_Create(t *testing.T) {
 	})
 
 	client := newTestClient(t, srv)
-	desc := "new ref"
 	ref, err := client.CollectionReferences.Create(context.Background(), "org-1", "col-1", &terrakube.CollectionReference{
-		Description: &desc,
+		Description: new("new ref"),
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
