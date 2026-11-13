@@ -2,7 +2,7 @@
 
 ## Development Setup
 
-1. Install [Go 1.24+](https://go.dev/dl/)
+1. Install [Go 1.27+](https://go.dev/dl/)
 2. Install [mise](https://mise.jdx.dev/) for tool management
 3. Clone the repo and install dependencies:
 
@@ -18,6 +18,7 @@ go mod download
 - All exported types and functions must have doc comments
 - No `omitempty` on boolean `jsonapi` struct tags (booleans must serialize `false`)
 - Use `*string` for optional string fields
+- Use `*time.Time` with the `rfc3339` tag option for date attributes: `jsonapi:"attr,createdDate,rfc3339"`
 - All service methods take `context.Context` as first parameter
 - Validate non-empty IDs before building URL paths
 - Use `google/jsonapi` for JSON:API serialization, `encoding/json` only for non-JSON:API endpoints
@@ -60,4 +61,5 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`
 1. Create a feature branch from `main`
 2. Make changes with tests
 3. Ensure `mise run check` passes
-4. Open a PR against `main`
+4. Add an entry under `Unreleased` in `CHANGELOG.md` for any change a user of the library can notice
+5. Open a PR against `main`

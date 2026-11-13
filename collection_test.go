@@ -14,9 +14,8 @@ func TestCollectionService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/collection", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "First collection"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Collection{
-			{ID: "col-1", Name: "Vars", Description: &desc, Priority: 1},
+			{ID: "col-1", Name: "Vars", Description: new("First collection"), Priority: 1},
 			{ID: "col-2", Name: "Secrets", Priority: 2},
 		})
 	})
@@ -76,9 +75,8 @@ func TestCollectionService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/collection/col-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Test collection"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Collection{
-			ID: "col-1", Name: "Vars", Description: &desc, Priority: 5,
+			ID: "col-1", Name: "Vars", Description: new("Test collection"), Priority: 5,
 		})
 	})
 
@@ -153,16 +151,14 @@ func TestCollectionService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		desc := "New collection"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Collection{
-			ID: "col-new", Name: "Created", Description: &desc, Priority: 3,
+			ID: "col-new", Name: "Created", Description: new("New collection"), Priority: 3,
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "New collection"
 	col, err := client.Collections.Create(context.Background(), "org-1", &terrakube.Collection{
-		Name: "Created", Description: &desc, Priority: 3,
+		Name: "Created", Description: new("New collection"), Priority: 3,
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -193,16 +189,14 @@ func TestCollectionService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/collection/col-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Updated"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Collection{
-			ID: "col-1", Name: "Updated", Description: &desc, Priority: 10,
+			ID: "col-1", Name: "Updated", Description: new("Updated"), Priority: 10,
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "Updated"
 	col, err := client.Collections.Update(context.Background(), "org-1", &terrakube.Collection{
-		ID: "col-1", Name: "Updated", Description: &desc, Priority: 10,
+		ID: "col-1", Name: "Updated", Description: new("Updated"), Priority: 10,
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -312,4 +306,3 @@ func TestCollectionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Collections.Get(context.Background(), "org-1", "col-1")
 }
-

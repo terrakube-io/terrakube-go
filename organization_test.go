@@ -15,9 +15,8 @@ func TestOrganizationService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "First org"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Organization{
-			{ID: "org-1", Name: "Alpha", Description: &desc, ExecutionMode: "remote"},
+			{ID: "org-1", Name: "Alpha", Description: new("First org"), ExecutionMode: "remote"},
 			{ID: "org-2", Name: "Beta", ExecutionMode: "local"},
 		})
 	})
@@ -64,10 +63,9 @@ func TestOrganizationService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Test org"
 		icon := "icon-url"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Organization{
-			ID: "org-1", Name: "Alpha", Description: &desc, ExecutionMode: "remote", Disabled: false, Icon: &icon,
+			ID: "org-1", Name: "Alpha", Description: new("Test org"), ExecutionMode: "remote", Disabled: false, Icon: &icon,
 		})
 	})
 
@@ -132,16 +130,14 @@ func TestOrganizationService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		desc := "New org"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Organization{
-			ID: "org-new", Name: "Created", Description: &desc, ExecutionMode: "remote",
+			ID: "org-new", Name: "Created", Description: new("New org"), ExecutionMode: "remote",
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "New org"
 	org, err := client.Organizations.Create(context.Background(), &terrakube.Organization{
-		Name: "Created", Description: &desc, ExecutionMode: "remote",
+		Name: "Created", Description: new("New org"), ExecutionMode: "remote",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -176,16 +172,14 @@ func TestOrganizationService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Updated"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Organization{
-			ID: "org-1", Name: "Updated", Description: &desc, ExecutionMode: "local",
+			ID: "org-1", Name: "Updated", Description: new("Updated"), ExecutionMode: "local",
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "Updated"
 	org, err := client.Organizations.Update(context.Background(), &terrakube.Organization{
-		ID: "org-1", Name: "Updated", Description: &desc, ExecutionMode: "local",
+		ID: "org-1", Name: "Updated", Description: new("Updated"), ExecutionMode: "local",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -208,7 +202,7 @@ func TestOrganizationService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestOrganizationService_Delete(t *testing.T) {

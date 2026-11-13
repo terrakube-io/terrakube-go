@@ -38,19 +38,9 @@ linters:
         - name: errorf
     gocritic:
       enabled-checks:
-        - appendAssign
-        - argOrder
-        - badCall
-        - badCond
         - badLock
         - badRegexp
-        - dupArg
-        - dupBranchBody
-        - dupCase
-        - dupSubExpr
-        - flagDeref
         - nilValReturn
-        - sloppyLen
         - truncateCmp
     gosec:
       excludes:

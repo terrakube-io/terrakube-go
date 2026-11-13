@@ -14,9 +14,8 @@ func TestStepService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/step", func(w http.ResponseWriter, _ *http.Request) {
-		out := "done"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Step{
-			{ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: &out},
+			{ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: new("done")},
 			{ID: "step-2", Name: "apply", Status: "pending", StepNumber: 2},
 		})
 	})
@@ -68,7 +67,7 @@ func TestStepService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestStepService_List_EmptyJobID(t *testing.T) {
@@ -81,7 +80,7 @@ func TestStepService_List_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty job ID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestStepService_Get(t *testing.T) {
@@ -89,9 +88,8 @@ func TestStepService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/job/job-1/step/step-1", func(w http.ResponseWriter, _ *http.Request) {
-		out := "Terraform plan output"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Step{
-			ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: &out,
+			ID: "step-1", Name: "plan", Status: "completed", StepNumber: 1, Output: new("Terraform plan output"),
 		})
 	})
 
@@ -130,9 +128,9 @@ func TestStepService_Get_EmptyIDs(t *testing.T) {
 		id    string
 		field string
 	}{
-		{"empty org ID", "", "job-1", "step-1", "organization ID"},
-		{"empty job ID", "org-1", "", "step-1", "job ID"},
-		{"empty step ID", "org-1", "job-1", "", "step ID"},
+		{"empty org ID", "", "job-1", "step-1", "organizationID"},
+		{"empty job ID", "org-1", "", "step-1", "jobID"},
+		{"empty step ID", "org-1", "job-1", "", "stepID"},
 	}
 
 	for _, tt := range tests {
@@ -203,7 +201,7 @@ func TestStepService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty organization ID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestStepService_Create_EmptyJobID(t *testing.T) {
@@ -216,7 +214,7 @@ func TestStepService_Create_EmptyJobID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty job ID")
 	}
-	assertValidationError(t, err, "job ID")
+	assertValidationError(t, err, "jobID")
 }
 
 func TestStepService_Update(t *testing.T) {
@@ -254,9 +252,9 @@ func TestStepService_Update_EmptyIDs(t *testing.T) {
 		step  *terrakube.Step
 		field string
 	}{
-		{"empty org ID", "", "job-1", &terrakube.Step{ID: "step-1"}, "organization ID"},
-		{"empty job ID", "org-1", "", &terrakube.Step{ID: "step-1"}, "job ID"},
-		{"empty step ID", "org-1", "job-1", &terrakube.Step{ID: ""}, "step ID"},
+		{"empty org ID", "", "job-1", &terrakube.Step{ID: "step-1"}, "organizationID"},
+		{"empty job ID", "org-1", "", &terrakube.Step{ID: "step-1"}, "jobID"},
+		{"empty step ID", "org-1", "job-1", &terrakube.Step{ID: ""}, "stepID"},
 	}
 
 	for _, tt := range tests {
@@ -299,9 +297,9 @@ func TestStepService_Delete_EmptyIDs(t *testing.T) {
 		id    string
 		field string
 	}{
-		{"empty org ID", "", "job-1", "step-1", "organization ID"},
-		{"empty job ID", "org-1", "", "step-1", "job ID"},
-		{"empty step ID", "org-1", "job-1", "", "step ID"},
+		{"empty org ID", "", "job-1", "step-1", "organizationID"},
+		{"empty job ID", "org-1", "", "step-1", "jobID"},
+		{"empty step ID", "org-1", "job-1", "", "stepID"},
 	}
 
 	for _, tt := range tests {

@@ -62,11 +62,9 @@ func TestGithubAppTokenService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/github_app_token/gat-1", func(w http.ResponseWriter, _ *http.Request) {
-		token := "ghp_abc123"
-		createdBy := "admin"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.GithubAppToken{
 			ID: "gat-1", AppID: "12345", InstallationID: "67890", Owner: "my-org",
-			Token: &token, CreatedBy: &createdBy,
+			Token: new("ghp_abc123"), CreatedBy: new("admin"),
 		})
 	})
 
@@ -186,7 +184,7 @@ func TestGithubAppTokenService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "github app token ID")
+	assertValidationError(t, err, "githubAppTokenID")
 }
 
 func TestGithubAppTokenService_Delete(t *testing.T) {

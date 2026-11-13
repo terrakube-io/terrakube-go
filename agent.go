@@ -4,14 +4,11 @@ import "context"
 
 // Agent represents an agent in Terrakube.
 type Agent struct {
-	ID          string  `jsonapi:"primary,agent"`
-	Name        string  `jsonapi:"attr,name"`
-	Description string  `jsonapi:"attr,description"`
-	URL         string  `jsonapi:"attr,url"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID           string        `jsonapi:"primary,agent"`
+	Name         string        `jsonapi:"attr,name"`
+	Description  string        `jsonapi:"attr,description"`
+	URL          string        `jsonapi:"attr,url"`
+	Organization *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // AgentService handles communication with the Agent related methods of the Terrakube API.
@@ -57,6 +54,8 @@ func (s *AgentService) Create(ctx context.Context, orgID string, agent *Agent) (
 
 // Update modifies an existing agent. The agent's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *AgentService) Update(ctx context.Context, orgID string, agent *Agent) (*Agent, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

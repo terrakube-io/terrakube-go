@@ -4,13 +4,13 @@ import "context"
 
 // Provider represents a Terrakube provider resource within an organization.
 type Provider struct {
-	ID          string  `jsonapi:"primary,provider"`
-	Name        string  `jsonapi:"attr,name"`
-	Description *string `jsonapi:"attr,description"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID                string             `jsonapi:"primary,provider"`
+	Name              string             `jsonapi:"attr,name"`
+	Description       *string            `jsonapi:"attr,description"`
+	Imported          bool               `jsonapi:"attr,imported"`
+	RegistryNamespace *string            `jsonapi:"attr,registryNamespace,omitempty"`
+	Organization      *Organization      `jsonapi:"relation,organization,omitempty"`
+	Versions          []*ProviderVersion `jsonapi:"relation,version,omitempty"`
 }
 
 // ProviderService handles communication with the provider related methods of
@@ -22,7 +22,7 @@ type ProviderService struct {
 // List returns all providers for the given organization.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProviderService) List(ctx context.Context, orgID string, opts *ListOptions) ([]*Provider, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -33,10 +33,10 @@ func (s *ProviderService) List(ctx context.Context, orgID string, opts *ListOpti
 // Get returns a single provider by ID.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProviderService) Get(ctx context.Context, orgID, id string) (*Provider, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", id); err != nil {
+	if err := validateID("providerID", id); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func (s *ProviderService) Get(ctx context.Context, orgID, id string) (*Provider,
 // Create creates a new provider in the given organization.
 // It returns a *ValidationError if orgID is empty and a *APIError on server errors.
 func (s *ProviderService) Create(ctx context.Context, orgID string, provider *Provider) (*Provider, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
 
@@ -57,11 +57,13 @@ func (s *ProviderService) Create(ctx context.Context, orgID string, provider *Pr
 
 // Update modifies an existing provider. The provider's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *ProviderService) Update(ctx context.Context, orgID string, provider *Provider) (*Provider, error) {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err
 	}
-	if err := validateID("provider ID", provider.ID); err != nil {
+	if err := validateID("providerID", provider.ID); err != nil {
 		return nil, err
 	}
 
@@ -72,10 +74,10 @@ func (s *ProviderService) Update(ctx context.Context, orgID string, provider *Pr
 // Delete removes a provider by ID.
 // It returns a *ValidationError if orgID or id is empty and a *APIError on server errors.
 func (s *ProviderService) Delete(ctx context.Context, orgID, id string) error {
-	if err := validateID("organization ID", orgID); err != nil {
+	if err := validateID("organizationID", orgID); err != nil {
 		return err
 	}
-	if err := validateID("provider ID", id); err != nil {
+	if err := validateID("providerID", id); err != nil {
 		return err
 	}
 

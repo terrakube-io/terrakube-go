@@ -15,9 +15,8 @@ func TestActionService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/action", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Run plan"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Action{
-			{ID: "act-1", Name: "plan", Label: "Plan", Action: "plan", Category: "terraform", Type: "system", Active: true, Description: &desc},
+			{ID: "act-1", Name: "plan", Label: "Plan", Action: "plan", Category: "terraform", Type: "system", Active: true, Description: new("Run plan")},
 			{ID: "act-2", Name: "apply", Label: "Apply", Action: "apply", Category: "terraform", Type: "system", Active: false},
 		})
 	})
@@ -64,12 +63,10 @@ func TestActionService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/action/act-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Run plan"
-		ver := "1.0.0"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Action{
 			ID: "act-1", Name: "plan", Label: "Plan", Action: "plan",
 			Category: "terraform", Type: "system", Active: true,
-			Description: &desc, Version: &ver,
+			Description: new("Run plan"), Version: new("1.0.0"),
 		})
 	})
 
@@ -217,7 +214,7 @@ func TestActionService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "action ID")
+	assertValidationError(t, err, "actionID")
 }
 
 func TestActionService_Delete(t *testing.T) {

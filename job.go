@@ -1,33 +1,55 @@
 package terrakube
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Job represents a Terrakube job resource.
 type Job struct {
-	ID                string     `jsonapi:"primary,job"`
-	Command           string     `jsonapi:"attr,command"`
-	Output            string     `jsonapi:"attr,output"`
-	Status            string     `jsonapi:"attr,status"`
-	Workspace         *Workspace `jsonapi:"relation,workspace,omitempty"`
-	ApprovalTeam      *string `jsonapi:"attr,approvalTeam"`
-	Comments          *string `jsonapi:"attr,comments"`
-	CommitID          *string `jsonapi:"attr,commitId"`
-	OverrideBranch    *string   `jsonapi:"attr,overrideBranch"`
-	OverrideSource    *string   `jsonapi:"attr,overrideSource"`
-	PlanChanges       bool      `jsonapi:"attr,planChanges"`
-	Refresh           bool      `jsonapi:"attr,refresh"`
-	RefreshOnly       bool      `jsonapi:"attr,refreshOnly"`
-	// Tcl is the Terrakube Configuration Language content for this job.
-	Tcl               *string   `jsonapi:"attr,tcl"`
-	TemplateReference *string   `jsonapi:"attr,templateReference"`
-	TerraformPlan     *string   `jsonapi:"attr,terraformPlan"`
-	Via               *string   `jsonapi:"attr,via"`
-	CreatedBy         *string   `jsonapi:"attr,createdBy"`
-	CreatedDate       *string   `jsonapi:"attr,createdDate"`
-	UpdatedBy         *string   `jsonapi:"attr,updatedBy"`
-	UpdatedDate       *string   `jsonapi:"attr,updatedDate"`
-	Steps             []*Step    `jsonapi:"relation,step,omitempty"`
-	Addresses         []*Address `jsonapi:"relation,address,omitempty"`
+	ID                             string              `jsonapi:"primary,job"`
+	Output                         string              `jsonapi:"attr,output"`
+	Status                         string              `jsonapi:"attr,status"`
+	ApprovalTeam                   *string             `jsonapi:"attr,approvalTeam"`
+	Comments                       *string             `jsonapi:"attr,comments"`
+	CommitID                       *string             `jsonapi:"attr,commitId"`
+	OverrideBranch                 *string             `jsonapi:"attr,overrideBranch"`
+	OverrideSource                 *string             `jsonapi:"attr,overrideSource"`
+	PlanChanges                    bool                `jsonapi:"attr,planChanges"`
+	Refresh                        bool                `jsonapi:"attr,refresh"`
+	RefreshOnly                    bool                `jsonapi:"attr,refreshOnly"`
+	PRNumber                       *int                `jsonapi:"attr,prNumber,omitempty"`
+	PRCommentError                 *string             `jsonapi:"attr,prCommentError,omitempty"`
+	TemplateReference              *string             `jsonapi:"attr,templateReference"`
+	TerraformPlan                  *string             `jsonapi:"attr,terraformPlan"`
+	Via                            *string             `jsonapi:"attr,via"`
+	TargetAddrs                    []string            `jsonapi:"attr,targetAddrs,omitempty"`
+	ReplaceAddrs                   []string            `jsonapi:"attr,replaceAddrs,omitempty"`
+	CreatedBy                      *string             `jsonapi:"attr,createdBy"`
+	CreatedDate                    *time.Time          `jsonapi:"attr,createdDate,rfc3339"`
+	UpdatedBy                      *string             `jsonapi:"attr,updatedBy"`
+	UpdatedDate                    *time.Time          `jsonapi:"attr,updatedDate,rfc3339"`
+	ApprovedAt                     *time.Time          `jsonapi:"attr,approvedAt,rfc3339"`
+	ApprovedBy                     *string             `jsonapi:"attr,approvedBy"`
+	CascadeDepth                   *int32              `jsonapi:"attr,cascadeDepth"`
+	DispatchFailureCount           *int32              `jsonapi:"attr,dispatchFailureCount"`
+	DispatchFirstFailureAt         *time.Time          `jsonapi:"attr,dispatchFirstFailureAt,rfc3339"`
+	DispatchLastAttemptAt          *time.Time          `jsonapi:"attr,dispatchLastAttemptAt,rfc3339"`
+	DispatchLastError              *string             `jsonapi:"attr,dispatchLastError"`
+	DispatchNextRetryAt            *time.Time          `jsonapi:"attr,dispatchNextRetryAt,rfc3339"`
+	EncryptedVariables             *string             `jsonapi:"attr,encryptedVariables"`
+	ResolvedTerraformVersion       *string             `jsonapi:"attr,resolvedTerraformVersion"`
+	TerraformPlanArtifacts         *string             `jsonapi:"attr,terraformPlanArtifacts"`
+	TerraformPlanArtifactsChecksum *string             `jsonapi:"attr,terraformPlanArtifactsChecksum"`
+	TriggeredByJobID               *int32              `jsonapi:"attr,triggeredByJobId"`
+	VariableNames                  []string            `jsonapi:"attr,variableNames"`
+	Variables                      map[string]any      `jsonapi:"attr,variables"`
+	VariablesAsArguments           bool                `jsonapi:"attr,variablesAsArguments"`
+	Organization                   *Organization       `jsonapi:"relation,organization,omitempty"`
+	Workspace                      *Workspace          `jsonapi:"relation,workspace,omitempty"`
+	Steps                          []*Step             `jsonapi:"relation,step,omitempty"`
+	Addresses                      []*Address          `jsonapi:"relation,address,omitempty"`
+	PolicyEvaluation               []*PolicyEvaluation `jsonapi:"relation,policyEvaluation,omitempty"`
 }
 
 // JobService handles communication with the job related methods of the
@@ -74,6 +96,8 @@ func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, 
 
 // Update modifies an existing job. The job's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

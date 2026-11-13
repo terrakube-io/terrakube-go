@@ -4,17 +4,14 @@ import "context"
 
 // CollectionItem represents a key/value item within a Terrakube collection.
 type CollectionItem struct {
-	ID          string  `jsonapi:"primary,item"`
-	Key         string  `jsonapi:"attr,key"`
-	Value       string  `jsonapi:"attr,value"`
-	Description *string `jsonapi:"attr,description"`
-	Category    string  `jsonapi:"attr,category"`
-	Sensitive   bool    `jsonapi:"attr,sensitive"`
-	Hcl         bool    `jsonapi:"attr,hcl"`
-	CreatedBy   *string `jsonapi:"attr,createdBy"`
-	CreatedDate *string `jsonapi:"attr,createdDate"`
-	UpdatedBy   *string `jsonapi:"attr,updatedBy"`
-	UpdatedDate *string `jsonapi:"attr,updatedDate"`
+	ID          string      `jsonapi:"primary,item"`
+	Key         string      `jsonapi:"attr,key"`
+	Value       string      `jsonapi:"attr,value"`
+	Description *string     `jsonapi:"attr,description"`
+	Category    string      `jsonapi:"attr,category"`
+	Sensitive   bool        `jsonapi:"attr,sensitive"`
+	Hcl         bool        `jsonapi:"attr,hcl"`
+	Collection  *Collection `jsonapi:"relation,collection,omitempty"`
 }
 
 // CollectionItemService handles communication with the collection item related
@@ -70,6 +67,8 @@ func (s *CollectionItemService) Create(ctx context.Context, orgID, collectionID 
 
 // Update modifies an existing collection item. The item's ID field must be set.
 // It returns a *ValidationError if orgID, collectionID, or the ID is empty and a *APIError on server errors.
+// Update sends every attribute of the struct, so start from the result of Get:
+// a field left at its zero value overwrites the value on the server.
 func (s *CollectionItemService) Update(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error) {
 	if err := validateID("organizationID", orgID); err != nil {
 		return nil, err

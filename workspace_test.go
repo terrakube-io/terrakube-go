@@ -2,9 +2,11 @@ package terrakube_test
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
 	"github.com/terrakube-io/terrakube-go/testutil"
@@ -15,9 +17,8 @@ func TestWorkspaceService_List(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/workspace", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "First workspace"
 		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.Workspace{
-			{ID: "ws-1", Name: "Dev", Description: &desc, Source: "https://github.com/ex/repo", Branch: "main"},
+			{ID: "ws-1", Name: "Dev", Description: new("First workspace"), Source: "https://github.com/ex/repo", Branch: "main"},
 			{ID: "ws-2", Name: "Prod", Source: "https://github.com/ex/repo", Branch: "prod"},
 		})
 	})
@@ -69,7 +70,7 @@ func TestWorkspaceService_List_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Get(t *testing.T) {
@@ -77,12 +78,10 @@ func TestWorkspaceService_Get(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Test workspace"
-		sharedIDs := "id1,id2"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Workspace{
-			ID: "ws-1", Name: "Dev", Description: &desc, Source: "https://github.com/ex/repo",
+			ID: "ws-1", Name: "Dev", Description: new("Test workspace"), Source: "https://github.com/ex/repo",
 			Branch: "main", Folder: "/", IaCType: "terraform", IaCVersion: "1.5.0",
-			ExecutionMode: "remote", GlobalRemoteState: true, SharedIDs: &sharedIDs,
+			ExecutionMode: "remote", GlobalRemoteState: true, SharedIDs: new("id1,id2"),
 		})
 	})
 
@@ -124,7 +123,7 @@ func TestWorkspaceService_Get_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Get_EmptyID(t *testing.T) {
@@ -166,17 +165,15 @@ func TestWorkspaceService_Create(t *testing.T) {
 		if ct := r.Header.Get("Content-Type"); ct != "application/vnd.api+json" {
 			t.Errorf("Content-Type = %q, want %q", ct, "application/vnd.api+json")
 		}
-		desc := "New workspace"
 		testutil.WriteJSONAPI(t, w, http.StatusCreated, &terrakube.Workspace{
-			ID: "ws-new", Name: "Created", Description: &desc, Source: "https://github.com/ex/repo",
+			ID: "ws-new", Name: "Created", Description: new("New workspace"), Source: "https://github.com/ex/repo",
 			Branch: "main", IaCType: "terraform", IaCVersion: "1.5.0", ExecutionMode: "remote",
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "New workspace"
 	ws, err := client.Workspaces.Create(context.Background(), "org-1", &terrakube.Workspace{
-		Name: "Created", Description: &desc, Source: "https://github.com/ex/repo",
+		Name: "Created", Description: new("New workspace"), Source: "https://github.com/ex/repo",
 		Branch: "main", IaCType: "terraform", IaCVersion: "1.5.0", ExecutionMode: "remote",
 	})
 	if err != nil {
@@ -200,7 +197,7 @@ func TestWorkspaceService_Create_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Create_BooleanFalse(t *testing.T) {
@@ -226,17 +223,15 @@ func TestWorkspaceService_Update(t *testing.T) {
 
 	srv := testutil.NewServer(t)
 	srv.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
-		desc := "Updated"
 		testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Workspace{
-			ID: "ws-1", Name: "Updated", Description: &desc, Source: "https://github.com/ex/repo",
+			ID: "ws-1", Name: "Updated", Description: new("Updated"), Source: "https://github.com/ex/repo",
 			Branch: "develop", ExecutionMode: "local",
 		})
 	})
 
 	client := newTestClient(t, srv)
-	desc := "Updated"
 	ws, err := client.Workspaces.Update(context.Background(), "org-1", &terrakube.Workspace{
-		ID: "ws-1", Name: "Updated", Description: &desc, Branch: "develop", ExecutionMode: "local",
+		ID: "ws-1", Name: "Updated", Description: new("Updated"), Branch: "develop", ExecutionMode: "local",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -259,7 +254,7 @@ func TestWorkspaceService_Update_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Update_EmptyID(t *testing.T) {
@@ -272,7 +267,7 @@ func TestWorkspaceService_Update_EmptyID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty ID")
 	}
-	assertValidationError(t, err, "workspace ID")
+	assertValidationError(t, err, "workspaceID")
 }
 
 func TestWorkspaceService_Delete(t *testing.T) {
@@ -300,7 +295,7 @@ func TestWorkspaceService_Delete_EmptyOrgID(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected validation error for empty orgID")
 	}
-	assertValidationError(t, err, "organization ID")
+	assertValidationError(t, err, "organizationID")
 }
 
 func TestWorkspaceService_Delete_EmptyID(t *testing.T) {
@@ -345,4 +340,87 @@ func TestWorkspaceService_AuthHeader(t *testing.T) {
 
 	client := newTestClient(t, srv)
 	_, _ = client.Workspaces.Get(context.Background(), "org-1", "ws-1")
+}
+
+func TestWorkspaceService_CreatedDateWireFormat(t *testing.T) {
+	t.Parallel()
+
+	instant := time.Date(2026, 11, 13, 19, 36, 48, 0, time.UTC)
+	cases := []struct {
+		name  string
+		attrs string
+		want  *time.Time
+	}{
+		{"rfc3339", `"createdDate":"2026-11-13T19:36:48Z",`, &instant},
+		{"null", `"createdDate":null,`, nil},
+		{"absent", ``, nil},
+		{
+			"fraction and offset", `"createdDate":"2026-11-13T19:36:48.123+02:00",`,
+			new(time.Date(2026, 11, 13, 17, 36, 48, 123_000_000, time.UTC)),
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("GET /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "application/vnd.api+json")
+				_, _ = io.WriteString(w, `{"data":{"type":"workspace","id":"ws-1","attributes":{`+tc.attrs+`"name":"Dev"}}}`)
+			})
+
+			ws, err := newTestClient(t, srv).Workspaces.Get(context.Background(), "org-1", "ws-1")
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			switch {
+			case tc.want == nil && ws.CreatedDate != nil:
+				t.Errorf("CreatedDate = %v, want nil", ws.CreatedDate)
+			case tc.want != nil && (ws.CreatedDate == nil || !ws.CreatedDate.Equal(*tc.want)):
+				t.Errorf("CreatedDate = %v, want %v", ws.CreatedDate, tc.want)
+			}
+		})
+	}
+
+	for _, tc := range []struct {
+		name string
+		date *time.Time
+		want any
+	}{
+		{"set", &instant, "2026-11-13T19:36:48Z"},
+		{"nil", nil, nil},
+	} {
+		t.Run("update "+tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			var body []byte
+			srv := testutil.NewServer(t)
+			srv.HandleFunc("PATCH /api/v1/organization/org-1/workspace/ws-1", func(w http.ResponseWriter, r *http.Request) {
+				body, _ = io.ReadAll(r.Body)
+				testutil.WriteJSONAPI(t, w, http.StatusOK, &terrakube.Workspace{ID: "ws-1", Name: "Dev"})
+			})
+
+			_, err := newTestClient(t, srv).Workspaces.Update(context.Background(), "org-1", &terrakube.Workspace{
+				ID: "ws-1", Name: "Dev", CreatedDate: tc.date,
+			})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			var doc struct {
+				Data struct {
+					Attributes map[string]any `json:"attributes"`
+				} `json:"data"`
+			}
+			if err := json.Unmarshal(body, &doc); err != nil {
+				t.Fatalf("decode request body %s: %v", body, err)
+			}
+			got, ok := doc.Data.Attributes["createdDate"]
+			if !ok {
+				t.Fatalf("createdDate missing from request attributes: %s", body)
+			}
+			if got != tc.want {
+				t.Errorf("createdDate = %#v, want %#v", got, tc.want)
+			}
+		})
+	}
 }
