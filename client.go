@@ -95,10 +95,11 @@ type ListOptions struct {
 
 // Client manages communication with the Terrakube API.
 type Client struct {
-	baseURL    *url.URL
-	token      string
-	httpClient *http.Client
-	userAgent  string
+	baseURL     *url.URL
+	token       string
+	httpClient  *http.Client
+	userAgent   string
+	insecureTLS bool
 
 	Organizations              *OrganizationService
 	Workspaces                 *WorkspaceService
@@ -149,7 +150,9 @@ type Client struct {
 // Option configures a Client.
 type Option func(*Client) error
 
-// WithEndpoint sets the Terrakube server URL.
+// WithEndpoint sets the Terrakube server URL. A path in the URL is kept as a
+// prefix for every request, for a server published under a sub-path
+// (https://example.com/terrakube).
 func WithEndpoint(endpoint string) Option {
 	return func(c *Client) error {
 		if endpoint == "" {
@@ -181,34 +184,47 @@ func WithToken(token string) Option {
 // WithHTTPClient sets a custom HTTP client.
 func WithHTTPClient(httpClient *http.Client) Option {
 	return func(c *Client) error {
+		if httpClient == nil {
+			return fmt.Errorf("http client must not be nil")
+		}
 		c.httpClient = httpClient
 		return nil
 	}
 }
 
-// WithInsecureTLS skips TLS certificate verification.
-// It modifies the TLS configuration of the existing transport rather than
-// replacing the entire http.Client, so it composes safely with WithHTTPClient.
+// WithInsecureTLS skips TLS certificate verification. It is applied after all
+// other options, so its position relative to WithHTTPClient does not matter.
+// The client's transport must be an *http.Transport (or unset): NewClient
+// returns an error for any other http.RoundTripper, whose TLS settings the
+// library cannot change.
 func WithInsecureTLS() Option {
 	return func(c *Client) error {
-		var transport *http.Transport
-		if t, ok := c.httpClient.Transport.(*http.Transport); ok && t != nil {
-			transport = t.Clone()
-		} else {
-			transport = http.DefaultTransport.(*http.Transport).Clone()
-		}
-		if transport.TLSClientConfig == nil {
-			transport.TLSClientConfig = &tls.Config{} //nolint:gosec // Struct initialized below
-		}
-		transport.TLSClientConfig.InsecureSkipVerify = true //nolint:gosec // User-requested insecure mode
-		c.httpClient = &http.Client{
-			Transport:     transport,
-			Timeout:       c.httpClient.Timeout,
-			CheckRedirect: c.httpClient.CheckRedirect,
-			Jar:           c.httpClient.Jar,
-		}
+		c.insecureTLS = true
 		return nil
 	}
+}
+
+// applyInsecureTLS replaces the HTTP client with a copy whose transport skips
+// certificate verification. The caller's client and transport are not modified.
+func (c *Client) applyInsecureTLS() error {
+	rt := c.httpClient.Transport
+	if rt == nil {
+		rt = http.DefaultTransport
+	}
+	base, ok := rt.(*http.Transport)
+	if !ok {
+		return fmt.Errorf("WithInsecureTLS needs an *http.Transport, got %T: disable verification in that transport instead", rt)
+	}
+	transport := base.Clone()
+	if transport.TLSClientConfig == nil {
+		transport.TLSClientConfig = &tls.Config{} //nolint:gosec // Struct initialized below
+	}
+	transport.TLSClientConfig.InsecureSkipVerify = true //nolint:gosec // User-requested insecure mode
+
+	hc := *c.httpClient
+	hc.Transport = transport
+	c.httpClient = &hc
+	return nil
 }
 
 // WithUserAgent sets a custom User-Agent header.
@@ -237,6 +253,11 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 	if c.token == "" {
 		return nil, fmt.Errorf("token is required: use WithToken()")
+	}
+	if c.insecureTLS {
+		if err := c.applyInsecureTLS(); err != nil {
+			return nil, err
+		}
 	}
 
 	c.Organizations = &OrganizationService{client: c}
@@ -296,6 +317,17 @@ func (c *Client) apiPath(segments ...string) string {
 	return p
 }
 
+// endpointURL returns the URL of reqPath on the configured endpoint, keeping
+// any path prefix the endpoint has (https://host/terrakube + /api/v1/x).
+func (c *Client) endpointURL(reqPath string) *url.URL {
+	u := *c.baseURL
+	u.Path = path.Join("/", u.Path, reqPath)
+	u.RawPath = ""
+	u.RawQuery = ""
+	u.Fragment = ""
+	return &u
+}
+
 // request builds an authenticated JSON:API HTTP request.
 func (c *Client) request(ctx context.Context, method, reqPath string, body any) (*http.Request, error) {
 	return c.requestWithQuery(ctx, method, reqPath, nil, body)
@@ -303,8 +335,7 @@ func (c *Client) request(ctx context.Context, method, reqPath string, body any) 
 
 // requestWithQuery builds an authenticated JSON:API HTTP request with query parameters.
 func (c *Client) requestWithQuery(ctx context.Context, method, reqPath string, params url.Values, body any) (*http.Request, error) {
-	rel := &url.URL{Path: reqPath}
-	u := c.baseURL.ResolveReference(rel)
+	u := c.endpointURL(reqPath)
 
 	if params != nil {
 		u.RawQuery = params.Encode()
@@ -365,8 +396,7 @@ func (c *Client) do(req *http.Request, v any) (*http.Response, error) { //nolint
 // requestRaw builds an authenticated HTTP request with standard JSON content type.
 // Used for non-JSON:API endpoints like TeamToken.
 func (c *Client) requestRaw(ctx context.Context, method, rawPath string, body any) (*http.Request, error) {
-	rel := &url.URL{Path: rawPath}
-	u := c.baseURL.ResolveReference(rel)
+	u := c.endpointURL(rawPath)
 
 	var buf io.Reader
 	if body != nil {
