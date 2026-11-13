@@ -89,7 +89,7 @@ func main() {
 The `APIVersion` constant tracks which Terrakube OpenAPI specification version this library targets.
 
 ```go
-fmt.Println(terrakube.APIVersion) // "2.27.0"
+fmt.Println(terrakube.APIVersion) // "2.33.0"
 ```
 
 ## Configuration
