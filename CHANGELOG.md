@@ -6,6 +6,8 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-14
+
 Targets Terrakube API 2.34.1.
 
 ### Breaking changes
@@ -47,4 +49,5 @@ Targets Terrakube API 2.34.1.
 
 - `Update` sends every attribute of the struct, so start from the result of `Get`. This is now stated on every `Update` method, in the package documentation and in the README.
 
-[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/terrakube-io/terrakube-go/compare/v0.5.0...v1.0.0
