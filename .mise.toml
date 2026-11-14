@@ -39,3 +39,7 @@ run = "go -C tools/speccheck run . diff"
 [tasks.spec-sync]
 description = "Update the client's source to match an OpenAPI document"
 run = "go -C tools/speccheck run . sync"
+
+[tasks.smoke]
+description = "Run the smoke test against a real Terrakube server (needs TERRAKUBE_SMOKE_ENDPOINT and TERRAKUBE_SMOKE_TOKEN)"
+run = "go test -tags=smoke -run TestSmoke -count=1 -v ."

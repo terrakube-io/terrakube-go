@@ -1,0 +1,120 @@
+name: Smoke
+
+# Runs the library against a real Terrakube server of the version it targets.
+# Started by hand, by the release workflow before a release is created, and
+# for pull requests that change the smoke test itself.
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/smoke.yml"
+      - "smoke_test.go"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test against Terrakube
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      COMPOSE_DIR: terrakube-server/docker-compose
+      PAT_ID: 00000000-0000-4000-8000-000000005e57
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.27"
+
+      - name: Read the Terrakube version the library targets
+        id: api
+        run: |
+          version=$(sed -nE 's/^const APIVersion = "(.*)"$/\1/p' client.go)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the Terrakube docker-compose stack
+        uses: actions/checkout@v6
+        with:
+          repository: terrakube-io/terrakube
+          ref: ${{ steps.api.outputs.version }}
+          path: terrakube-server
+          sparse-checkout: docker-compose
+
+      - name: Create certificates for the local stack
+        working-directory: ${{ env.COMPOSE_DIR }}
+        run: |
+          mkcert() { go run filippo.io/mkcert@v1.4.4 "$@"; }
+          mkcert -key-file key.pem -cert-file cert.pem \
+            localhost terrakube.localhost terrakube-api.localhost \
+            terrakube-registry.localhost terrakube-executor.localhost \
+            terrakube-dex.localhost
+          cp "$(mkcert -CAROOT)/rootCA.pem" rootCA.pem
+          echo "127.0.0.1 terrakube-api.localhost terrakube-dex.localhost" | sudo tee -a /etc/hosts
+
+      # The stack's .env points the API at "terrakube-redis" and
+      # "terrakube-minio", names its compose file does not define.
+      - name: Start Terrakube
+        working-directory: ${{ env.COMPOSE_DIR }}
+        env:
+          TK_VERSION: ${{ steps.api.outputs.version }}
+        run: |
+          cat > docker-compose.override.yml <<'YAML'
+          services:
+            redis-service:
+              networks:
+                default:
+                  aliases: [terrakube-redis]
+            minio:
+              networks:
+                default:
+                  aliases: [terrakube-minio]
+          YAML
+          docker compose up -d --quiet-pull
+
+      - name: Wait for the API
+        working-directory: ${{ env.COMPOSE_DIR }}
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS --cacert rootCA.pem https://terrakube-api.localhost/actuator/health >/dev/null 2>&1; then
+              echo "API is up after $((i * 5)) seconds"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "The API did not become healthy in 5 minutes"
+          docker compose ps --all
+          # Without the database migration lines and the JVM's exit report,
+          # what is left is short and holds the reason.
+          docker compose logs --no-log-prefix terrakube-api \
+            | grep -vE 'liquibase|^\s*$|^\s*(-|\()|^\s+at ' | tail -n 120
+          exit 1
+
+      # Nobody can log in here, so the test signs its own personal access token.
+      # The server accepts one only if its id is a row in the pat table.
+      - name: Register a token id
+        working-directory: ${{ env.COMPOSE_DIR }}
+        run: |
+          docker compose exec -T postgresql-service \
+            sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' <<SQL
+          insert into pat (id, days, description, created_date, created_by, deleted)
+          values ('${PAT_ID}', 1, 'smoke', now(), 'smoke@example.com', false);
+          SQL
+          echo "TERRAKUBE_SMOKE_PAT_SECRET=$(sed -n 's/^PAT_SECRET=//p' .env)" >> "$GITHUB_ENV"
+
+      - name: Run the smoke test
+        env:
+          TERRAKUBE_SMOKE_ENDPOINT: https://terrakube-api.localhost
+          TERRAKUBE_SMOKE_PAT_ID: ${{ env.PAT_ID }}
+          SSL_CERT_FILE: ${{ github.workspace }}/${{ env.COMPOSE_DIR }}/rootCA.pem
+        run: go test -tags=smoke -run TestSmoke -count=1 -v .
+
+      - name: Show server logs
+        if: failure()
+        working-directory: ${{ env.COMPOSE_DIR }}
+        run: |
+          docker compose ps --all
+          docker compose logs --no-log-prefix terrakube-api | grep -vE '^\s*$' | tail -n 200

@@ -41,6 +41,18 @@ mise run coverage   # with coverage report
 mise run check      # vet + lint + test
 ```
 
+### Smoke test
+
+`smoke_test.go` (build tag `smoke`) runs read/write round trips against a real Terrakube server of the version in `APIVersion`. The unit tests cannot see a mismatch between the library and the server; this test can. It creates one organization and disables it at the end.
+
+```bash
+TERRAKUBE_SMOKE_ENDPOINT=https://terrakube-api.localhost \
+TERRAKUBE_SMOKE_TOKEN=<token of an instance administrator> \
+mise run smoke
+```
+
+The `Smoke` workflow runs it in CI against the Terrakube docker-compose stack: start it by hand from the Actions tab, and it runs automatically before a release is created.
+
 ## Commit Format
 
 Use [conventional commits](https://www.conventionalcommits.org/):
