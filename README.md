@@ -90,6 +90,20 @@ err := client.StepLogs.Follow(ctx, orgID, jobID, stepID, nil, func(e terrakube.S
 
 `Follow` returns nil when the job is complete. It reconnects after the server rotates the stream, a dropped connection or a 429/5xx answer (honouring `Retry-After`), resuming after the last event it delivered, and gives up after `StepLogFollowOptions.MaxFailures` failed connection attempts in a row (5 by default). `StepLogFollowOptions.LastEventID` resumes from an event ID you saved.
 
+### Personal access tokens and permissions
+
+`PATs` manages the caller's personal access tokens. `Create` takes a lifetime in days (0 for a token that never expires, if the server's maximum allows it) and returns the token once; `PATCreated.ID` is read from the token and is what `Delete` takes. `Access` tells what the caller may do:
+
+```go
+pat, err := client.PATs.Create(ctx, 30, "ci")
+// use pat.Token; later: client.PATs.Delete(ctx, pat.ID)
+
+teams, err := client.Access.CurrentTeams(ctx)                      // ["TERRAKUBE_ADMIN", ...]
+perms, err := client.Access.WorkspacePermissions(ctx, orgID, wsID) // perms.PlanJob, perms.ApproveJob, ...
+```
+
+The server lets only an interactive user create tokens: `PATs.Create` answers 403 when the client is authenticated with a personal access token, a team token or a federated token, unless the server allows a personal access token to create tokens that expire before it does.
+
 ## Supported Resources
 
 | Resource | Service Field | Scope |
@@ -140,6 +154,8 @@ err := client.StepLogs.Follow(ctx, orgID, jobID, stepID, nil, func(e terrakube.S
 | State | `State` | Workspace (state files, not JSON:API) |
 | Output | `Outputs` | Workspace (read from the state) |
 | Step Log | `StepLogs` | Step (logs, not JSON:API) |
+| Personal Access Token | `PATs` | Caller (not JSON:API) |
+| Teams and Permissions | `Access` | Caller (read-only, not JSON:API) |
 
 ## API Version
 

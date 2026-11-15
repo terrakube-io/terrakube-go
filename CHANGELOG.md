@@ -6,6 +6,13 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-15
+
+### Added
+
+- **`PATs` service** for the caller's personal access tokens (`/pat/v1`). `Create(ctx, days, description)` returns a `PATCreated` with the token, which the server returns only once, and its `ID`, read from the token's `jti` claim. `days` 0 creates a token that never expires (the server refuses it when it has a maximum lifetime); a negative `days` returns a `*ValidationError`. `List` returns the tokens that are not deleted, expired ones included, and `Delete` revokes one. The interfaces are `PATLister`, `PATCreator`, `PATDeleter` and `PATCRUD`.
+- **`Access` service** for what the caller may do. `CurrentTeams` returns the groups the server sees for the caller. `Permissions` and `WorkspacePermissions` return the caller's effective `Permissions` in an organization or a workspace, as the server computes them from the caller's teams and the workspace and project access entries; an organization the caller has no team in gives no permissions rather than an error. The interfaces are `CurrentTeamsLister`, `PermissionsGetter` and `WorkspacePermissionsGetter`.
+
 ## [1.2.0] - 2026-11-15
 
 ### Added
@@ -75,7 +82,8 @@ Targets Terrakube API 2.34.1.
 
 - `Update` sends every attribute of the struct, so start from the result of `Get`. This is now stated on every `Update` method, in the package documentation and in the README.
 
-[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/terrakube-io/terrakube-go/compare/v0.5.0...v1.0.0

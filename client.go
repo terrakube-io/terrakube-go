@@ -167,6 +167,8 @@ type Client struct {
 	State                      *StateService
 	Outputs                    *OutputService
 	StepLogs                   *StepLogService
+	PATs                       *PATService
+	Access                     *AccessService
 }
 
 // Option configures a Client.
@@ -330,6 +332,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.State = &StateService{client: c}
 	c.Outputs = &OutputService{client: c}
 	c.StepLogs = &StepLogService{client: c}
+	c.PATs = &PATService{client: c}
+	c.Access = &AccessService{client: c}
 
 	return c, nil
 }

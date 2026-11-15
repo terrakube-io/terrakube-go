@@ -630,6 +630,8 @@ func TestNewClient_FilterKeys(t *testing.T) {
 		"State":      true,
 		"Outputs":    true,
 		"StepLogs":   true,
+		"PATs":       true,
+		"Access":     true,
 	}
 
 	// Private fields on Client that aren't services.
