@@ -137,3 +137,68 @@ func (s *PolicySetParameterService) Delete(ctx context.Context, orgID, policySet
 	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "parameters", policySetParameterID)
 	return s.del(ctx, path)
 }
+
+// ListByPolicySet returns the policy set parameters of a policy set, from the top-level
+// /policy_set/{id}/parameters path, for callers that do not know its organization.
+// It returns a *ValidationError if policySetID is empty and a *APIError on server errors.
+func (s *PolicySetParameterService) ListByPolicySet(ctx context.Context, policySetID string, opts *ListOptions) ([]*PolicySetParameter, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	return s.list(ctx, s.client.apiPath("policy_set", policySetID, "parameters"), opts)
+}
+
+// GetByPolicySet retrieves a policy set parameter of a policy set from the top-level
+// /policy_set/{id}/parameters/{id} path.
+// It returns a *ValidationError if policySetID or id is empty and a *APIError on server errors.
+func (s *PolicySetParameterService) GetByPolicySet(ctx context.Context, policySetID, id string) (*PolicySetParameter, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetParameterID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("policy_set", policySetID, "parameters", id))
+}
+
+// CreateFieldsByPolicySet creates a policy set parameter in a policy set through the top-level
+// /policy_set/{id}/parameters path, sending only the attributes and relationships set in p.
+// It returns a *ValidationError if policySetID is empty and a *APIError on server errors.
+func (s *PolicySetParameterService) CreateFieldsByPolicySet(ctx context.Context, policySetID string, p Patch) (*PolicySetParameter, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	return s.createFields(ctx, s.client.apiPath("policy_set", policySetID, "parameters"), p)
+}
+
+// UpdateFieldsByPolicySet modifies only the attributes and relationships set in p on a
+// policy set parameter of a policy set, through the top-level /policy_set/{id}/parameters/{id} path; a Relationship with a nil ID
+// clears that link.
+// It returns a *ValidationError if policySetID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicySetParameterService) UpdateFieldsByPolicySet(ctx context.Context, policySetID, id string, p Patch) (*PolicySetParameter, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetParameterID", id); err != nil {
+		return nil, err
+	}
+
+	return s.updateFields(ctx, s.client.apiPath("policy_set", policySetID, "parameters", id), id, p)
+}
+
+// DeleteByPolicySet removes a policy set parameter of a policy set through the top-level
+// /policy_set/{id}/parameters/{id} path.
+// It returns a *ValidationError if policySetID or id is empty and a *APIError on server errors.
+func (s *PolicySetParameterService) DeleteByPolicySet(ctx context.Context, policySetID, id string) error {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return err
+	}
+	if err := validateID("policySetParameterID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("policy_set", policySetID, "parameters", id))
+}

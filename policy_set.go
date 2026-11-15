@@ -128,3 +128,36 @@ func (s *PolicySetService) Delete(ctx context.Context, orgID, policySetID string
 	path := s.client.apiPath("organization", orgID, "policySet", policySetID)
 	return s.del(ctx, path)
 }
+
+// GetByID retrieves a policy set by its ID alone, from the top-level /policy_set/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *PolicySetService) GetByID(ctx context.Context, id string) (*PolicySet, error) {
+	if err := validateID("policySetID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("policy_set", id))
+}
+
+// UpdateFieldsByID modifies only the attributes and relationships set in p on the policy set
+// with the given id, through the top-level /policy_set/{id} path; a Relationship with a nil ID
+// clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicySetService) UpdateFieldsByID(ctx context.Context, id string, p Patch) (*PolicySet, error) {
+	if err := validateID("policySetID", id); err != nil {
+		return nil, err
+	}
+
+	return s.updateFields(ctx, s.client.apiPath("policy_set", id), id, p)
+}
+
+// DeleteByID removes the policy set with the given id through the top-level /policy_set/{id} path.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *PolicySetService) DeleteByID(ctx context.Context, id string) error {
+	if err := validateID("policySetID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("policy_set", id))
+}

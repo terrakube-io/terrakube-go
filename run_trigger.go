@@ -137,3 +137,44 @@ func (s *RunTriggerService) Delete(ctx context.Context, orgID, workspaceID, runT
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "runTriggers", runTriggerID)
 	return s.del(ctx, path)
 }
+
+// CreateFieldsTopLevel creates a run trigger through the top-level /runTrigger path,
+// sending only the attributes and relationships set in p. Set the sourceWorkspace and
+// destinationWorkspace relationships in p; no organization ID is needed.
+// It returns a *APIError on server errors.
+func (s *RunTriggerService) CreateFieldsTopLevel(ctx context.Context, p Patch) (*RunTrigger, error) {
+	return s.createFields(ctx, s.client.apiPath("runTrigger"), p)
+}
+
+// GetByID retrieves a run trigger by its ID alone, from the top-level /runTrigger/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *RunTriggerService) GetByID(ctx context.Context, id string) (*RunTrigger, error) {
+	if err := validateID("runTriggerID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("runTrigger", id))
+}
+
+// UpdateFieldsByID modifies only the attributes and relationships set in p on the run trigger
+// with the given id, through the top-level /runTrigger/{id} path; a Relationship with a nil ID
+// clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *RunTriggerService) UpdateFieldsByID(ctx context.Context, id string, p Patch) (*RunTrigger, error) {
+	if err := validateID("runTriggerID", id); err != nil {
+		return nil, err
+	}
+
+	return s.updateFields(ctx, s.client.apiPath("runTrigger", id), id, p)
+}
+
+// DeleteByID removes the run trigger with the given id through the top-level /runTrigger/{id} path.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *RunTriggerService) DeleteByID(ctx context.Context, id string) error {
+	if err := validateID("runTriggerID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("runTrigger", id))
+}

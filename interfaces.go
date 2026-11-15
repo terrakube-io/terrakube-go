@@ -90,6 +90,11 @@ type WorkspaceCRUD interface {
 	WorkspaceDeleter
 }
 
+// WorkspaceByIDGetter retrieves a workspace by its own ID, on the top-level path.
+type WorkspaceByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*Workspace, error)
+}
+
 // ModuleLister lists modules.
 type ModuleLister interface {
 	List(ctx context.Context, orgID string, opts *ListOptions) ([]*Module, error)
@@ -816,6 +821,11 @@ type WebhookCRUD interface {
 	WebhookDeleter
 }
 
+// WebhookByIDGetter retrieves a webhook by its own ID, on the top-level path.
+type WebhookByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*Webhook, error)
+}
+
 // WebhookEventLister lists webhook events.
 type WebhookEventLister interface {
 	List(ctx context.Context, orgID, workspaceID, webhookID string, opts *ListOptions) ([]*WebhookEvent, error)
@@ -858,6 +868,11 @@ type WebhookEventCRUD interface {
 	WebhookEventCreator
 	WebhookEventUpdater
 	WebhookEventDeleter
+}
+
+// WebhookEventByIDGetter retrieves a webhook event by its own ID, on the top-level path.
+type WebhookEventByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*WebhookEvent, error)
 }
 
 // HistoryLister lists history entries.
@@ -1542,6 +1557,21 @@ type NotificationConfigurationCRUD interface {
 	NotificationConfigurationDeleter
 }
 
+// NotificationConfigurationByIDGetter retrieves a notification configuration by its own ID, on the top-level path.
+type NotificationConfigurationByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationByIDFieldsUpdater updates only the given attributes and relationships of a notification configuration, by its own ID.
+type NotificationConfigurationByIDFieldsUpdater interface {
+	UpdateFieldsByID(ctx context.Context, id string, p Patch) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationByIDDeleter deletes a notification configuration by its own ID, on the top-level path.
+type NotificationConfigurationByIDDeleter interface {
+	DeleteByID(ctx context.Context, id string) error
+}
+
 // NotificationTriggerLister lists notification triggers.
 type NotificationTriggerLister interface {
 	List(ctx context.Context, orgID, configID string, opts *ListOptions) ([]*NotificationTrigger, error)
@@ -1586,6 +1616,21 @@ type NotificationTriggerCRUD interface {
 	NotificationTriggerDeleter
 }
 
+// NotificationTriggerByConfigurationLister lists the notification triggers of a notification configuration, knowing only the notification configuration.
+type NotificationTriggerByConfigurationLister interface {
+	ListByConfiguration(ctx context.Context, configID string, opts *ListOptions) ([]*NotificationTrigger, error)
+}
+
+// NotificationTriggerByConfigurationFieldsCreator creates notification triggers from the given attributes and relationships, knowing only the notification configuration.
+type NotificationTriggerByConfigurationFieldsCreator interface {
+	CreateFieldsByConfiguration(ctx context.Context, configID string, p Patch) (*NotificationTrigger, error)
+}
+
+// NotificationTriggerByConfigurationDeleter deletes a notification trigger, knowing only its notification configuration.
+type NotificationTriggerByConfigurationDeleter interface {
+	DeleteByConfiguration(ctx context.Context, configID, id string) error
+}
+
 // PolicyAttachmentLister lists policy attachments.
 type PolicyAttachmentLister interface {
 	List(ctx context.Context, orgID, policySetID string, opts *ListOptions) ([]*PolicyAttachment, error)
@@ -1628,6 +1673,31 @@ type PolicyAttachmentCRUD interface {
 	PolicyAttachmentCreator
 	PolicyAttachmentUpdater
 	PolicyAttachmentDeleter
+}
+
+// PolicyAttachmentByPolicySetLister lists the policy attachments of a policy set, knowing only the policy set.
+type PolicyAttachmentByPolicySetLister interface {
+	ListByPolicySet(ctx context.Context, policySetID string, opts *ListOptions) ([]*PolicyAttachment, error)
+}
+
+// PolicyAttachmentByPolicySetGetter retrieves a policy attachment, knowing only its policy set.
+type PolicyAttachmentByPolicySetGetter interface {
+	GetByPolicySet(ctx context.Context, policySetID, id string) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentByPolicySetFieldsCreator creates policy attachments from the given attributes and relationships, knowing only the policy set.
+type PolicyAttachmentByPolicySetFieldsCreator interface {
+	CreateFieldsByPolicySet(ctx context.Context, policySetID string, p Patch) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentByPolicySetFieldsUpdater updates only the given attributes and relationships of a policy attachment, knowing only its policy set.
+type PolicyAttachmentByPolicySetFieldsUpdater interface {
+	UpdateFieldsByPolicySet(ctx context.Context, policySetID, id string, p Patch) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentByPolicySetDeleter deletes a policy attachment, knowing only its policy set.
+type PolicyAttachmentByPolicySetDeleter interface {
+	DeleteByPolicySet(ctx context.Context, policySetID, id string) error
 }
 
 // PolicyEvaluationLister lists policy evaluations.
@@ -1682,6 +1752,21 @@ type PolicyExemptionCRUD interface {
 	PolicyExemptionCreator
 	PolicyExemptionUpdater
 	PolicyExemptionDeleter
+}
+
+// PolicyExemptionByIDGetter retrieves a policy exemption by its own ID, on the top-level path.
+type PolicyExemptionByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*PolicyExemption, error)
+}
+
+// PolicyExemptionByIDFieldsUpdater updates only the given attributes and relationships of a policy exemption, by its own ID.
+type PolicyExemptionByIDFieldsUpdater interface {
+	UpdateFieldsByID(ctx context.Context, id string, p Patch) (*PolicyExemption, error)
+}
+
+// PolicyExemptionByIDDeleter deletes a policy exemption by its own ID, on the top-level path.
+type PolicyExemptionByIDDeleter interface {
+	DeleteByID(ctx context.Context, id string) error
 }
 
 // PolicyOverrideGetter retrieves a single policy override.
@@ -1753,6 +1838,21 @@ type PolicySetCRUD interface {
 	PolicySetDeleter
 }
 
+// PolicySetByIDGetter retrieves a policy set by its own ID, on the top-level path.
+type PolicySetByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*PolicySet, error)
+}
+
+// PolicySetByIDFieldsUpdater updates only the given attributes and relationships of a policy set, by its own ID.
+type PolicySetByIDFieldsUpdater interface {
+	UpdateFieldsByID(ctx context.Context, id string, p Patch) (*PolicySet, error)
+}
+
+// PolicySetByIDDeleter deletes a policy set by its own ID, on the top-level path.
+type PolicySetByIDDeleter interface {
+	DeleteByID(ctx context.Context, id string) error
+}
+
 // PolicySetParameterLister lists policy set parameters.
 type PolicySetParameterLister interface {
 	List(ctx context.Context, orgID, policySetID string, opts *ListOptions) ([]*PolicySetParameter, error)
@@ -1797,6 +1897,31 @@ type PolicySetParameterCRUD interface {
 	PolicySetParameterDeleter
 }
 
+// PolicySetParameterByPolicySetLister lists the policy set parameters of a policy set, knowing only the policy set.
+type PolicySetParameterByPolicySetLister interface {
+	ListByPolicySet(ctx context.Context, policySetID string, opts *ListOptions) ([]*PolicySetParameter, error)
+}
+
+// PolicySetParameterByPolicySetGetter retrieves a policy set parameter, knowing only its policy set.
+type PolicySetParameterByPolicySetGetter interface {
+	GetByPolicySet(ctx context.Context, policySetID, id string) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterByPolicySetFieldsCreator creates policy set parameters from the given attributes and relationships, knowing only the policy set.
+type PolicySetParameterByPolicySetFieldsCreator interface {
+	CreateFieldsByPolicySet(ctx context.Context, policySetID string, p Patch) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterByPolicySetFieldsUpdater updates only the given attributes and relationships of a policy set parameter, knowing only its policy set.
+type PolicySetParameterByPolicySetFieldsUpdater interface {
+	UpdateFieldsByPolicySet(ctx context.Context, policySetID, id string, p Patch) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterByPolicySetDeleter deletes a policy set parameter, knowing only its policy set.
+type PolicySetParameterByPolicySetDeleter interface {
+	DeleteByPolicySet(ctx context.Context, policySetID, id string) error
+}
+
 // RunTriggerLister lists run triggers.
 type RunTriggerLister interface {
 	List(ctx context.Context, orgID, workspaceID string, opts *ListOptions) ([]*RunTrigger, error)
@@ -1839,6 +1964,26 @@ type RunTriggerCRUD interface {
 	RunTriggerCreator
 	RunTriggerUpdater
 	RunTriggerDeleter
+}
+
+// RunTriggerTopLevelFieldsCreator creates run triggers from the given attributes and relationships on the top-level path, without the organization or workspace.
+type RunTriggerTopLevelFieldsCreator interface {
+	CreateFieldsTopLevel(ctx context.Context, p Patch) (*RunTrigger, error)
+}
+
+// RunTriggerByIDGetter retrieves a run trigger by its own ID, on the top-level path.
+type RunTriggerByIDGetter interface {
+	GetByID(ctx context.Context, id string) (*RunTrigger, error)
+}
+
+// RunTriggerByIDFieldsUpdater updates only the given attributes and relationships of a run trigger, by its own ID.
+type RunTriggerByIDFieldsUpdater interface {
+	UpdateFieldsByID(ctx context.Context, id string, p Patch) (*RunTrigger, error)
+}
+
+// RunTriggerByIDDeleter deletes a run trigger by its own ID, on the top-level path.
+type RunTriggerByIDDeleter interface {
+	DeleteByID(ctx context.Context, id string) error
 }
 
 // PATLister lists the caller's personal access tokens.
@@ -1943,4 +2088,37 @@ var (
 	_ CurrentTeamsLister            = (*AccessService)(nil)
 	_ PermissionsGetter             = (*AccessService)(nil)
 	_ WorkspacePermissionsGetter    = (*AccessService)(nil)
+)
+
+// Compile-time checks for the methods on top-level paths.
+var (
+	_ RunTriggerTopLevelFieldsCreator                 = (*RunTriggerService)(nil)
+	_ RunTriggerByIDGetter                            = (*RunTriggerService)(nil)
+	_ RunTriggerByIDFieldsUpdater                     = (*RunTriggerService)(nil)
+	_ RunTriggerByIDDeleter                           = (*RunTriggerService)(nil)
+	_ WebhookByIDGetter                               = (*WebhookService)(nil)
+	_ WebhookEventByIDGetter                          = (*WebhookEventService)(nil)
+	_ WorkspaceByIDGetter                             = (*WorkspaceService)(nil)
+	_ PolicySetByIDGetter                             = (*PolicySetService)(nil)
+	_ PolicySetByIDFieldsUpdater                      = (*PolicySetService)(nil)
+	_ PolicySetByIDDeleter                            = (*PolicySetService)(nil)
+	_ PolicyExemptionByIDGetter                       = (*PolicyExemptionService)(nil)
+	_ PolicyExemptionByIDFieldsUpdater                = (*PolicyExemptionService)(nil)
+	_ PolicyExemptionByIDDeleter                      = (*PolicyExemptionService)(nil)
+	_ NotificationConfigurationByIDGetter             = (*NotificationConfigurationService)(nil)
+	_ NotificationConfigurationByIDFieldsUpdater      = (*NotificationConfigurationService)(nil)
+	_ NotificationConfigurationByIDDeleter            = (*NotificationConfigurationService)(nil)
+	_ PolicySetParameterByPolicySetLister             = (*PolicySetParameterService)(nil)
+	_ PolicySetParameterByPolicySetGetter             = (*PolicySetParameterService)(nil)
+	_ PolicySetParameterByPolicySetFieldsCreator      = (*PolicySetParameterService)(nil)
+	_ PolicySetParameterByPolicySetFieldsUpdater      = (*PolicySetParameterService)(nil)
+	_ PolicySetParameterByPolicySetDeleter            = (*PolicySetParameterService)(nil)
+	_ PolicyAttachmentByPolicySetLister               = (*PolicyAttachmentService)(nil)
+	_ PolicyAttachmentByPolicySetGetter               = (*PolicyAttachmentService)(nil)
+	_ PolicyAttachmentByPolicySetFieldsCreator        = (*PolicyAttachmentService)(nil)
+	_ PolicyAttachmentByPolicySetFieldsUpdater        = (*PolicyAttachmentService)(nil)
+	_ PolicyAttachmentByPolicySetDeleter              = (*PolicyAttachmentService)(nil)
+	_ NotificationTriggerByConfigurationLister        = (*NotificationTriggerService)(nil)
+	_ NotificationTriggerByConfigurationFieldsCreator = (*NotificationTriggerService)(nil)
+	_ NotificationTriggerByConfigurationDeleter       = (*NotificationTriggerService)(nil)
 )
