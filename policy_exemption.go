@@ -64,6 +64,18 @@ func (s *PolicyExemptionService) Create(ctx context.Context, orgID string, entit
 	return s.create(ctx, path, entity)
 }
 
+// CreateFields creates a new policy exemption, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *PolicyExemptionService) CreateFields(ctx context.Context, orgID string, p Patch) (*PolicyExemption, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policyExemption")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing policy exemption. The policy exemption's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -78,6 +90,21 @@ func (s *PolicyExemptionService) Update(ctx context.Context, orgID string, entit
 
 	path := s.client.apiPath("organization", orgID, "policyExemption", entity.ID)
 	return s.update(ctx, path, entity)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the policy exemption
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicyExemptionService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*PolicyExemption, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyExemptionID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policyExemption", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a policy exemption.

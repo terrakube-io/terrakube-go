@@ -294,3 +294,55 @@ func TestPolicyAttachmentService_Delete_EmptyPolicySetID(t *testing.T) {
 	err := client.PolicyAttachments.Delete(context.Background(), "org-1", "", "policyattachment-1")
 	assertValidationError(t, err, "policySetID")
 }
+
+func TestPolicyAttachmentService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/policySet/policyset-1/attachments", "policy_attachment")
+
+	got, err := newTestClient(t, srv).PolicyAttachments.CreateFields(context.Background(), "org-1", "policyset-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestPolicyAttachmentService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyAttachments.CreateFields(context.Background(), "", "policyset-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicyAttachments.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "policySetID")
+}
+
+func TestPolicyAttachmentService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/policySet/policyset-1/attachments/id-1", "policy_attachment")
+
+	got, err := newTestClient(t, srv).PolicyAttachments.UpdateFields(context.Background(), "org-1", "policyset-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestPolicyAttachmentService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyAttachments.UpdateFields(context.Background(), "", "policyset-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicyAttachments.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "policySetID")
+	_, err = client.PolicyAttachments.UpdateFields(context.Background(), "org-1", "policyset-1", "", testPatch)
+	assertValidationError(t, err, "policyAttachmentID")
+}

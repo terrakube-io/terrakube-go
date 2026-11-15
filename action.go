@@ -54,6 +54,14 @@ func (s *ActionService) Create(ctx context.Context, action *Action) (*Action, er
 	return s.create(ctx, path, action)
 }
 
+// CreateFields creates a new action, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *APIError on server errors.
+func (s *ActionService) CreateFields(ctx context.Context, p Patch) (*Action, error) {
+	path := s.client.apiPath("action")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing action. The action's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -65,6 +73,18 @@ func (s *ActionService) Update(ctx context.Context, action *Action) (*Action, er
 
 	path := s.client.apiPath("action", action.ID)
 	return s.update(ctx, path, action)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the action
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ActionService) UpdateFields(ctx context.Context, id string, p Patch) (*Action, error) {
+	if err := validateID("actionID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("action", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes an action by ID.

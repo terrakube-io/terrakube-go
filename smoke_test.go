@@ -222,6 +222,53 @@ func TestSmoke(t *testing.T) {
 	if len(jobs) != 1 {
 		t.Errorf("Jobs.List returned %d jobs, want 1", len(jobs))
 	}
+
+	// --- sparse writes: UpdateFields sets and clears a to-one relationship ---
+	proj, err := c.Projects.Create(ctx, org.ID, &terrakube.Project{Name: "smoke-project"})
+	must("Projects.Create", err)
+	_, err = c.Workspaces.UpdateFields(ctx, org.ID, ws.ID, terrakube.Patch{
+		Relationships: map[string]terrakube.Relationship{"project": {Type: "project", ID: &proj.ID}},
+	})
+	must("Workspaces.UpdateFields(set project)", err)
+	got, err := c.Workspaces.Get(ctx, org.ID, ws.ID)
+	must("Workspaces.Get after setting project", err)
+	if got.Project == nil || got.Project.ID != proj.ID {
+		t.Errorf("workspace project after UpdateFields = %v, want %s", got.Project, proj.ID)
+	}
+	_, err = c.Workspaces.UpdateFields(ctx, org.ID, ws.ID, terrakube.Patch{
+		Relationships: map[string]terrakube.Relationship{"project": {Type: "project"}}, // nil ID clears it
+	})
+	must("Workspaces.UpdateFields(clear project)", err)
+	got, err = c.Workspaces.Get(ctx, org.ID, ws.ID)
+	must("Workspaces.Get after clearing project", err)
+	if got.Project != nil {
+		t.Errorf("workspace project after clearing = %+v, want none", got.Project)
+	}
+	if got.Description == nil || *got.Description != "updated" {
+		t.Errorf("workspace description after sparse writes = %v, want it untouched (\"updated\")", got.Description)
+	}
+
+	// --- sparse create: unset attributes keep the server default ---
+	rt, err := c.RunTriggers.CreateFields(ctx, org.ID, second.ID, terrakube.Patch{
+		Relationships: map[string]terrakube.Relationship{
+			"sourceWorkspace":      {Type: "workspace", ID: &ws.ID},
+			"destinationWorkspace": {Type: "workspace", ID: &second.ID},
+		},
+	})
+	must("RunTriggers.CreateFields", err)
+	if !rt.Enabled {
+		t.Errorf("run trigger created without enabled: Enabled = false, want the server default true")
+	}
+
+	// --- state: a workspace that never ran has no current state ---
+	state, err := c.State.Current(ctx, org.ID, ws.ID)
+	switch {
+	case errors.Is(err, terrakube.ErrStateNotFound):
+	case err != nil:
+		t.Errorf("State.Current err = %v, want nil or ErrStateNotFound", err)
+	default:
+		_ = state.Close()
+	}
 }
 
 func workspaceIDs(ws []*terrakube.Workspace) []string {

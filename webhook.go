@@ -95,6 +95,21 @@ func (s *WebhookService) Create(ctx context.Context, orgID, workspaceID string, 
 	return s.create(ctx, path, webhook)
 }
 
+// CreateFields creates a new webhook for a workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *WebhookService) CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*Webhook, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing webhook. The webhook's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -112,6 +127,24 @@ func (s *WebhookService) Update(ctx context.Context, orgID, workspaceID string, 
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhook.ID)
 	return s.update(ctx, path, webhook)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the webhook
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *WebhookService) UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*Webhook, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("webhookID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a webhook.
@@ -185,6 +218,24 @@ func (s *WebhookEventService) Create(ctx context.Context, orgID, workspaceID, we
 	return s.create(ctx, path, event)
 }
 
+// CreateFields creates a new webhook event, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID, workspaceID, or webhookID is empty and a *APIError on server errors.
+func (s *WebhookEventService) CreateFields(ctx context.Context, orgID, workspaceID, webhookID string, p Patch) (*WebhookEvent, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("webhookID", webhookID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing webhook event. The webhook event's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, webhookID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -205,6 +256,27 @@ func (s *WebhookEventService) Update(ctx context.Context, orgID, workspaceID, we
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", event.ID)
 	return s.update(ctx, path, event)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the webhook event
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, webhookID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *WebhookEventService) UpdateFields(ctx context.Context, orgID, workspaceID, webhookID, id string, p Patch) (*WebhookEvent, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("webhookID", webhookID); err != nil {
+		return nil, err
+	}
+	if err := validateID("eventID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a webhook event.

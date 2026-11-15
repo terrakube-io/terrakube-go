@@ -60,6 +60,18 @@ func (s *SSHService) Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 	return s.create(ctx, path, ssh)
 }
 
+// CreateFields creates a new SSH key in an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *SSHService) CreateFields(ctx context.Context, orgID string, p Patch) (*SSH, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "ssh")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing SSH key. The SSH key's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -74,6 +86,21 @@ func (s *SSHService) Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, 
 
 	path := s.client.apiPath("organization", orgID, "ssh", ssh.ID)
 	return s.update(ctx, path, ssh)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the SSH key
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *SSHService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*SSH, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("sshID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "ssh", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes an SSH key by ID.

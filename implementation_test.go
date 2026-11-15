@@ -365,3 +365,59 @@ func TestImplementationService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Implementations.Get(context.Background(), "org-1", "prov-1", "ver-1", "impl-1")
 }
+
+func TestImplementationService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/provider/provider-1/version/version-1/implementation", "implementation")
+
+	got, err := newTestClient(t, srv).Implementations.CreateFields(context.Background(), "org-1", "provider-1", "version-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestImplementationService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Implementations.CreateFields(context.Background(), "", "provider-1", "version-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Implementations.CreateFields(context.Background(), "org-1", "", "version-1", testPatch)
+	assertValidationError(t, err, "providerID")
+	_, err = client.Implementations.CreateFields(context.Background(), "org-1", "provider-1", "", testPatch)
+	assertValidationError(t, err, "versionID")
+}
+
+func TestImplementationService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/provider/provider-1/version/version-1/implementation/id-1", "implementation")
+
+	got, err := newTestClient(t, srv).Implementations.UpdateFields(context.Background(), "org-1", "provider-1", "version-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestImplementationService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Implementations.UpdateFields(context.Background(), "", "provider-1", "version-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Implementations.UpdateFields(context.Background(), "org-1", "", "version-1", "id-1", testPatch)
+	assertValidationError(t, err, "providerID")
+	_, err = client.Implementations.UpdateFields(context.Background(), "org-1", "provider-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "versionID")
+	_, err = client.Implementations.UpdateFields(context.Background(), "org-1", "provider-1", "version-1", "", testPatch)
+	assertValidationError(t, err, "implementationID")
+}

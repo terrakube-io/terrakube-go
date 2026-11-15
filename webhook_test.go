@@ -783,3 +783,111 @@ func TestWebhookService_List_UndecodableBody(t *testing.T) {
 		t.Fatal("expected a decoding error for a resource of another type")
 	}
 }
+
+func TestWebhookService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/webhook", "webhook")
+
+	got, err := newTestClient(t, srv).Webhooks.CreateFields(context.Background(), "org-1", "workspace-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestWebhookService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Webhooks.CreateFields(context.Background(), "", "workspace-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Webhooks.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "workspaceID")
+}
+
+func TestWebhookService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/webhook/id-1", "webhook")
+
+	got, err := newTestClient(t, srv).Webhooks.UpdateFields(context.Background(), "org-1", "workspace-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestWebhookService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Webhooks.UpdateFields(context.Background(), "", "workspace-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Webhooks.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "workspaceID")
+	_, err = client.Webhooks.UpdateFields(context.Background(), "org-1", "workspace-1", "", testPatch)
+	assertValidationError(t, err, "webhookID")
+}
+
+func TestWebhookEventService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/webhook/webhook-1/events", "webhook_event")
+
+	got, err := newTestClient(t, srv).WebhookEvents.CreateFields(context.Background(), "org-1", "workspace-1", "webhook-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestWebhookEventService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.WebhookEvents.CreateFields(context.Background(), "", "workspace-1", "webhook-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.WebhookEvents.CreateFields(context.Background(), "org-1", "", "webhook-1", testPatch)
+	assertValidationError(t, err, "workspaceID")
+	_, err = client.WebhookEvents.CreateFields(context.Background(), "org-1", "workspace-1", "", testPatch)
+	assertValidationError(t, err, "webhookID")
+}
+
+func TestWebhookEventService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/webhook/webhook-1/events/id-1", "webhook_event")
+
+	got, err := newTestClient(t, srv).WebhookEvents.UpdateFields(context.Background(), "org-1", "workspace-1", "webhook-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestWebhookEventService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.WebhookEvents.UpdateFields(context.Background(), "", "workspace-1", "webhook-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.WebhookEvents.UpdateFields(context.Background(), "org-1", "", "webhook-1", "id-1", testPatch)
+	assertValidationError(t, err, "workspaceID")
+	_, err = client.WebhookEvents.UpdateFields(context.Background(), "org-1", "workspace-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "webhookID")
+	_, err = client.WebhookEvents.UpdateFields(context.Background(), "org-1", "workspace-1", "webhook-1", "", testPatch)
+	assertValidationError(t, err, "eventID")
+}

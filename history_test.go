@@ -319,3 +319,55 @@ func TestHistoryService_AuthHeader(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+func TestHistoryService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/history", "history")
+
+	got, err := newTestClient(t, srv).History.CreateFields(context.Background(), "org-1", "workspace-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestHistoryService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.History.CreateFields(context.Background(), "", "workspace-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.History.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "workspaceID")
+}
+
+func TestHistoryService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/history/id-1", "history")
+
+	got, err := newTestClient(t, srv).History.UpdateFields(context.Background(), "org-1", "workspace-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestHistoryService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.History.UpdateFields(context.Background(), "", "workspace-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.History.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "workspaceID")
+	_, err = client.History.UpdateFields(context.Background(), "org-1", "workspace-1", "", testPatch)
+	assertValidationError(t, err, "historyID")
+}

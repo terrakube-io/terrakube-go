@@ -270,3 +270,51 @@ func TestCollectionReferenceService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.CollectionReferences.Get(context.Background(), "ref-1")
 }
+
+func TestCollectionReferenceService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/collection/collection-1/reference", "reference")
+
+	got, err := newTestClient(t, srv).CollectionReferences.CreateFields(context.Background(), "org-1", "collection-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestCollectionReferenceService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.CollectionReferences.CreateFields(context.Background(), "", "collection-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.CollectionReferences.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "collectionID")
+}
+
+func TestCollectionReferenceService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/reference/id-1", "reference")
+
+	got, err := newTestClient(t, srv).CollectionReferences.UpdateFields(context.Background(), "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestCollectionReferenceService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.CollectionReferences.UpdateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "referenceID")
+}

@@ -65,6 +65,21 @@ func (s *VariableService) Create(ctx context.Context, orgID, workspaceID string,
 	return s.create(ctx, path, variable)
 }
 
+// CreateFields creates a new variable in the workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *VariableService) CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*Variable, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "variable")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing variable. The variable's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -82,6 +97,24 @@ func (s *VariableService) Update(ctx context.Context, orgID, workspaceID string,
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "variable", variable.ID)
 	return s.update(ctx, path, variable)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the variable
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *VariableService) UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*Variable, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("variableID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "variable", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a variable by ID.

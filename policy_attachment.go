@@ -69,6 +69,21 @@ func (s *PolicyAttachmentService) Create(ctx context.Context, orgID, policySetID
 	return s.create(ctx, path, entity)
 }
 
+// CreateFields creates a new policy attachment, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or policySetID is empty and a *APIError on server errors.
+func (s *PolicyAttachmentService) CreateFields(ctx context.Context, orgID, policySetID string, p Patch) (*PolicyAttachment, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "attachments")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing policy attachment. The policy attachment's ID field must be set.
 // It returns a *ValidationError if orgID, policySetID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -86,6 +101,24 @@ func (s *PolicyAttachmentService) Update(ctx context.Context, orgID, policySetID
 
 	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "attachments", entity.ID)
 	return s.update(ctx, path, entity)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the policy attachment
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, policySetID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicyAttachmentService) UpdateFields(ctx context.Context, orgID, policySetID, id string, p Patch) (*PolicyAttachment, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyAttachmentID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "attachments", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a policy attachment.

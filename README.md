@@ -58,6 +58,15 @@ ws.Description = new("managed by automation")
 ws, err = client.Workspaces.Update(ctx, orgID, ws)
 ```
 
+`UpdateFields` sends only the attributes and relationships you name, and a `Relationship` with a nil `ID` clears that link. For a to-many relationship set `Many` and list every target in `IDs` (an empty list clears the set). `CreateFields` does the same on create, so the server applies its defaults to everything else:
+
+```go
+ws, err := client.Workspaces.UpdateFields(ctx, orgID, wsID, terrakube.Patch{
+    Attributes:    map[string]any{"description": "managed by automation"},
+    Relationships: map[string]terrakube.Relationship{"vcs": {Type: "vcs", ID: nil}}, // unlink the VCS connection
+})
+```
+
 ### Listing
 
 `List` with no page options lists the collection and never follows links found in responses. Workspaces, workspace tags, actions, federated, agents, organization variables, and workspace access are fetched page by page until the server reports no more, ordered by id. Every other resource type, and any type for which the server refuses paging, is fetched in one request, so the result stops at any limit the server applies to it.
@@ -111,6 +120,8 @@ ws, err = client.Workspaces.Update(ctx, orgID, ws)
 | Policy Evaluation | `PolicyEvaluations` | Job (read-only) |
 | Policy Override | `PolicyOverrides` | Policy Evaluation |
 | Run Trigger | `RunTriggers` | Workspace |
+| State | `State` | Workspace (state files, not JSON:API) |
+| Output | `Outputs` | Workspace (read from the state) |
 
 ## API Version
 

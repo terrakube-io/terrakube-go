@@ -228,3 +228,76 @@ func TestNotificationConfigurationService_ValidationErrors(t *testing.T) {
 	err = client.NotificationConfigurations.Delete(context.Background(), "org-1", "")
 	assertValidationError(t, err, "notificationConfigurationID")
 }
+
+func TestNotificationConfigurationService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/notificationConfiguration", "notification_configuration")
+
+	got, err := newTestClient(t, srv).NotificationConfigurations.CreateFields(context.Background(), "org-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestNotificationConfigurationService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.NotificationConfigurations.CreateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}
+
+func TestNotificationConfigurationService_CreateForWorkspaceFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/notificationConfiguration", "notification_configuration")
+
+	got, err := newTestClient(t, srv).NotificationConfigurations.CreateForWorkspaceFields(context.Background(), "org-1", "workspace-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestNotificationConfigurationService_CreateForWorkspaceFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.NotificationConfigurations.CreateForWorkspaceFields(context.Background(), "", "workspace-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.NotificationConfigurations.CreateForWorkspaceFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "workspaceID")
+}
+
+func TestNotificationConfigurationService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/notificationConfiguration/id-1", "notification_configuration")
+
+	got, err := newTestClient(t, srv).NotificationConfigurations.UpdateFields(context.Background(), "org-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestNotificationConfigurationService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.NotificationConfigurations.UpdateFields(context.Background(), "", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.NotificationConfigurations.UpdateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "notificationConfigurationID")
+}

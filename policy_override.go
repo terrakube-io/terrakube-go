@@ -61,6 +61,24 @@ func (s *PolicyOverrideService) Create(ctx context.Context, orgID, jobID, policy
 	return s.create(ctx, path, entity)
 }
 
+// CreateFields creates a new policy override, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID, jobID, or policyEvaluationID is empty and a *APIError on server errors.
+func (s *PolicyOverrideService) CreateFields(ctx context.Context, orgID, jobID, policyEvaluationID string, p Patch) (*PolicyOverride, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyEvaluationID", policyEvaluationID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "policyEvaluation", policyEvaluationID, "override")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing policy override. The policy override's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, policyEvaluationID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -81,4 +99,25 @@ func (s *PolicyOverrideService) Update(ctx context.Context, orgID, jobID, policy
 
 	path := s.client.apiPath("organization", orgID, "job", jobID, "policyEvaluation", policyEvaluationID, "override", entity.ID)
 	return s.update(ctx, path, entity)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the policy override
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, jobID, policyEvaluationID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicyOverrideService) UpdateFields(ctx context.Context, orgID, jobID, policyEvaluationID, id string, p Patch) (*PolicyOverride, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyEvaluationID", policyEvaluationID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyOverrideID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "policyEvaluation", policyEvaluationID, "override", id)
+	return s.updateFields(ctx, path, id, p)
 }

@@ -65,6 +65,21 @@ func (s *CollectionItemService) Create(ctx context.Context, orgID, collectionID 
 	return s.create(ctx, path, item)
 }
 
+// CreateFields creates a new item in the given collection, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or collectionID is empty and a *APIError on server errors.
+func (s *CollectionItemService) CreateFields(ctx context.Context, orgID, collectionID string, p Patch) (*CollectionItem, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("collectionID", collectionID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "collection", collectionID, "item")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing collection item. The item's ID field must be set.
 // It returns a *ValidationError if orgID, collectionID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -82,6 +97,24 @@ func (s *CollectionItemService) Update(ctx context.Context, orgID, collectionID 
 
 	path := s.client.apiPath("organization", orgID, "collection", collectionID, "item", item.ID)
 	return s.update(ctx, path, item)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the collection item
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, collectionID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *CollectionItemService) UpdateFields(ctx context.Context, orgID, collectionID, id string, p Patch) (*CollectionItem, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("collectionID", collectionID); err != nil {
+		return nil, err
+	}
+	if err := validateID("itemID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "collection", collectionID, "item", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a collection item by ID.

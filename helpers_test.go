@@ -3,6 +3,8 @@ package terrakube_test
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -76,4 +78,56 @@ func assertJSONBoolField(t *testing.T, body []byte, attrName string, expected bo
 	if boolVal != expected {
 		t.Errorf("attribute %q = %v, want %v", attrName, boolVal, expected)
 	}
+}
+
+// testPatch is the sparse write the per-service UpdateFields and CreateFields tests send.
+var testPatch = terrakube.Patch{Attributes: map[string]any{"description": "x"}}
+
+// checkFieldsBody checks that r carries testPatch as a JSON:API document of jsonapiType with the given id.
+func checkFieldsBody(t *testing.T, r *http.Request, jsonapiType, id string) {
+	t.Helper()
+	var doc struct {
+		Data map[string]any `json:"data"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&doc); err != nil {
+		t.Errorf("decoding body: %v", err)
+		return
+	}
+	want := map[string]any{"type": jsonapiType, "attributes": map[string]any{"description": "x"}}
+	if id != "" {
+		want["id"] = id
+	}
+	if !reflect.DeepEqual(doc.Data, want) {
+		t.Errorf("data = %v, want %v", doc.Data, want)
+	}
+}
+
+// writeResource answers with a JSON:API resource object of jsonapiType and id.
+func writeResource(w http.ResponseWriter, status int, jsonapiType, id string) {
+	w.Header().Set("Content-Type", "application/vnd.api+json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"type": jsonapiType, "id": id, "attributes": map[string]any{}}})
+}
+
+// handleUpdateFields serves a sparse PATCH of testPatch to the resource "id-1" at path, answered
+// with 204, and the GET that follows.
+func handleUpdateFields(t *testing.T, srv *testutil.Server, path, jsonapiType string) {
+	t.Helper()
+	const id = "id-1"
+	srv.HandleFunc("PATCH "+path, func(w http.ResponseWriter, r *http.Request) {
+		checkFieldsBody(t, r, jsonapiType, id)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	srv.HandleFunc("GET "+path, func(w http.ResponseWriter, _ *http.Request) {
+		writeResource(w, http.StatusOK, jsonapiType, id)
+	})
+}
+
+// handleCreateFields serves a sparse POST of testPatch at path, answered with a resource whose ID is "new-1".
+func handleCreateFields(t *testing.T, srv *testutil.Server, path, jsonapiType string) {
+	t.Helper()
+	srv.HandleFunc("POST "+path, func(w http.ResponseWriter, r *http.Request) {
+		checkFieldsBody(t, r, jsonapiType, "")
+		writeResource(w, http.StatusCreated, jsonapiType, "new-1")
+	})
 }

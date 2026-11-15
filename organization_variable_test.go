@@ -377,3 +377,51 @@ func TestOrganizationVariableService_AuthHeader(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+func TestOrganizationVariableService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/globalvar", "globalvar")
+
+	got, err := newTestClient(t, srv).OrganizationVariables.CreateFields(context.Background(), "org-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestOrganizationVariableService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.OrganizationVariables.CreateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}
+
+func TestOrganizationVariableService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/globalvar/id-1", "globalvar")
+
+	got, err := newTestClient(t, srv).OrganizationVariables.UpdateFields(context.Background(), "org-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestOrganizationVariableService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.OrganizationVariables.UpdateFields(context.Background(), "", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.OrganizationVariables.UpdateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "globalvarID")
+}

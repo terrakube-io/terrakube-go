@@ -196,3 +196,59 @@ func TestPolicyOverrideService_Update_EmptyPolicyEvaluationID(t *testing.T) {
 	_, err := client.PolicyOverrides.Update(context.Background(), "org-1", "job-1", "", newTestPolicyOverride())
 	assertValidationError(t, err, "policyEvaluationID")
 }
+
+func TestPolicyOverrideService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/job/job-1/policyEvaluation/policyevaluation-1/override", "policy_override")
+
+	got, err := newTestClient(t, srv).PolicyOverrides.CreateFields(context.Background(), "org-1", "job-1", "policyevaluation-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestPolicyOverrideService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyOverrides.CreateFields(context.Background(), "", "job-1", "policyevaluation-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicyOverrides.CreateFields(context.Background(), "org-1", "", "policyevaluation-1", testPatch)
+	assertValidationError(t, err, "jobID")
+	_, err = client.PolicyOverrides.CreateFields(context.Background(), "org-1", "job-1", "", testPatch)
+	assertValidationError(t, err, "policyEvaluationID")
+}
+
+func TestPolicyOverrideService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/job/job-1/policyEvaluation/policyevaluation-1/override/id-1", "policy_override")
+
+	got, err := newTestClient(t, srv).PolicyOverrides.UpdateFields(context.Background(), "org-1", "job-1", "policyevaluation-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestPolicyOverrideService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyOverrides.UpdateFields(context.Background(), "", "job-1", "policyevaluation-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicyOverrides.UpdateFields(context.Background(), "org-1", "", "policyevaluation-1", "id-1", testPatch)
+	assertValidationError(t, err, "jobID")
+	_, err = client.PolicyOverrides.UpdateFields(context.Background(), "org-1", "job-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "policyEvaluationID")
+	_, err = client.PolicyOverrides.UpdateFields(context.Background(), "org-1", "job-1", "policyevaluation-1", "", testPatch)
+	assertValidationError(t, err, "policyOverrideID")
+}

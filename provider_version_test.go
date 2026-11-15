@@ -338,3 +338,55 @@ func TestProviderVersionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.ProviderVersions.Get(context.Background(), "org-1", "prov-1", "ver-1")
 }
+
+func TestProviderVersionService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/provider/provider-1/version", "version")
+
+	got, err := newTestClient(t, srv).ProviderVersions.CreateFields(context.Background(), "org-1", "provider-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestProviderVersionService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.ProviderVersions.CreateFields(context.Background(), "", "provider-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.ProviderVersions.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "providerID")
+}
+
+func TestProviderVersionService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/provider/provider-1/version/id-1", "version")
+
+	got, err := newTestClient(t, srv).ProviderVersions.UpdateFields(context.Background(), "org-1", "provider-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestProviderVersionService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.ProviderVersions.UpdateFields(context.Background(), "", "provider-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.ProviderVersions.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "providerID")
+	_, err = client.ProviderVersions.UpdateFields(context.Background(), "org-1", "provider-1", "", testPatch)
+	assertValidationError(t, err, "versionID")
+}

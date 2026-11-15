@@ -51,6 +51,18 @@ func (s *FederatedClaimService) Create(ctx context.Context, federatedID string, 
 	return s.create(ctx, path, claim)
 }
 
+// CreateFields creates a new federated claim for a federated identity configuration, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if federatedID is empty and a *APIError on server errors.
+func (s *FederatedClaimService) CreateFields(ctx context.Context, federatedID string, p Patch) (*FederatedClaim, error) {
+	if err := validateID("federatedID", federatedID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("federated", federatedID, "claims")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing federated claim. The claim ID must be set.
 // It returns a *ValidationError if federatedID or claim ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -65,6 +77,21 @@ func (s *FederatedClaimService) Update(ctx context.Context, federatedID string, 
 
 	path := s.client.apiPath("federated", federatedID, "claims", claim.ID)
 	return s.update(ctx, path, claim)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the federated claim
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if federatedID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *FederatedClaimService) UpdateFields(ctx context.Context, federatedID, id string, p Patch) (*FederatedClaim, error) {
+	if err := validateID("federatedID", federatedID); err != nil {
+		return nil, err
+	}
+	if err := validateID("federatedClaimID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("federated", federatedID, "claims", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a federated claim by ID under a federated identity configuration.

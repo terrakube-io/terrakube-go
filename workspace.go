@@ -93,6 +93,18 @@ func (s *WorkspaceService) Create(ctx context.Context, orgID string, ws *Workspa
 	return s.create(ctx, path, ws)
 }
 
+// CreateFields creates a new workspace within an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *WorkspaceService) CreateFields(ctx context.Context, orgID string, p Patch) (*Workspace, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing workspace within an organization. The workspace's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -107,6 +119,21 @@ func (s *WorkspaceService) Update(ctx context.Context, orgID string, ws *Workspa
 
 	path := s.client.apiPath("organization", orgID, "workspace", ws.ID)
 	return s.update(ctx, path, ws)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the workspace
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *WorkspaceService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Workspace, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a workspace by ID within an organization.

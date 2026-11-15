@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // crudService is a generic base for JSON:API CRUD operations.
@@ -62,6 +63,9 @@ func (s *crudService[T]) buildListParams(opts *ListOptions) url.Values {
 	if opts.PageSize > 0 {
 		params.Set("page[size]", strconv.Itoa(opts.PageSize))
 	}
+	if opts.Sort != "" {
+		params.Set("sort", opts.Sort)
+	}
 
 	return params
 }
@@ -77,17 +81,23 @@ func (s *crudService[T]) listPage(ctx context.Context, path string, params url.V
 
 // listAll fetches every page of a collection using the server's meta.page.
 // The first request asks only for totals, so the server picks the page size;
-// later pages repeat that size. Every request sorts by id: the server adds no
-// order of its own, and without one the pages of a collection can overlap.
+// later pages repeat that size. Every request sorts by id, after the caller's
+// order if there is one: the server adds no order of its own, and without a
+// unique key the pages of a collection can overlap.
 func (s *crudService[T]) listAll(ctx context.Context, path string, params url.Values) ([]*T, error) {
+	callerSort := params.Get("sort")
 	params.Set("page[totals]", "")
-	params.Set("sort", "id")
+	params.Set("sort", withIDTieBreak(callerSort))
 	all, page, err := s.listPage(ctx, path, params)
 	if apiErr, ok := errors.AsType[*APIError](err); ok && apiErr.StatusCode == http.StatusBadRequest {
 		// Which resource types a server can page depends on its version.
-		// If it refuses page parameters, list the collection in one request.
+		// If it refuses page parameters, list the collection in one request,
+		// in the caller's order if there is one.
 		params.Del("page[totals]")
 		params.Del("sort")
+		if callerSort != "" {
+			params.Set("sort", callerSort)
+		}
 		all, _, err = s.listPage(ctx, path, params)
 		return all, err
 	}
@@ -110,6 +120,20 @@ func (s *crudService[T]) listAll(ctx context.Context, path string, params url.Va
 		all = append(all, items...)
 	}
 	return all, nil
+}
+
+// withIDTieBreak returns the sort expression sortExpr followed by id, unless it
+// already sorts by id. An empty sortExpr sorts by id alone.
+func withIDTieBreak(sortExpr string) string {
+	if sortExpr == "" {
+		return "id"
+	}
+	for field := range strings.SplitSeq(sortExpr, ",") {
+		if f := strings.TrimSpace(strings.TrimLeft(strings.TrimSpace(field), "+-")); f == "id" {
+			return sortExpr
+		}
+	}
+	return sortExpr + ",id"
 }
 
 // get retrieves a single resource at the given path.

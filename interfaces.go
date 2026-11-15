@@ -17,9 +17,19 @@ type OrganizationCreator interface {
 	Create(ctx context.Context, org *Organization) (*Organization, error)
 }
 
+// OrganizationFieldsCreator creates organizations from the given attributes and relationships only.
+type OrganizationFieldsCreator interface {
+	CreateFields(ctx context.Context, p Patch) (*Organization, error)
+}
+
 // OrganizationUpdater updates organizations.
 type OrganizationUpdater interface {
 	Update(ctx context.Context, org *Organization) (*Organization, error)
+}
+
+// OrganizationFieldsUpdater updates only the given attributes and relationships of organizations.
+type OrganizationFieldsUpdater interface {
+	UpdateFields(ctx context.Context, id string, p Patch) (*Organization, error)
 }
 
 // OrganizationDeleter deletes organizations.
@@ -51,9 +61,19 @@ type WorkspaceCreator interface {
 	Create(ctx context.Context, orgID string, ws *Workspace) (*Workspace, error)
 }
 
+// WorkspaceFieldsCreator creates workspaces from the given attributes and relationships only.
+type WorkspaceFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Workspace, error)
+}
+
 // WorkspaceUpdater updates workspaces.
 type WorkspaceUpdater interface {
 	Update(ctx context.Context, orgID string, ws *Workspace) (*Workspace, error)
+}
+
+// WorkspaceFieldsUpdater updates only the given attributes and relationships of workspaces.
+type WorkspaceFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Workspace, error)
 }
 
 // WorkspaceDeleter deletes workspaces.
@@ -85,9 +105,19 @@ type ModuleCreator interface {
 	Create(ctx context.Context, orgID string, module *Module) (*Module, error)
 }
 
+// ModuleFieldsCreator creates modules from the given attributes and relationships only.
+type ModuleFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Module, error)
+}
+
 // ModuleUpdater updates modules.
 type ModuleUpdater interface {
 	Update(ctx context.Context, orgID string, module *Module) (*Module, error)
+}
+
+// ModuleFieldsUpdater updates only the given attributes and relationships of modules.
+type ModuleFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Module, error)
 }
 
 // ModuleDeleter deletes modules.
@@ -119,9 +149,19 @@ type TeamCreator interface {
 	Create(ctx context.Context, orgID string, team *Team) (*Team, error)
 }
 
+// TeamFieldsCreator creates teams from the given attributes and relationships only.
+type TeamFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Team, error)
+}
+
 // TeamUpdater updates teams.
 type TeamUpdater interface {
 	Update(ctx context.Context, orgID string, team *Team) (*Team, error)
+}
+
+// TeamFieldsUpdater updates only the given attributes and relationships of teams.
+type TeamFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Team, error)
 }
 
 // TeamDeleter deletes teams.
@@ -175,9 +215,19 @@ type VariableCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, variable *Variable) (*Variable, error)
 }
 
+// VariableFieldsCreator creates variables from the given attributes and relationships only.
+type VariableFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*Variable, error)
+}
+
 // VariableUpdater updates variables.
 type VariableUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, variable *Variable) (*Variable, error)
+}
+
+// VariableFieldsUpdater updates only the given attributes and relationships of variables.
+type VariableFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*Variable, error)
 }
 
 // VariableDeleter deletes variables.
@@ -209,9 +259,19 @@ type OrganizationVariableCreator interface {
 	Create(ctx context.Context, orgID string, variable *OrganizationVariable) (*OrganizationVariable, error)
 }
 
+// OrganizationVariableFieldsCreator creates organization variables from the given attributes and relationships only.
+type OrganizationVariableFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*OrganizationVariable, error)
+}
+
 // OrganizationVariableUpdater updates organization variables.
 type OrganizationVariableUpdater interface {
 	Update(ctx context.Context, orgID string, variable *OrganizationVariable) (*OrganizationVariable, error)
+}
+
+// OrganizationVariableFieldsUpdater updates only the given attributes and relationships of organization variables.
+type OrganizationVariableFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*OrganizationVariable, error)
 }
 
 // OrganizationVariableDeleter deletes organization variables.
@@ -243,9 +303,19 @@ type TemplateCreator interface {
 	Create(ctx context.Context, orgID string, tmpl *Template) (*Template, error)
 }
 
+// TemplateFieldsCreator creates templates from the given attributes and relationships only.
+type TemplateFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Template, error)
+}
+
 // TemplateUpdater updates templates.
 type TemplateUpdater interface {
 	Update(ctx context.Context, orgID string, tmpl *Template) (*Template, error)
+}
+
+// TemplateFieldsUpdater updates only the given attributes and relationships of templates.
+type TemplateFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Template, error)
 }
 
 // TemplateDeleter deletes templates.
@@ -277,9 +347,19 @@ type TagCreator interface {
 	Create(ctx context.Context, orgID string, tag *Tag) (*Tag, error)
 }
 
+// TagFieldsCreator creates tags from the given attributes and relationships only.
+type TagFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Tag, error)
+}
+
 // TagUpdater updates tags.
 type TagUpdater interface {
 	Update(ctx context.Context, orgID string, tag *Tag) (*Tag, error)
+}
+
+// TagFieldsUpdater updates only the given attributes and relationships of tags.
+type TagFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Tag, error)
 }
 
 // TagDeleter deletes tags.
@@ -311,9 +391,19 @@ type VCSCreator interface {
 	Create(ctx context.Context, orgID string, vcs *VCS) (*VCS, error)
 }
 
+// VCSFieldsCreator creates VCS connections from the given attributes and relationships only.
+type VCSFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*VCS, error)
+}
+
 // VCSUpdater updates VCS connections.
 type VCSUpdater interface {
 	Update(ctx context.Context, orgID string, vcs *VCS) (*VCS, error)
+}
+
+// VCSFieldsUpdater updates only the given attributes and relationships of VCS connections.
+type VCSFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*VCS, error)
 }
 
 // VCSDeleter deletes VCS connections.
@@ -345,9 +435,19 @@ type SSHCreator interface {
 	Create(ctx context.Context, orgID string, ssh *SSH) (*SSH, error)
 }
 
+// SSHFieldsCreator creates SSH keys from the given attributes and relationships only.
+type SSHFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*SSH, error)
+}
+
 // SSHUpdater updates SSH keys.
 type SSHUpdater interface {
 	Update(ctx context.Context, orgID string, ssh *SSH) (*SSH, error)
+}
+
+// SSHFieldsUpdater updates only the given attributes and relationships of SSH keys.
+type SSHFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*SSH, error)
 }
 
 // SSHDeleter deletes SSH keys.
@@ -379,9 +479,19 @@ type AgentCreator interface {
 	Create(ctx context.Context, orgID string, agent *Agent) (*Agent, error)
 }
 
+// AgentFieldsCreator creates agents from the given attributes and relationships only.
+type AgentFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Agent, error)
+}
+
 // AgentUpdater updates agents.
 type AgentUpdater interface {
 	Update(ctx context.Context, orgID string, agent *Agent) (*Agent, error)
+}
+
+// AgentFieldsUpdater updates only the given attributes and relationships of agents.
+type AgentFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Agent, error)
 }
 
 // AgentDeleter deletes agents.
@@ -413,9 +523,19 @@ type CollectionCreator interface {
 	Create(ctx context.Context, orgID string, collection *Collection) (*Collection, error)
 }
 
+// CollectionFieldsCreator creates collections from the given attributes and relationships only.
+type CollectionFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Collection, error)
+}
+
 // CollectionUpdater updates collections.
 type CollectionUpdater interface {
 	Update(ctx context.Context, orgID string, collection *Collection) (*Collection, error)
+}
+
+// CollectionFieldsUpdater updates only the given attributes and relationships of collections.
+type CollectionFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Collection, error)
 }
 
 // CollectionDeleter deletes collections.
@@ -447,9 +567,19 @@ type CollectionItemCreator interface {
 	Create(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error)
 }
 
+// CollectionItemFieldsCreator creates collection items from the given attributes and relationships only.
+type CollectionItemFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, collectionID string, p Patch) (*CollectionItem, error)
+}
+
 // CollectionItemUpdater updates collection items.
 type CollectionItemUpdater interface {
 	Update(ctx context.Context, orgID, collectionID string, item *CollectionItem) (*CollectionItem, error)
+}
+
+// CollectionItemFieldsUpdater updates only the given attributes and relationships of collection items.
+type CollectionItemFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, collectionID, id string, p Patch) (*CollectionItem, error)
 }
 
 // CollectionItemDeleter deletes collection items.
@@ -481,9 +611,19 @@ type CollectionReferenceCreator interface {
 	Create(ctx context.Context, orgID, collectionID string, ref *CollectionReference) (*CollectionReference, error)
 }
 
+// CollectionReferenceFieldsCreator creates collection references from the given attributes and relationships only.
+type CollectionReferenceFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, collectionID string, p Patch) (*CollectionReference, error)
+}
+
 // CollectionReferenceUpdater updates collection references.
 type CollectionReferenceUpdater interface {
 	Update(ctx context.Context, ref *CollectionReference) (*CollectionReference, error)
+}
+
+// CollectionReferenceFieldsUpdater updates only the given attributes and relationships of collection references.
+type CollectionReferenceFieldsUpdater interface {
+	UpdateFields(ctx context.Context, id string, p Patch) (*CollectionReference, error)
 }
 
 // CollectionReferenceDeleter deletes collection references.
@@ -515,9 +655,19 @@ type WorkspaceTagCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, tag *WorkspaceTag) (*WorkspaceTag, error)
 }
 
+// WorkspaceTagFieldsCreator creates workspace tags from the given attributes and relationships only.
+type WorkspaceTagFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*WorkspaceTag, error)
+}
+
 // WorkspaceTagUpdater updates workspace tags.
 type WorkspaceTagUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, tag *WorkspaceTag) (*WorkspaceTag, error)
+}
+
+// WorkspaceTagFieldsUpdater updates only the given attributes and relationships of workspace tags.
+type WorkspaceTagFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*WorkspaceTag, error)
 }
 
 // WorkspaceTagDeleter deletes workspace tags.
@@ -549,9 +699,19 @@ type WorkspaceAccessCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error)
 }
 
+// WorkspaceAccessFieldsCreator creates workspace access entries from the given attributes and relationships only.
+type WorkspaceAccessFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*WorkspaceAccess, error)
+}
+
 // WorkspaceAccessUpdater updates workspace access entries.
 type WorkspaceAccessUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, access *WorkspaceAccess) (*WorkspaceAccess, error)
+}
+
+// WorkspaceAccessFieldsUpdater updates only the given attributes and relationships of workspace access entries.
+type WorkspaceAccessFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*WorkspaceAccess, error)
 }
 
 // WorkspaceAccessDeleter deletes workspace access entries.
@@ -583,9 +743,19 @@ type WorkspaceScheduleCreator interface {
 	Create(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error)
 }
 
+// WorkspaceScheduleFieldsCreator creates workspace schedules from the given attributes and relationships only.
+type WorkspaceScheduleFieldsCreator interface {
+	CreateFields(ctx context.Context, workspaceID string, p Patch) (*WorkspaceSchedule, error)
+}
+
 // WorkspaceScheduleUpdater updates workspace schedules.
 type WorkspaceScheduleUpdater interface {
 	Update(ctx context.Context, workspaceID string, schedule *WorkspaceSchedule) (*WorkspaceSchedule, error)
+}
+
+// WorkspaceScheduleFieldsUpdater updates only the given attributes and relationships of workspace schedules.
+type WorkspaceScheduleFieldsUpdater interface {
+	UpdateFields(ctx context.Context, workspaceID, id string, p Patch) (*WorkspaceSchedule, error)
 }
 
 // WorkspaceScheduleDeleter deletes workspace schedules.
@@ -617,9 +787,19 @@ type WebhookCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error)
 }
 
+// WebhookFieldsCreator creates webhooks from the given attributes and relationships only.
+type WebhookFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*Webhook, error)
+}
+
 // WebhookUpdater updates webhooks.
 type WebhookUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, webhook *Webhook) (*Webhook, error)
+}
+
+// WebhookFieldsUpdater updates only the given attributes and relationships of webhooks.
+type WebhookFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*Webhook, error)
 }
 
 // WebhookDeleter deletes webhooks.
@@ -651,9 +831,19 @@ type WebhookEventCreator interface {
 	Create(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error)
 }
 
+// WebhookEventFieldsCreator creates webhook events from the given attributes and relationships only.
+type WebhookEventFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID, webhookID string, p Patch) (*WebhookEvent, error)
+}
+
 // WebhookEventUpdater updates webhook events.
 type WebhookEventUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID, webhookID string, event *WebhookEvent) (*WebhookEvent, error)
+}
+
+// WebhookEventFieldsUpdater updates only the given attributes and relationships of webhook events.
+type WebhookEventFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, webhookID, id string, p Patch) (*WebhookEvent, error)
 }
 
 // WebhookEventDeleter deletes webhook events.
@@ -685,9 +875,19 @@ type HistoryCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, history *History) (*History, error)
 }
 
+// HistoryFieldsCreator creates history entries from the given attributes and relationships only.
+type HistoryFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*History, error)
+}
+
 // HistoryUpdater updates history entries.
 type HistoryUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, history *History) (*History, error)
+}
+
+// HistoryFieldsUpdater updates only the given attributes and relationships of history entries.
+type HistoryFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*History, error)
 }
 
 // HistoryDeleter deletes history entries.
@@ -719,9 +919,19 @@ type JobCreator interface {
 	Create(ctx context.Context, orgID string, job *Job) (*Job, error)
 }
 
+// JobFieldsCreator creates jobs from the given attributes and relationships only.
+type JobFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Job, error)
+}
+
 // JobUpdater updates jobs.
 type JobUpdater interface {
 	Update(ctx context.Context, orgID string, job *Job) (*Job, error)
+}
+
+// JobFieldsUpdater updates only the given attributes and relationships of jobs.
+type JobFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Job, error)
 }
 
 // JobDeleter deletes jobs.
@@ -753,9 +963,19 @@ type ActionCreator interface {
 	Create(ctx context.Context, action *Action) (*Action, error)
 }
 
+// ActionFieldsCreator creates actions from the given attributes and relationships only.
+type ActionFieldsCreator interface {
+	CreateFields(ctx context.Context, p Patch) (*Action, error)
+}
+
 // ActionUpdater updates actions.
 type ActionUpdater interface {
 	Update(ctx context.Context, action *Action) (*Action, error)
+}
+
+// ActionFieldsUpdater updates only the given attributes and relationships of actions.
+type ActionFieldsUpdater interface {
+	UpdateFields(ctx context.Context, id string, p Patch) (*Action, error)
 }
 
 // ActionDeleter deletes actions.
@@ -787,9 +1007,19 @@ type StepCreator interface {
 	Create(ctx context.Context, orgID, jobID string, step *Step) (*Step, error)
 }
 
+// StepFieldsCreator creates steps from the given attributes and relationships only.
+type StepFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, jobID string, p Patch) (*Step, error)
+}
+
 // StepUpdater updates steps.
 type StepUpdater interface {
 	Update(ctx context.Context, orgID, jobID string, step *Step) (*Step, error)
+}
+
+// StepFieldsUpdater updates only the given attributes and relationships of steps.
+type StepFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, jobID, id string, p Patch) (*Step, error)
 }
 
 // StepDeleter deletes steps.
@@ -821,9 +1051,19 @@ type ProviderCreator interface {
 	Create(ctx context.Context, orgID string, provider *Provider) (*Provider, error)
 }
 
+// ProviderFieldsCreator creates providers from the given attributes and relationships only.
+type ProviderFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Provider, error)
+}
+
 // ProviderUpdater updates providers.
 type ProviderUpdater interface {
 	Update(ctx context.Context, orgID string, provider *Provider) (*Provider, error)
+}
+
+// ProviderFieldsUpdater updates only the given attributes and relationships of providers.
+type ProviderFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Provider, error)
 }
 
 // ProviderDeleter deletes providers.
@@ -855,9 +1095,19 @@ type ProviderVersionCreator interface {
 	Create(ctx context.Context, orgID, providerID string, version *ProviderVersion) (*ProviderVersion, error)
 }
 
+// ProviderVersionFieldsCreator creates provider versions from the given attributes and relationships only.
+type ProviderVersionFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, providerID string, p Patch) (*ProviderVersion, error)
+}
+
 // ProviderVersionUpdater updates provider versions.
 type ProviderVersionUpdater interface {
 	Update(ctx context.Context, orgID, providerID string, version *ProviderVersion) (*ProviderVersion, error)
+}
+
+// ProviderVersionFieldsUpdater updates only the given attributes and relationships of provider versions.
+type ProviderVersionFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, providerID, id string, p Patch) (*ProviderVersion, error)
 }
 
 // ProviderVersionDeleter deletes provider versions.
@@ -889,9 +1139,19 @@ type ImplementationCreator interface {
 	Create(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error)
 }
 
+// ImplementationFieldsCreator creates implementations from the given attributes and relationships only.
+type ImplementationFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, providerID, versionID string, p Patch) (*Implementation, error)
+}
+
 // ImplementationUpdater updates implementations.
 type ImplementationUpdater interface {
 	Update(ctx context.Context, orgID, providerID, versionID string, impl *Implementation) (*Implementation, error)
+}
+
+// ImplementationFieldsUpdater updates only the given attributes and relationships of implementations.
+type ImplementationFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, providerID, versionID, id string, p Patch) (*Implementation, error)
 }
 
 // ImplementationDeleter deletes implementations.
@@ -923,9 +1183,19 @@ type ModuleVersionCreator interface {
 	Create(ctx context.Context, orgID, moduleID string, version *ModuleVersion) (*ModuleVersion, error)
 }
 
+// ModuleVersionFieldsCreator creates module versions from the given attributes and relationships only.
+type ModuleVersionFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, moduleID string, p Patch) (*ModuleVersion, error)
+}
+
 // ModuleVersionUpdater updates module versions.
 type ModuleVersionUpdater interface {
 	Update(ctx context.Context, orgID, moduleID string, version *ModuleVersion) (*ModuleVersion, error)
+}
+
+// ModuleVersionFieldsUpdater updates only the given attributes and relationships of module versions.
+type ModuleVersionFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, moduleID, id string, p Patch) (*ModuleVersion, error)
 }
 
 // ModuleVersionDeleter deletes module versions.
@@ -957,9 +1227,19 @@ type GithubAppTokenCreator interface {
 	Create(ctx context.Context, token *GithubAppToken) (*GithubAppToken, error)
 }
 
+// GithubAppTokenFieldsCreator creates GitHub App tokens from the given attributes and relationships only.
+type GithubAppTokenFieldsCreator interface {
+	CreateFields(ctx context.Context, p Patch) (*GithubAppToken, error)
+}
+
 // GithubAppTokenUpdater updates GitHub App tokens.
 type GithubAppTokenUpdater interface {
 	Update(ctx context.Context, token *GithubAppToken) (*GithubAppToken, error)
+}
+
+// GithubAppTokenFieldsUpdater updates only the given attributes and relationships of GitHub App tokens.
+type GithubAppTokenFieldsUpdater interface {
+	UpdateFields(ctx context.Context, id string, p Patch) (*GithubAppToken, error)
 }
 
 // GithubAppTokenDeleter deletes GitHub App tokens.
@@ -991,9 +1271,19 @@ type AddressCreator interface {
 	Create(ctx context.Context, orgID, jobID string, address *Address) (*Address, error)
 }
 
+// AddressFieldsCreator creates addresses from the given attributes and relationships only.
+type AddressFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, jobID string, p Patch) (*Address, error)
+}
+
 // AddressUpdater updates addresses.
 type AddressUpdater interface {
 	Update(ctx context.Context, orgID, jobID string, address *Address) (*Address, error)
+}
+
+// AddressFieldsUpdater updates only the given attributes and relationships of addresses.
+type AddressFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, jobID, id string, p Patch) (*Address, error)
 }
 
 // AddressDeleter deletes addresses.
@@ -1025,9 +1315,19 @@ type ProjectCreator interface {
 	Create(ctx context.Context, orgID string, project *Project) (*Project, error)
 }
 
+// ProjectFieldsCreator creates projects from the given attributes and relationships only.
+type ProjectFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*Project, error)
+}
+
 // ProjectUpdater updates projects.
 type ProjectUpdater interface {
 	Update(ctx context.Context, orgID string, project *Project) (*Project, error)
+}
+
+// ProjectFieldsUpdater updates only the given attributes and relationships of projects.
+type ProjectFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Project, error)
 }
 
 // ProjectDeleter deletes projects.
@@ -1059,9 +1359,19 @@ type ProjectAccessCreator interface {
 	Create(ctx context.Context, orgID, projectID string, access *ProjectAccess) (*ProjectAccess, error)
 }
 
+// ProjectAccessFieldsCreator creates project access rules from the given attributes and relationships only.
+type ProjectAccessFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, projectID string, p Patch) (*ProjectAccess, error)
+}
+
 // ProjectAccessUpdater updates project access rules.
 type ProjectAccessUpdater interface {
 	Update(ctx context.Context, orgID, projectID string, access *ProjectAccess) (*ProjectAccess, error)
+}
+
+// ProjectAccessFieldsUpdater updates only the given attributes and relationships of project access rules.
+type ProjectAccessFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, projectID, id string, p Patch) (*ProjectAccess, error)
 }
 
 // ProjectAccessDeleter deletes project access rules.
@@ -1093,9 +1403,19 @@ type FederatedCreator interface {
 	Create(ctx context.Context, fed *Federated) (*Federated, error)
 }
 
+// FederatedFieldsCreator creates federated identity configurations from the given attributes and relationships only.
+type FederatedFieldsCreator interface {
+	CreateFields(ctx context.Context, p Patch) (*Federated, error)
+}
+
 // FederatedUpdater updates federated identity configurations.
 type FederatedUpdater interface {
 	Update(ctx context.Context, fed *Federated) (*Federated, error)
+}
+
+// FederatedFieldsUpdater updates only the given attributes and relationships of federated identity configurations.
+type FederatedFieldsUpdater interface {
+	UpdateFields(ctx context.Context, id string, p Patch) (*Federated, error)
 }
 
 // FederatedDeleter deletes federated identity configurations.
@@ -1127,9 +1447,19 @@ type FederatedClaimCreator interface {
 	Create(ctx context.Context, federatedID string, claim *FederatedClaim) (*FederatedClaim, error)
 }
 
+// FederatedClaimFieldsCreator creates federated claims from the given attributes and relationships only.
+type FederatedClaimFieldsCreator interface {
+	CreateFields(ctx context.Context, federatedID string, p Patch) (*FederatedClaim, error)
+}
+
 // FederatedClaimUpdater updates federated claims.
 type FederatedClaimUpdater interface {
 	Update(ctx context.Context, federatedID string, claim *FederatedClaim) (*FederatedClaim, error)
+}
+
+// FederatedClaimFieldsUpdater updates only the given attributes and relationships of federated claims.
+type FederatedClaimFieldsUpdater interface {
+	UpdateFields(ctx context.Context, federatedID, id string, p Patch) (*FederatedClaim, error)
 }
 
 // FederatedClaimDeleter deletes federated claims.
@@ -1171,14 +1501,29 @@ type NotificationConfigurationCreator interface {
 	Create(ctx context.Context, orgID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
 }
 
+// NotificationConfigurationFieldsCreator creates organization-level notification configurations from the given attributes and relationships only.
+type NotificationConfigurationFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*NotificationConfiguration, error)
+}
+
 // NotificationConfigurationWorkspaceCreator creates workspace-level notification configurations.
 type NotificationConfigurationWorkspaceCreator interface {
 	CreateForWorkspace(ctx context.Context, orgID, workspaceID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
 }
 
+// NotificationConfigurationWorkspaceFieldsCreator creates workspace-level notification configurations from the given attributes and relationships only.
+type NotificationConfigurationWorkspaceFieldsCreator interface {
+	CreateForWorkspaceFields(ctx context.Context, orgID, workspaceID string, p Patch) (*NotificationConfiguration, error)
+}
+
 // NotificationConfigurationUpdater updates notification configurations.
 type NotificationConfigurationUpdater interface {
 	Update(ctx context.Context, orgID string, config *NotificationConfiguration) (*NotificationConfiguration, error)
+}
+
+// NotificationConfigurationFieldsUpdater updates only the given attributes and relationships of notification configurations.
+type NotificationConfigurationFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*NotificationConfiguration, error)
 }
 
 // NotificationConfigurationDeleter deletes notification configurations.
@@ -1212,9 +1557,19 @@ type NotificationTriggerCreator interface {
 	Create(ctx context.Context, orgID, configID string, trigger *NotificationTrigger) (*NotificationTrigger, error)
 }
 
+// NotificationTriggerFieldsCreator creates notification triggers from the given attributes and relationships only.
+type NotificationTriggerFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, configID string, p Patch) (*NotificationTrigger, error)
+}
+
 // NotificationTriggerUpdater updates notification triggers.
 type NotificationTriggerUpdater interface {
 	Update(ctx context.Context, orgID, configID string, trigger *NotificationTrigger) (*NotificationTrigger, error)
+}
+
+// NotificationTriggerFieldsUpdater updates only the given attributes and relationships of notification triggers.
+type NotificationTriggerFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, configID, id string, p Patch) (*NotificationTrigger, error)
 }
 
 // NotificationTriggerDeleter deletes notification triggers.
@@ -1246,9 +1601,19 @@ type PolicyAttachmentCreator interface {
 	Create(ctx context.Context, orgID, policySetID string, entity *PolicyAttachment) (*PolicyAttachment, error)
 }
 
+// PolicyAttachmentFieldsCreator creates policy attachments from the given attributes and relationships only.
+type PolicyAttachmentFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, policySetID string, p Patch) (*PolicyAttachment, error)
+}
+
 // PolicyAttachmentUpdater updates policy attachments.
 type PolicyAttachmentUpdater interface {
 	Update(ctx context.Context, orgID, policySetID string, entity *PolicyAttachment) (*PolicyAttachment, error)
+}
+
+// PolicyAttachmentFieldsUpdater updates only the given attributes and relationships of policy attachments.
+type PolicyAttachmentFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, policySetID, id string, p Patch) (*PolicyAttachment, error)
 }
 
 // PolicyAttachmentDeleter deletes policy attachments.
@@ -1290,9 +1655,19 @@ type PolicyExemptionCreator interface {
 	Create(ctx context.Context, orgID string, entity *PolicyExemption) (*PolicyExemption, error)
 }
 
+// PolicyExemptionFieldsCreator creates policy exemptions from the given attributes and relationships only.
+type PolicyExemptionFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*PolicyExemption, error)
+}
+
 // PolicyExemptionUpdater updates policy exemptions.
 type PolicyExemptionUpdater interface {
 	Update(ctx context.Context, orgID string, entity *PolicyExemption) (*PolicyExemption, error)
+}
+
+// PolicyExemptionFieldsUpdater updates only the given attributes and relationships of policy exemptions.
+type PolicyExemptionFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*PolicyExemption, error)
 }
 
 // PolicyExemptionDeleter deletes policy exemptions.
@@ -1319,9 +1694,19 @@ type PolicyOverrideCreator interface {
 	Create(ctx context.Context, orgID, jobID, policyEvaluationID string, entity *PolicyOverride) (*PolicyOverride, error)
 }
 
+// PolicyOverrideFieldsCreator creates policy overrides from the given attributes and relationships only.
+type PolicyOverrideFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, jobID, policyEvaluationID string, p Patch) (*PolicyOverride, error)
+}
+
 // PolicyOverrideUpdater updates policy overrides.
 type PolicyOverrideUpdater interface {
 	Update(ctx context.Context, orgID, jobID, policyEvaluationID string, entity *PolicyOverride) (*PolicyOverride, error)
+}
+
+// PolicyOverrideFieldsUpdater updates only the given attributes and relationships of policy overrides.
+type PolicyOverrideFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, jobID, policyEvaluationID, id string, p Patch) (*PolicyOverride, error)
 }
 
 // PolicySetLister lists policy sets.
@@ -1339,9 +1724,19 @@ type PolicySetCreator interface {
 	Create(ctx context.Context, orgID string, entity *PolicySet) (*PolicySet, error)
 }
 
+// PolicySetFieldsCreator creates policy sets from the given attributes and relationships only.
+type PolicySetFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID string, p Patch) (*PolicySet, error)
+}
+
 // PolicySetUpdater updates policy sets.
 type PolicySetUpdater interface {
 	Update(ctx context.Context, orgID string, entity *PolicySet) (*PolicySet, error)
+}
+
+// PolicySetFieldsUpdater updates only the given attributes and relationships of policy sets.
+type PolicySetFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, id string, p Patch) (*PolicySet, error)
 }
 
 // PolicySetDeleter deletes policy sets.
@@ -1373,9 +1768,19 @@ type PolicySetParameterCreator interface {
 	Create(ctx context.Context, orgID, policySetID string, entity *PolicySetParameter) (*PolicySetParameter, error)
 }
 
+// PolicySetParameterFieldsCreator creates policy set parameters from the given attributes and relationships only.
+type PolicySetParameterFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, policySetID string, p Patch) (*PolicySetParameter, error)
+}
+
 // PolicySetParameterUpdater updates policy set parameters.
 type PolicySetParameterUpdater interface {
 	Update(ctx context.Context, orgID, policySetID string, entity *PolicySetParameter) (*PolicySetParameter, error)
+}
+
+// PolicySetParameterFieldsUpdater updates only the given attributes and relationships of policy set parameters.
+type PolicySetParameterFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, policySetID, id string, p Patch) (*PolicySetParameter, error)
 }
 
 // PolicySetParameterDeleter deletes policy set parameters.
@@ -1407,9 +1812,19 @@ type RunTriggerCreator interface {
 	Create(ctx context.Context, orgID, workspaceID string, entity *RunTrigger) (*RunTrigger, error)
 }
 
+// RunTriggerFieldsCreator creates run triggers from the given attributes and relationships only.
+type RunTriggerFieldsCreator interface {
+	CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*RunTrigger, error)
+}
+
 // RunTriggerUpdater updates run triggers.
 type RunTriggerUpdater interface {
 	Update(ctx context.Context, orgID, workspaceID string, entity *RunTrigger) (*RunTrigger, error)
+}
+
+// RunTriggerFieldsUpdater updates only the given attributes and relationships of run triggers.
+type RunTriggerFieldsUpdater interface {
+	UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*RunTrigger, error)
 }
 
 // RunTriggerDeleter deletes run triggers.

@@ -55,6 +55,21 @@ func (s *CollectionReferenceService) Create(ctx context.Context, orgID, collecti
 	return s.create(ctx, path, ref)
 }
 
+// CreateFields creates a new reference in the given collection, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or collectionID is empty and a *APIError on server errors.
+func (s *CollectionReferenceService) CreateFields(ctx context.Context, orgID, collectionID string, p Patch) (*CollectionReference, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("collectionID", collectionID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "collection", collectionID, "reference")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing collection reference using the flat endpoint.
 // The reference's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
@@ -67,6 +82,18 @@ func (s *CollectionReferenceService) Update(ctx context.Context, ref *Collection
 
 	path := s.client.apiPath("reference", ref.ID)
 	return s.update(ctx, path, ref)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the collection reference
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *CollectionReferenceService) UpdateFields(ctx context.Context, id string, p Patch) (*CollectionReference, error) {
+	if err := validateID("referenceID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("reference", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a collection reference by ID using the flat endpoint.

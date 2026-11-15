@@ -64,6 +64,21 @@ func (s *ProviderVersionService) Create(ctx context.Context, orgID, providerID s
 	return s.create(ctx, path, version)
 }
 
+// CreateFields creates a new version for the given provider, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or providerID is empty and a *APIError on server errors.
+func (s *ProviderVersionService) CreateFields(ctx context.Context, orgID, providerID string, p Patch) (*ProviderVersion, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("providerID", providerID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider", providerID, "version")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing provider version. The version's ID field must be set.
 // It returns a *ValidationError if orgID, providerID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -81,6 +96,24 @@ func (s *ProviderVersionService) Update(ctx context.Context, orgID, providerID s
 
 	path := s.client.apiPath("organization", orgID, "provider", providerID, "version", version.ID)
 	return s.update(ctx, path, version)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the provider version
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, providerID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ProviderVersionService) UpdateFields(ctx context.Context, orgID, providerID, id string, p Patch) (*ProviderVersion, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("providerID", providerID); err != nil {
+		return nil, err
+	}
+	if err := validateID("versionID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider", providerID, "version", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a provider version by ID.

@@ -55,6 +55,18 @@ func (s *ProviderService) Create(ctx context.Context, orgID string, provider *Pr
 	return s.create(ctx, path, provider)
 }
 
+// CreateFields creates a new provider in the given organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *ProviderService) CreateFields(ctx context.Context, orgID string, p Patch) (*Provider, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing provider. The provider's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -69,6 +81,21 @@ func (s *ProviderService) Update(ctx context.Context, orgID string, provider *Pr
 
 	path := s.client.apiPath("organization", orgID, "provider", provider.ID)
 	return s.update(ctx, path, provider)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the provider
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ProviderService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Provider, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("providerID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a provider by ID.

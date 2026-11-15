@@ -67,6 +67,21 @@ func (s *StepService) Create(ctx context.Context, orgID, jobID string, step *Ste
 	return s.create(ctx, path, step)
 }
 
+// CreateFields creates a new step in the given job, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or jobID is empty and a *APIError on server errors.
+func (s *StepService) CreateFields(ctx context.Context, orgID, jobID string, p Patch) (*Step, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "step")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing step. The step's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -84,6 +99,24 @@ func (s *StepService) Update(ctx context.Context, orgID, jobID string, step *Ste
 
 	path := s.client.apiPath("organization", orgID, "job", jobID, "step", step.ID)
 	return s.update(ctx, path, step)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the step
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, jobID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *StepService) UpdateFields(ctx context.Context, orgID, jobID, id string, p Patch) (*Step, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+	if err := validateID("stepID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "step", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a step by ID.

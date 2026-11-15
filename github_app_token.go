@@ -49,6 +49,14 @@ func (s *GithubAppTokenService) Create(ctx context.Context, token *GithubAppToke
 	return s.create(ctx, path, token)
 }
 
+// CreateFields creates a new GitHub App token, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *APIError on server errors.
+func (s *GithubAppTokenService) CreateFields(ctx context.Context, p Patch) (*GithubAppToken, error) {
+	path := s.client.apiPath("github_app_token")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing GitHub App token. The token's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -60,6 +68,18 @@ func (s *GithubAppTokenService) Update(ctx context.Context, token *GithubAppToke
 
 	path := s.client.apiPath("github_app_token", token.ID)
 	return s.update(ctx, path, token)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the GitHub App token
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *GithubAppTokenService) UpdateFields(ctx context.Context, id string, p Patch) (*GithubAppToken, error) {
+	if err := validateID("githubAppTokenID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("github_app_token", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a GitHub App token by ID.

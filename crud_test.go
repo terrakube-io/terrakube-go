@@ -627,6 +627,8 @@ func TestNewClient_FilterKeys(t *testing.T) {
 	skipFields := map[string]bool{
 		"TeamTokens": true,
 		"Operations": true,
+		"State":      true,
+		"Outputs":    true,
 	}
 
 	// Private fields on Client that aren't services.
