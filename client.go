@@ -9,12 +9,14 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"math"
 	"net/http"
 	"net/url"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/jsonapi"
 )
@@ -45,7 +47,7 @@ func (c *Client) doList[T any](req *http.Request) ([]*T, *pageInfo, error) {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, nil, c.parseAPIError(req, resp.StatusCode, bodyBytes)
+		return nil, nil, c.parseAPIError(req, resp, bodyBytes)
 	}
 
 	if len(bodyBytes) == 0 {
@@ -164,6 +166,7 @@ type Client struct {
 	RunTriggers                *RunTriggerService
 	State                      *StateService
 	Outputs                    *OutputService
+	StepLogs                   *StepLogService
 }
 
 // Option configures a Client.
@@ -326,6 +329,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.RunTriggers = &RunTriggerService{client: c, filterKey: "filter[runTrigger]"}
 	c.State = &StateService{client: c}
 	c.Outputs = &OutputService{client: c}
+	c.StepLogs = &StepLogService{client: c}
 
 	return c, nil
 }
@@ -403,7 +407,7 @@ func (c *Client) do(req *http.Request, v any) (*http.Response, error) { //nolint
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return resp, c.parseAPIError(req, resp.StatusCode, bodyBytes)
+		return resp, c.parseAPIError(req, resp, bodyBytes)
 	}
 
 	if v != nil && len(bodyBytes) > 0 {
@@ -459,7 +463,7 @@ func (c *Client) doRaw(req *http.Request, v any) (*http.Response, error) { //nol
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return resp, c.parseAPIError(req, resp.StatusCode, bodyBytes)
+		return resp, c.parseAPIError(req, resp, bodyBytes)
 	}
 
 	if v != nil && len(bodyBytes) > 0 {
@@ -473,12 +477,13 @@ func (c *Client) doRaw(req *http.Request, v any) (*http.Response, error) { //nol
 
 // parseAPIError constructs an APIError from an HTTP response, parsing
 // structured error details from the response body when possible.
-func (c *Client) parseAPIError(req *http.Request, statusCode int, body []byte) *APIError {
+func (c *Client) parseAPIError(req *http.Request, resp *http.Response, body []byte) *APIError {
 	apiErr := &APIError{
-		StatusCode: statusCode,
+		StatusCode: resp.StatusCode,
 		Method:     req.Method,
 		Path:       req.URL.Path,
 		Body:       body,
+		RetryAfter: retryAfter(resp.Header.Get("Retry-After")),
 	}
 	var errResp struct {
 		Errors []ErrorDetail `json:"errors"`
@@ -497,6 +502,24 @@ func (c *Client) parseAPIError(req *http.Request, statusCode int, body []byte) *
 		}
 	}
 	return apiErr
+}
+
+// retryAfter parses a Retry-After header value, in seconds or as an HTTP date,
+// into a wait. It returns 0 for an empty, invalid or past value.
+func retryAfter(v string) time.Duration {
+	if v == "" {
+		return 0
+	}
+	if secs, err := strconv.ParseInt(v, 10, 64); err == nil {
+		if secs <= 0 || secs > int64(math.MaxInt64/time.Second) {
+			return 0
+		}
+		return time.Duration(secs) * time.Second
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		return max(time.Until(t), 0)
+	}
+	return 0
 }
 
 // validateID checks that a resource ID is not empty and is a single path
@@ -556,7 +579,7 @@ func (c *Client) streamURL(ctx context.Context, method string, u *url.URL, hdr h
 		if err != nil {
 			return nil, fmt.Errorf("reading response body: %w", err)
 		}
-		return nil, c.parseAPIError(req, resp.StatusCode, body)
+		return nil, c.parseAPIError(req, resp, body)
 	}
 	return resp, nil
 }

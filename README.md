@@ -73,6 +73,23 @@ ws, err := client.Workspaces.UpdateFields(ctx, orgID, wsID, terrakube.Patch{
 
 `ListOptions.Page` and `PageSize` return one page. The server accepts them only for those seven types (verified on Terrakube 2.34.1); for every other resource type `List` returns a `*ValidationError` without sending a request.
 
+### Step logs
+
+`StepLogs.Get` returns a step's log as a stream; while the step runs, it is the output so far. `StepLogOptions.Offset` reads from a byte offset on, and `StepLog.Incomplete` reports a log the server marked as incomplete. `StepLogs.Follow` reads a running step's log as it is written and calls your function for each output event:
+
+```go
+err := client.StepLogs.Follow(ctx, orgID, jobID, stepID, nil, func(e terrakube.StepLogEvent) error {
+    if e.Gap != nil {
+        // The stream skipped output: read the whole log with StepLogs.Get.
+        return nil
+    }
+    fmt.Println(e.Data)
+    return nil
+})
+```
+
+`Follow` returns nil when the job is complete. It reconnects after the server rotates the stream, a dropped connection or a 429/5xx answer (honouring `Retry-After`), resuming after the last event it delivered, and gives up after `StepLogFollowOptions.MaxFailures` failed connection attempts in a row (5 by default). `StepLogFollowOptions.LastEventID` resumes from an event ID you saved.
+
 ## Supported Resources
 
 | Resource | Service Field | Scope |
@@ -122,6 +139,7 @@ ws, err := client.Workspaces.UpdateFields(ctx, orgID, wsID, terrakube.Patch{
 | Run Trigger | `RunTriggers` | Workspace |
 | State | `State` | Workspace (state files, not JSON:API) |
 | Output | `Outputs` | Workspace (read from the state) |
+| Step Log | `StepLogs` | Step (logs, not JSON:API) |
 
 ## API Version
 

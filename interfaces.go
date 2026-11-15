@@ -1841,6 +1841,16 @@ type RunTriggerCRUD interface {
 	RunTriggerDeleter
 }
 
+// StepLogGetter reads the log of a job step.
+type StepLogGetter interface {
+	Get(ctx context.Context, orgID, jobID, stepID string, opts *StepLogOptions) (*StepLog, error)
+}
+
+// StepLogFollower follows the log of a job step as it is written.
+type StepLogFollower interface {
+	Follow(ctx context.Context, orgID, jobID, stepID string, opts *StepLogFollowOptions, fn func(StepLogEvent) error) error
+}
+
 // Compile-time interface satisfaction checks.
 var (
 	_ OrganizationCRUD              = (*OrganizationService)(nil)
@@ -1890,4 +1900,6 @@ var (
 	_ PolicySetCRUD                 = (*PolicySetService)(nil)
 	_ PolicySetParameterCRUD        = (*PolicySetParameterService)(nil)
 	_ RunTriggerCRUD                = (*RunTriggerService)(nil)
+	_ StepLogGetter                 = (*StepLogService)(nil)
+	_ StepLogFollower               = (*StepLogService)(nil)
 )

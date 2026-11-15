@@ -6,6 +6,14 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-15
+
+### Added
+
+- **`StepLogs` service** for job step logs. `Get` returns a step's log (the output so far while the step runs); `StepLogOptions.Offset` reads from a byte offset on with a `Range` request, and `StepLog.Incomplete` reports the server's `X-Terrakube-Output-Incomplete` mark. `Follow` reads the log's Server-Sent Events as they are written and calls a function for each output event and each gap (output the server could not replay; read it with `Get`). It returns nil when the job is complete and reconnects with `Last-Event-ID` after the server rotates the stream, a dropped connection or a 429/5xx answer, without delivering an event twice; it gives up after `StepLogFollowOptions.MaxFailures` failed attempts in a row. The interfaces are `StepLogGetter` and `StepLogFollower`.
+- `APIError.RetryAfter` holds the wait a `Retry-After` header asked for, such as on a 503.
+- `ErrUnsupported` also matches a missing route on `/tfoutput/v1/organization/{org}/job/{job}/step/{step}`. An unknown job or step there is a plain 404 and does not match.
+
 ## [1.1.0] - 2026-11-15
 
 ### Added
@@ -67,6 +75,7 @@ Targets Terrakube API 2.34.1.
 
 - `Update` sends every attribute of the struct, so start from the result of `Get`. This is now stated on every `Update` method, in the package documentation and in the README.
 
-[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/terrakube-io/terrakube-go/compare/v0.5.0...v1.0.0

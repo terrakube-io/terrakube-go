@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // ErrUnsupported is matched with errors.Is against an error from the API. It
@@ -14,8 +15,9 @@ import (
 // endpoint, as an older Terrakube release does:
 //   - a JSON:API 404 whose detail starts with "Unknown collection";
 //   - a 404 or 405 from one of these raw endpoint families, when the body is
-//     not an entity-not-found error: /tfoutput/v1/.../stream, /pat/v1,
-//     /notification/v1/..., /access-token/v1/teams/current-teams,
+//     not an entity-not-found error: /tfoutput/v1/.../step/{id},
+//     /tfoutput/v1/.../stream, /pat/v1, /notification/v1/...,
+//     /access-token/v1/teams/current-teams,
 //     /access-token/v1/teams/permissions/..., /vcs/v1/{id}/groups,
 //     /vcs/v1/{id}/repositories, /importer/tfcloud/..., /migrate/v1/...,
 //     /admin/v1/scheduler/reconciliation, /policy/v1/.../evaluation,
@@ -29,6 +31,7 @@ var ErrUnsupported = errors.New("terrakube: not supported by this server")
 // unsupportedFamilies are the raw endpoint paths on which a missing route
 // means the server lacks the endpoint. Any endpoint path prefix comes first.
 var unsupportedFamilies = regexp.MustCompile(`^(?:/.*)?(?:` + strings.Join([]string{
+	`/tfoutput/v1/organization/[^/]+/job/[^/]+/step/[^/]+`,
 	`/tfoutput/v1/.+/stream`,
 	`/pat/v1/?`,
 	`/notification/v1/.*`,
@@ -50,6 +53,10 @@ type APIError struct {
 	Path       string
 	Body       []byte
 	Errors     []ErrorDetail
+
+	// RetryAfter is the wait the server asked for in a Retry-After header
+	// (with a 503 or 429), or 0 when it sent none.
+	RetryAfter time.Duration
 }
 
 // ErrorDetail represents a single error entry in a JSON:API error response.
