@@ -23,3 +23,6 @@ func (c *Client) RequestStream(ctx context.Context, method, path string, hdr htt
 func (c *Client) RequestStreamURL(ctx context.Context, method, rawURL string, hdr http.Header) (*http.Response, error) {
 	return c.requestStreamURL(ctx, method, rawURL, hdr)
 }
+
+// DefaultStepLogBackoff is defaultStepLogBackoff.
+var DefaultStepLogBackoff = defaultStepLogBackoff
