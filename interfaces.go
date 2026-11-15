@@ -1841,6 +1841,43 @@ type RunTriggerCRUD interface {
 	RunTriggerDeleter
 }
 
+// PATLister lists the caller's personal access tokens.
+type PATLister interface {
+	List(ctx context.Context) ([]*PAT, error)
+}
+
+// PATCreator creates personal access tokens.
+type PATCreator interface {
+	Create(ctx context.Context, days int, description string) (*PATCreated, error)
+}
+
+// PATDeleter revokes personal access tokens.
+type PATDeleter interface {
+	Delete(ctx context.Context, id string) error
+}
+
+// PATCRUD combines all personal access token operations.
+type PATCRUD interface {
+	PATLister
+	PATCreator
+	PATDeleter
+}
+
+// CurrentTeamsLister lists the groups the caller belongs to.
+type CurrentTeamsLister interface {
+	CurrentTeams(ctx context.Context) ([]string, error)
+}
+
+// PermissionsGetter reads the caller's permissions in an organization.
+type PermissionsGetter interface {
+	Permissions(ctx context.Context, orgID string) (*Permissions, error)
+}
+
+// WorkspacePermissionsGetter reads the caller's permissions in a workspace.
+type WorkspacePermissionsGetter interface {
+	WorkspacePermissions(ctx context.Context, orgID, wsID string) (*Permissions, error)
+}
+
 // StepLogGetter reads the log of a job step.
 type StepLogGetter interface {
 	Get(ctx context.Context, orgID, jobID, stepID string, opts *StepLogOptions) (*StepLog, error)
@@ -1902,4 +1939,8 @@ var (
 	_ RunTriggerCRUD                = (*RunTriggerService)(nil)
 	_ StepLogGetter                 = (*StepLogService)(nil)
 	_ StepLogFollower               = (*StepLogService)(nil)
+	_ PATCRUD                       = (*PATService)(nil)
+	_ CurrentTeamsLister            = (*AccessService)(nil)
+	_ PermissionsGetter             = (*AccessService)(nil)
+	_ WorkspacePermissionsGetter    = (*AccessService)(nil)
 )
