@@ -298,3 +298,25 @@ func (s *WebhookEventService) Delete(ctx context.Context, orgID, workspaceID, we
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "webhook", webhookID, "events", eventID)
 	return s.del(ctx, path)
 }
+
+// GetByID retrieves a webhook by its ID alone, from the top-level /webhook/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *WebhookService) GetByID(ctx context.Context, id string) (*Webhook, error) {
+	if err := validateID("webhookID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("webhook", id))
+}
+
+// GetByID retrieves a webhook event by its ID alone, from the top-level /webhook_event/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *WebhookEventService) GetByID(ctx context.Context, id string) (*WebhookEvent, error) {
+	if err := validateID("eventID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("webhook_event", id))
+}

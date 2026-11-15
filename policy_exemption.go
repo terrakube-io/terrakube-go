@@ -120,3 +120,36 @@ func (s *PolicyExemptionService) Delete(ctx context.Context, orgID, policyExempt
 	path := s.client.apiPath("organization", orgID, "policyExemption", policyExemptionID)
 	return s.del(ctx, path)
 }
+
+// GetByID retrieves a policy exemption by its ID alone, from the top-level /policy_exemption/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *PolicyExemptionService) GetByID(ctx context.Context, id string) (*PolicyExemption, error) {
+	if err := validateID("policyExemptionID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("policy_exemption", id))
+}
+
+// UpdateFieldsByID modifies only the attributes and relationships set in p on the policy exemption
+// with the given id, through the top-level /policy_exemption/{id} path; a Relationship with a nil ID
+// clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicyExemptionService) UpdateFieldsByID(ctx context.Context, id string, p Patch) (*PolicyExemption, error) {
+	if err := validateID("policyExemptionID", id); err != nil {
+		return nil, err
+	}
+
+	return s.updateFields(ctx, s.client.apiPath("policy_exemption", id), id, p)
+}
+
+// DeleteByID removes the policy exemption with the given id through the top-level /policy_exemption/{id} path.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *PolicyExemptionService) DeleteByID(ctx context.Context, id string) error {
+	if err := validateID("policyExemptionID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("policy_exemption", id))
+}

@@ -37,6 +37,7 @@ TeamToken uses `/access-token/v1/teams` with standard JSON. Uses `requestRaw`/`d
 - `testutil/` MUST NOT import the main `terrakube` package (avoids import cycles)
 - Each `_test.go` covers: CRUD success, error responses, empty ID validation, boolean serialization, auth headers
 - `crud_test.go` validates the generic base once so per-resource tests can be thin
+- `by_id_test.go` covers, table-driven, the methods that address a resource on its top-level path (`*ByID`, `*ByPolicySet`, `*ByConfiguration`, `CreateFieldsTopLevel`) across services
 
 ## Known patterns to follow
 

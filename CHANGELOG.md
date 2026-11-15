@@ -6,6 +6,16 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+### Added
+
+- **Methods that address a resource by its own ID** on the server's top-level paths, for callers that do not know its organization or workspace (for example a Terraform resource imported by ID). Each method that takes an ID returns a `*ValidationError` when it is empty.
+  - `RunTriggers.CreateFieldsTopLevel`, `GetByID`, `UpdateFieldsByID` and `DeleteByID` on `/runTrigger[/{id}]`.
+  - `Webhooks.GetByID`, `WebhookEvents.GetByID` and `Workspaces.GetByID` on `/webhook/{id}`, `/webhook_event/{id}` and `/workspace/{id}`. A webhook's `Workspace` and a workspace's `Organization` relationship then give the parent IDs.
+  - `PolicySets`, `PolicyExemptions` and `NotificationConfigurations`: `GetByID`, `UpdateFieldsByID` and `DeleteByID` on `/policy_set/{id}`, `/policy_exemption/{id}` and `/notification_configuration/{id}`. The last also serves workspace-level configurations.
+  - `PolicySetParameters` and `PolicyAttachments`: `ListByPolicySet`, `GetByPolicySet`, `CreateFieldsByPolicySet`, `UpdateFieldsByPolicySet` and `DeleteByPolicySet` on `/policy_set/{id}/parameters` and `/policy_set/{id}/attachments`.
+  - `NotificationTriggers.ListByConfiguration`, `CreateFieldsByConfiguration` and `DeleteByConfiguration` on `/notification_configuration/{id}/triggers`.
+  - Each method has its own interface, next to the resource's other interfaces: `<Resource>ByIDGetter`, `<Resource>ByIDFieldsUpdater` and `<Resource>ByIDDeleter`, `RunTriggerTopLevelFieldsCreator`, `PolicySetParameterByPolicySetLister` (and `Getter`, `FieldsCreator`, `FieldsUpdater`, `Deleter`), the same for `PolicyAttachment`, and `NotificationTriggerByConfigurationLister`, `FieldsCreator` and `Deleter`.
+
 ## [1.3.0] - 2026-11-15
 
 ### Added

@@ -137,3 +137,68 @@ func (s *PolicyAttachmentService) Delete(ctx context.Context, orgID, policySetID
 	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "attachments", policyAttachmentID)
 	return s.del(ctx, path)
 }
+
+// ListByPolicySet returns the policy attachments of a policy set, from the top-level
+// /policy_set/{id}/attachments path, for callers that do not know its organization.
+// It returns a *ValidationError if policySetID is empty and a *APIError on server errors.
+func (s *PolicyAttachmentService) ListByPolicySet(ctx context.Context, policySetID string, opts *ListOptions) ([]*PolicyAttachment, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	return s.list(ctx, s.client.apiPath("policy_set", policySetID, "attachments"), opts)
+}
+
+// GetByPolicySet retrieves a policy attachment of a policy set from the top-level
+// /policy_set/{id}/attachments/{id} path.
+// It returns a *ValidationError if policySetID or id is empty and a *APIError on server errors.
+func (s *PolicyAttachmentService) GetByPolicySet(ctx context.Context, policySetID, id string) (*PolicyAttachment, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyAttachmentID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("policy_set", policySetID, "attachments", id))
+}
+
+// CreateFieldsByPolicySet creates a policy attachment in a policy set through the top-level
+// /policy_set/{id}/attachments path, sending only the attributes and relationships set in p.
+// It returns a *ValidationError if policySetID is empty and a *APIError on server errors.
+func (s *PolicyAttachmentService) CreateFieldsByPolicySet(ctx context.Context, policySetID string, p Patch) (*PolicyAttachment, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	return s.createFields(ctx, s.client.apiPath("policy_set", policySetID, "attachments"), p)
+}
+
+// UpdateFieldsByPolicySet modifies only the attributes and relationships set in p on a
+// policy attachment of a policy set, through the top-level /policy_set/{id}/attachments/{id} path; a Relationship with a nil ID
+// clears that link.
+// It returns a *ValidationError if policySetID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicyAttachmentService) UpdateFieldsByPolicySet(ctx context.Context, policySetID, id string, p Patch) (*PolicyAttachment, error) {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policyAttachmentID", id); err != nil {
+		return nil, err
+	}
+
+	return s.updateFields(ctx, s.client.apiPath("policy_set", policySetID, "attachments", id), id, p)
+}
+
+// DeleteByPolicySet removes a policy attachment of a policy set through the top-level
+// /policy_set/{id}/attachments/{id} path.
+// It returns a *ValidationError if policySetID or id is empty and a *APIError on server errors.
+func (s *PolicyAttachmentService) DeleteByPolicySet(ctx context.Context, policySetID, id string) error {
+	if err := validateID("policySetID", policySetID); err != nil {
+		return err
+	}
+	if err := validateID("policyAttachmentID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("policy_set", policySetID, "attachments", id))
+}

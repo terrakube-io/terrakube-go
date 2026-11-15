@@ -149,3 +149,14 @@ func (s *WorkspaceService) Delete(ctx context.Context, orgID, id string) error {
 	path := s.client.apiPath("organization", orgID, "workspace", id)
 	return s.del(ctx, path)
 }
+
+// GetByID retrieves a workspace by its ID alone, from the top-level /workspace/{id} path,
+// for callers that do not know its parent resources.
+// It returns a *ValidationError if id is empty and a *APIError on server errors.
+func (s *WorkspaceService) GetByID(ctx context.Context, id string) (*Workspace, error) {
+	if err := validateID("workspaceID", id); err != nil {
+		return nil, err
+	}
+
+	return s.get(ctx, s.client.apiPath("workspace", id))
+}

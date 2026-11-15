@@ -135,3 +135,39 @@ func (s *NotificationTriggerService) Delete(ctx context.Context, orgID, configID
 	path := s.client.apiPath("organization", orgID, "notificationConfiguration", configID, "triggers", id)
 	return s.del(ctx, path)
 }
+
+// ListByConfiguration returns the notification triggers of a notification configuration, from the top-level
+// /notification_configuration/{id}/triggers path, for callers that do not know its organization.
+// It returns a *ValidationError if configID is empty and a *APIError on server errors.
+func (s *NotificationTriggerService) ListByConfiguration(ctx context.Context, configID string, opts *ListOptions) ([]*NotificationTrigger, error) {
+	if err := validateID("notificationConfigurationID", configID); err != nil {
+		return nil, err
+	}
+
+	return s.list(ctx, s.client.apiPath("notification_configuration", configID, "triggers"), opts)
+}
+
+// CreateFieldsByConfiguration creates a notification trigger in a notification configuration through the top-level
+// /notification_configuration/{id}/triggers path, sending only the attributes and relationships set in p.
+// It returns a *ValidationError if configID is empty and a *APIError on server errors.
+func (s *NotificationTriggerService) CreateFieldsByConfiguration(ctx context.Context, configID string, p Patch) (*NotificationTrigger, error) {
+	if err := validateID("notificationConfigurationID", configID); err != nil {
+		return nil, err
+	}
+
+	return s.createFields(ctx, s.client.apiPath("notification_configuration", configID, "triggers"), p)
+}
+
+// DeleteByConfiguration removes a notification trigger of a notification configuration through the top-level
+// /notification_configuration/{id}/triggers/{id} path.
+// It returns a *ValidationError if configID or id is empty and a *APIError on server errors.
+func (s *NotificationTriggerService) DeleteByConfiguration(ctx context.Context, configID, id string) error {
+	if err := validateID("notificationConfigurationID", configID); err != nil {
+		return err
+	}
+	if err := validateID("notificationTriggerID", id); err != nil {
+		return err
+	}
+
+	return s.del(ctx, s.client.apiPath("notification_configuration", configID, "triggers", id))
+}

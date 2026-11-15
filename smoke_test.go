@@ -260,6 +260,35 @@ func TestSmoke(t *testing.T) {
 		t.Errorf("run trigger created without enabled: Enabled = false, want the server default true")
 	}
 
+	// --- top-level paths: a resource addressed by its own ID, without its parents ---
+	gotWS, err := c.Workspaces.GetByID(ctx, ws.ID)
+	must("Workspaces.GetByID", err)
+	if gotWS.Organization == nil || gotWS.Organization.ID != org.ID {
+		t.Errorf("Workspaces.GetByID organization = %+v, want %s", gotWS.Organization, org.ID)
+	}
+	gotRT, err := c.RunTriggers.GetByID(ctx, rt.ID)
+	must("RunTriggers.GetByID", err)
+	if gotRT.ID != rt.ID {
+		t.Errorf("RunTriggers.GetByID ID = %q, want %q", gotRT.ID, rt.ID)
+	}
+	gotRT, err = c.RunTriggers.UpdateFieldsByID(ctx, rt.ID, terrakube.Patch{Attributes: map[string]any{"enabled": false}})
+	must("RunTriggers.UpdateFieldsByID", err)
+	if gotRT.Enabled {
+		t.Errorf("run trigger after UpdateFieldsByID: Enabled = true, want false")
+	}
+	must("RunTriggers.DeleteByID", c.RunTriggers.DeleteByID(ctx, rt.ID))
+	if _, err := c.RunTriggers.GetByID(ctx, rt.ID); !terrakube.IsNotFound(err) {
+		t.Errorf("RunTriggers.GetByID after DeleteByID err = %v, want not found", err)
+	}
+	top, err := c.RunTriggers.CreateFieldsTopLevel(ctx, terrakube.Patch{
+		Relationships: map[string]terrakube.Relationship{
+			"sourceWorkspace":      {Type: "workspace", ID: &second.ID},
+			"destinationWorkspace": {Type: "workspace", ID: &ws.ID},
+		},
+	})
+	must("RunTriggers.CreateFieldsTopLevel", err)
+	must("RunTriggers.DeleteByID(top-level)", c.RunTriggers.DeleteByID(ctx, top.ID))
+
 	// --- state: a workspace that never ran has no current state ---
 	state, err := c.State.Current(ctx, org.ID, ws.ID)
 	switch {
