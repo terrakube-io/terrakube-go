@@ -6,6 +6,8 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-15
+
 ### Added
 
 - **Methods that address a resource by its own ID** on the server's top-level paths, for callers that do not know its organization or workspace (for example a Terraform resource imported by ID). Each method that takes an ID returns a `*ValidationError` when it is empty.
@@ -92,7 +94,8 @@ Targets Terrakube API 2.34.1.
 
 - `Update` sends every attribute of the struct, so start from the result of `Get`. This is now stated on every `Update` method, in the package documentation and in the README.
 
-[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...v1.1.0
