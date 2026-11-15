@@ -164,3 +164,55 @@ func TestNotificationTriggerService_ValidationErrors(t *testing.T) {
 	err = client.NotificationTriggers.Delete(context.Background(), "org-1", "cfg-1", "")
 	assertValidationError(t, err, "notificationTriggerID")
 }
+
+func TestNotificationTriggerService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/notificationConfiguration/config-1/triggers", "notification_trigger")
+
+	got, err := newTestClient(t, srv).NotificationTriggers.CreateFields(context.Background(), "org-1", "config-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestNotificationTriggerService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.NotificationTriggers.CreateFields(context.Background(), "", "config-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.NotificationTriggers.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "notificationConfigurationID")
+}
+
+func TestNotificationTriggerService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/notificationConfiguration/config-1/triggers/id-1", "notification_trigger")
+
+	got, err := newTestClient(t, srv).NotificationTriggers.UpdateFields(context.Background(), "org-1", "config-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestNotificationTriggerService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.NotificationTriggers.UpdateFields(context.Background(), "", "config-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.NotificationTriggers.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "notificationConfigurationID")
+	_, err = client.NotificationTriggers.UpdateFields(context.Background(), "org-1", "config-1", "", testPatch)
+	assertValidationError(t, err, "notificationTriggerID")
+}

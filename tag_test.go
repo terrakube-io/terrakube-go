@@ -298,3 +298,51 @@ func TestTagService_AuthHeader(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+func TestTagService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/tag", "tag")
+
+	got, err := newTestClient(t, srv).Tags.CreateFields(context.Background(), "org-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestTagService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Tags.CreateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}
+
+func TestTagService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/tag/id-1", "tag")
+
+	got, err := newTestClient(t, srv).Tags.UpdateFields(context.Background(), "org-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestTagService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Tags.UpdateFields(context.Background(), "", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Tags.UpdateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "tagID")
+}

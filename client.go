@@ -5,16 +5,23 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"path"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/google/jsonapi"
 )
+
+// ErrForeignHost is returned when a URL taken from server data points to a host
+// other than the configured endpoint. The token is never sent to that host.
+var ErrForeignHost = errors.New("terrakube: URL is outside the API endpoint")
 
 // pageInfo is the pagination metadata the server returns in meta.page.
 type pageInfo struct {
@@ -87,7 +94,9 @@ const (
 // the server reports no more, ordered by id; all others, and any type for
 // which the server refuses paging, are fetched in one request in the server's
 // order, so the result stops at any limit the server applies to that type.
-// Links in responses are never followed.
+// Links in responses are never followed. Sort replaces the default order; when
+// a collection is listed page by page, sort on a unique attribute, or pages
+// can overlap.
 //
 // The server accepts Page and PageSize only for some resource types: workspace,
 // workspace tag, action, federated, agent, organization variable, and workspace
@@ -98,6 +107,7 @@ type ListOptions struct {
 	Include  string // Comma-separated relationship names to sideload (e.g. "workspace,organization").
 	Page     int    // 1-indexed page number; 0 means unset.
 	PageSize int    // Items per page; 0 means unset (server default).
+	Sort     string // Sort expression (e.g. "-createdDate" for newest first); empty means the default order described above.
 }
 
 // Client manages communication with the Terrakube API.
@@ -152,6 +162,8 @@ type Client struct {
 	PolicySets                 *PolicySetService
 	PolicySetParameters        *PolicySetParameterService
 	RunTriggers                *RunTriggerService
+	State                      *StateService
+	Outputs                    *OutputService
 }
 
 // Option configures a Client.
@@ -266,6 +278,7 @@ func NewClient(opts ...Option) (*Client, error) {
 			return nil, err
 		}
 	}
+	c.httpClient = c.originBound(c.httpClient)
 
 	c.Organizations = &OrganizationService{client: c}
 	c.Workspaces = &WorkspaceService{client: c, paged: true, filterKey: "filter[workspace]"}
@@ -311,6 +324,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.PolicySets = &PolicySetService{client: c, filterKey: "filter[policy_set]"}
 	c.PolicySetParameters = &PolicySetParameterService{client: c, filterKey: "filter[policy_set_parameter]"}
 	c.RunTriggers = &RunTriggerService{client: c, filterKey: "filter[runTrigger]"}
+	c.State = &StateService{client: c}
+	c.Outputs = &OutputService{client: c}
 
 	return c, nil
 }
@@ -484,10 +499,185 @@ func (c *Client) parseAPIError(req *http.Request, statusCode int, body []byte) *
 	return apiErr
 }
 
-// validateID checks that a resource ID is not empty.
+// validateID checks that a resource ID is not empty and is a single path
+// segment, so it cannot point a request at another path.
 func validateID(field, value string) error {
-	if value == "" {
+	switch {
+	case value == "":
 		return &ValidationError{Field: field, Message: "must not be empty"}
+	case strings.Contains(value, "/"):
+		return &ValidationError{Field: field, Message: `must not contain "/"`}
+	case value == "." || value == "..":
+		return &ValidationError{Field: field, Message: `must not be "." or ".."`}
 	}
 	return nil
+}
+
+// maxErrorBody caps how much of an error response a streaming request reads.
+const maxErrorBody = 1 << 20
+
+// requestStream sends an authenticated request to reqPath on the configured
+// endpoint and returns the response without reading its body; the caller must
+// close it. hdr is added to the request headers. A non-2xx response is read,
+// closed and returned as a *APIError.
+func (c *Client) requestStream(ctx context.Context, method, reqPath string, hdr http.Header) (*http.Response, error) {
+	return c.streamURL(ctx, method, c.endpointURL(reqPath), hdr)
+}
+
+// requestStreamURL is requestStream for a URL taken from server data. It
+// returns ErrForeignHost, without sending a request, when the URL is not on the
+// configured endpoint.
+func (c *Client) requestStreamURL(ctx context.Context, method, rawURL string, hdr http.Header) (*http.Response, error) {
+	u, err := c.serverURL(rawURL)
+	if err != nil {
+		return nil, err
+	}
+	return c.streamURL(ctx, method, u, hdr)
+}
+
+// streamURL sends an authenticated request to u. The caller has checked that u
+// is on the configured endpoint.
+func (c *Client) streamURL(ctx context.Context, method string, u *url.URL, hdr http.Header) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	maps.Copy(req.Header, hdr)
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("User-Agent", c.userAgent)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		defer resp.Body.Close() //nolint:errcheck // response body close errors are inconsequential
+		body, err := io.ReadAll(io.LimitReader(resp.Body, maxErrorBody))
+		if err != nil {
+			return nil, fmt.Errorf("reading response body: %w", err)
+		}
+		return nil, c.parseAPIError(req, resp.StatusCode, body)
+	}
+	return resp, nil
+}
+
+// originBound returns a copy of hc that refuses to follow a redirect off the
+// configured endpoint, so a redirect never carries the token to another
+// scheme, host, port or path. The error from Do then wraps ErrForeignHost.
+// A redirect that stays on the endpoint goes on to hc's own CheckRedirect, or
+// to the default limit of 10 redirects. hc itself is not modified.
+func (c *Client) originBound(hc *http.Client) *http.Client {
+	bound := *hc
+	next := hc.CheckRedirect
+	bound.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if !c.redirectAllowed(req.URL) {
+			return ErrForeignHost
+		}
+		if next != nil {
+			return next(req, via)
+		}
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		return nil
+	}
+	return &bound
+}
+
+// redirectAllowed reports whether a redirect to target stays on the configured
+// endpoint. Besides the endpoint itself, an http endpoint may be upgraded to
+// https on the same host and path, as a TLS-terminating ingress does: the
+// token then travels encrypted to the host it was already sent to.
+func (c *Client) redirectAllowed(target *url.URL) bool {
+	if sameOrigin(c.baseURL, target) {
+		return true
+	}
+	if !strings.EqualFold(c.baseURL.Scheme, "http") {
+		return false
+	}
+	upgraded := *c.baseURL
+	upgraded.Scheme = "https"
+	return sameOrigin(&upgraded, target)
+}
+
+// serverURL parses a URL taken from server data and checks that it is on the
+// configured endpoint. It returns ErrForeignHost when it is not, so the token
+// is never sent elsewhere.
+func (c *Client) serverURL(rawURL string) (*url.URL, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrForeignHost, err)
+	}
+	if !sameOrigin(c.baseURL, u) {
+		return nil, ErrForeignHost
+	}
+	return u, nil
+}
+
+// sameOrigin reports whether target has the scheme, host and port of endpoint
+// and a path under the endpoint's path. Default ports are made explicit before
+// they are compared, and scheme and host are compared in ASCII only (so a
+// Unicode look-alike such as the Kelvin sign does not match "k"). A target
+// with user info, an empty segment ("//") or a "." or ".." segment (also
+// before a ";" parameter, as in "..;") is never on the endpoint, so a server
+// cannot normalise it to a path outside the endpoint's path.
+func sameOrigin(endpoint, target *url.URL) bool {
+	if endpoint == nil || target == nil || !target.IsAbs() || target.Opaque != "" || target.User != nil {
+		return false
+	}
+	if !asciiEqualFold(endpoint.Scheme, target.Scheme) ||
+		!asciiEqualFold(endpoint.Hostname(), target.Hostname()) ||
+		effectivePort(endpoint) != effectivePort(target) {
+		return false
+	}
+	if strings.Contains(target.EscapedPath(), "//") {
+		return false
+	}
+	for seg := range strings.SplitSeq(target.Path, "/") {
+		seg, _, _ = strings.Cut(seg, ";")
+		if seg == "." || seg == ".." {
+			return false
+		}
+	}
+	base := strings.TrimSuffix(path.Clean("/"+endpoint.Path), "/")
+	p := path.Clean("/" + target.Path)
+	return base == "" || p == base || strings.HasPrefix(p, base+"/")
+}
+
+// asciiEqualFold is strings.EqualFold restricted to ASCII letters: any other
+// byte must match exactly.
+func asciiEqualFold(a, b string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range len(a) {
+		x, y := a[i], b[i]
+		if 'A' <= x && x <= 'Z' {
+			x += 'a' - 'A'
+		}
+		if 'A' <= y && y <= 'Z' {
+			y += 'a' - 'A'
+		}
+		if x != y {
+			return false
+		}
+	}
+	return true
+}
+
+// effectivePort returns the port of u, or the default port of its scheme.
+func effectivePort(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		if n, err := strconv.Atoi(p); err == nil {
+			return strconv.Itoa(n)
+		}
+		return p
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http":
+		return "80"
+	case "https":
+		return "443"
+	}
+	return ""
 }

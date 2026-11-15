@@ -59,6 +59,18 @@ func (s *ProjectService) Create(ctx context.Context, orgID string, project *Proj
 	return s.create(ctx, path, project)
 }
 
+// CreateFields creates a new project within an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *ProjectService) CreateFields(ctx context.Context, orgID string, p Patch) (*Project, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "project")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing project within an organization. The project's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -73,6 +85,21 @@ func (s *ProjectService) Update(ctx context.Context, orgID string, project *Proj
 
 	path := s.client.apiPath("organization", orgID, "project", project.ID)
 	return s.update(ctx, path, project)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the project
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ProjectService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Project, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("projectID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "project", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a project by ID within an organization.

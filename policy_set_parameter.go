@@ -69,6 +69,21 @@ func (s *PolicySetParameterService) Create(ctx context.Context, orgID, policySet
 	return s.create(ctx, path, entity)
 }
 
+// CreateFields creates a new policy set parameter, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or policySetID is empty and a *APIError on server errors.
+func (s *PolicySetParameterService) CreateFields(ctx context.Context, orgID, policySetID string, p Patch) (*PolicySetParameter, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "parameters")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing policy set parameter. The policy set parameter's ID field must be set.
 // It returns a *ValidationError if orgID, policySetID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -86,6 +101,24 @@ func (s *PolicySetParameterService) Update(ctx context.Context, orgID, policySet
 
 	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "parameters", entity.ID)
 	return s.update(ctx, path, entity)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the policy set parameter
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, policySetID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *PolicySetParameterService) UpdateFields(ctx context.Context, orgID, policySetID, id string, p Patch) (*PolicySetParameter, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetID", policySetID); err != nil {
+		return nil, err
+	}
+	if err := validateID("policySetParameterID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "policySet", policySetID, "parameters", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a policy set parameter.

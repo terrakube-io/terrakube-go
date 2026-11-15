@@ -344,3 +344,55 @@ func TestStepService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Steps.Get(context.Background(), "org-1", "job-1", "step-1")
 }
+
+func TestStepService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/job/job-1/step", "step")
+
+	got, err := newTestClient(t, srv).Steps.CreateFields(context.Background(), "org-1", "job-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestStepService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Steps.CreateFields(context.Background(), "", "job-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Steps.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "jobID")
+}
+
+func TestStepService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/job/job-1/step/id-1", "step")
+
+	got, err := newTestClient(t, srv).Steps.UpdateFields(context.Background(), "org-1", "job-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestStepService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Steps.UpdateFields(context.Background(), "", "job-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Steps.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "jobID")
+	_, err = client.Steps.UpdateFields(context.Background(), "org-1", "job-1", "", testPatch)
+	assertValidationError(t, err, "stepID")
+}

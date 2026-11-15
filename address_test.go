@@ -315,3 +315,55 @@ func TestAddressService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Addresses.Get(context.Background(), "org-1", "job-1", "addr-1")
 }
+
+func TestAddressService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/job/job-1/address", "address")
+
+	got, err := newTestClient(t, srv).Addresses.CreateFields(context.Background(), "org-1", "job-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestAddressService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Addresses.CreateFields(context.Background(), "", "job-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Addresses.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "jobID")
+}
+
+func TestAddressService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/job/job-1/address/id-1", "address")
+
+	got, err := newTestClient(t, srv).Addresses.UpdateFields(context.Background(), "org-1", "job-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestAddressService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Addresses.UpdateFields(context.Background(), "", "job-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Addresses.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "jobID")
+	_, err = client.Addresses.UpdateFields(context.Background(), "org-1", "job-1", "", testPatch)
+	assertValidationError(t, err, "addressID")
+}

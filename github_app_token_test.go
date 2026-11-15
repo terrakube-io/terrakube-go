@@ -247,3 +247,41 @@ func TestGithubAppTokenService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.GithubAppTokens.Get(context.Background(), "gat-1")
 }
+
+func TestGithubAppTokenService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/github_app_token", "github_app_token")
+
+	got, err := newTestClient(t, srv).GithubAppTokens.CreateFields(context.Background(), testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestGithubAppTokenService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/github_app_token/id-1", "github_app_token")
+
+	got, err := newTestClient(t, srv).GithubAppTokens.UpdateFields(context.Background(), "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestGithubAppTokenService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.GithubAppTokens.UpdateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "githubAppTokenID")
+}

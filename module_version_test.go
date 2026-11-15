@@ -342,3 +342,55 @@ func TestModuleVersionService_GitTag(t *testing.T) {
 		t.Errorf("GitTag = %v, want %q", created.GitTag, "v1.2.3")
 	}
 }
+
+func TestModuleVersionService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/module/module-1/version", "module_version")
+
+	got, err := newTestClient(t, srv).ModuleVersions.CreateFields(context.Background(), "org-1", "module-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestModuleVersionService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.ModuleVersions.CreateFields(context.Background(), "", "module-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.ModuleVersions.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "moduleID")
+}
+
+func TestModuleVersionService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/module/module-1/version/id-1", "module_version")
+
+	got, err := newTestClient(t, srv).ModuleVersions.UpdateFields(context.Background(), "org-1", "module-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestModuleVersionService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.ModuleVersions.UpdateFields(context.Background(), "", "module-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.ModuleVersions.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "moduleID")
+	_, err = client.ModuleVersions.UpdateFields(context.Background(), "org-1", "module-1", "", testPatch)
+	assertValidationError(t, err, "versionID")
+}

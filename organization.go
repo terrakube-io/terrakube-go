@@ -59,6 +59,14 @@ func (s *OrganizationService) Create(ctx context.Context, org *Organization) (*O
 	return s.create(ctx, path, org)
 }
 
+// CreateFields creates a new organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *APIError on server errors.
+func (s *OrganizationService) CreateFields(ctx context.Context, p Patch) (*Organization, error) {
+	path := s.client.apiPath("organization")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing organization. The organization's ID field must be set.
 // It returns a *ValidationError if the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -70,6 +78,18 @@ func (s *OrganizationService) Update(ctx context.Context, org *Organization) (*O
 
 	path := s.client.apiPath("organization", org.ID)
 	return s.update(ctx, path, org)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the organization
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if id is empty or p sets nothing, and a *APIError on server errors.
+func (s *OrganizationService) UpdateFields(ctx context.Context, id string, p Patch) (*Organization, error) {
+	if err := validateID("organizationID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes an organization by ID.

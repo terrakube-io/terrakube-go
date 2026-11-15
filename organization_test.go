@@ -263,3 +263,41 @@ func TestOrganizationService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Organizations.Get(context.Background(), "org-1")
 }
+
+func TestOrganizationService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization", "organization")
+
+	got, err := newTestClient(t, srv).Organizations.CreateFields(context.Background(), testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestOrganizationService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/id-1", "organization")
+
+	got, err := newTestClient(t, srv).Organizations.UpdateFields(context.Background(), "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestOrganizationService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Organizations.UpdateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}

@@ -79,6 +79,24 @@ func (s *ImplementationService) Create(ctx context.Context, orgID, providerID, v
 	return s.create(ctx, path, impl)
 }
 
+// CreateFields creates a new implementation for a provider version, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID, providerID, or versionID is empty and a *APIError on server errors.
+func (s *ImplementationService) CreateFields(ctx context.Context, orgID, providerID, versionID string, p Patch) (*Implementation, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("providerID", providerID); err != nil {
+		return nil, err
+	}
+	if err := validateID("versionID", versionID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider", providerID, "version", versionID, "implementation")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing implementation. The implementation's ID field must be set.
 // It returns a *ValidationError if orgID, providerID, versionID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -99,6 +117,27 @@ func (s *ImplementationService) Update(ctx context.Context, orgID, providerID, v
 
 	path := s.client.apiPath("organization", orgID, "provider", providerID, "version", versionID, "implementation", impl.ID)
 	return s.update(ctx, path, impl)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the implementation
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, providerID, versionID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ImplementationService) UpdateFields(ctx context.Context, orgID, providerID, versionID, id string, p Patch) (*Implementation, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("providerID", providerID); err != nil {
+		return nil, err
+	}
+	if err := validateID("versionID", versionID); err != nil {
+		return nil, err
+	}
+	if err := validateID("implementationID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "provider", providerID, "version", versionID, "implementation", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes an implementation by ID.

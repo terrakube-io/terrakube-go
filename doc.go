@@ -116,6 +116,15 @@
 // Relationships are different: a nil or empty relationship is not sent and is
 // left unchanged.
 //
+// UpdateFields sends only the attributes and relationships in a [Patch]; a
+// [Relationship] with a nil ID clears that link. CreateFields does the same on
+// create, so the server applies its defaults to every attribute not named:
+//
+//	ws, err := client.Workspaces.UpdateFields(ctx, orgID, wsID, terrakube.Patch{
+//		Attributes:    map[string]any{"description": "managed by automation"},
+//		Relationships: map[string]terrakube.Relationship{"vcs": {Type: "vcs"}}, // unlink
+//	})
+//
 // # List Filtering
 //
 // List methods accept an optional [ListOptions] parameter for server-side

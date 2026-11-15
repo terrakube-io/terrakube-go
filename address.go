@@ -66,6 +66,21 @@ func (s *AddressService) Create(ctx context.Context, orgID, jobID string, addres
 	return s.create(ctx, path, address)
 }
 
+// CreateFields creates a new address for a job, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or jobID is empty and a *APIError on server errors.
+func (s *AddressService) CreateFields(ctx context.Context, orgID, jobID string, p Patch) (*Address, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "address")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing address. The address's ID field must be set.
 // It returns a *ValidationError if orgID, jobID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -83,6 +98,24 @@ func (s *AddressService) Update(ctx context.Context, orgID, jobID string, addres
 
 	path := s.client.apiPath("organization", orgID, "job", jobID, "address", address.ID)
 	return s.update(ctx, path, address)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the address
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, jobID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *AddressService) UpdateFields(ctx context.Context, orgID, jobID, id string, p Patch) (*Address, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", jobID); err != nil {
+		return nil, err
+	}
+	if err := validateID("addressID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", jobID, "address", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes an address by ID.

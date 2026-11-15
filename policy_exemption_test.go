@@ -260,3 +260,51 @@ func TestPolicyExemptionService_Delete_EmptyOrganizationID(t *testing.T) {
 	err := client.PolicyExemptions.Delete(context.Background(), "", "policyexemption-1")
 	assertValidationError(t, err, "organizationID")
 }
+
+func TestPolicyExemptionService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/policyExemption", "policy_exemption")
+
+	got, err := newTestClient(t, srv).PolicyExemptions.CreateFields(context.Background(), "org-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestPolicyExemptionService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyExemptions.CreateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}
+
+func TestPolicyExemptionService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/policyExemption/id-1", "policy_exemption")
+
+	got, err := newTestClient(t, srv).PolicyExemptions.UpdateFields(context.Background(), "org-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestPolicyExemptionService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicyExemptions.UpdateFields(context.Background(), "", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicyExemptions.UpdateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "policyExemptionID")
+}

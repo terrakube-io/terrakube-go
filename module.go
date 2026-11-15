@@ -69,6 +69,18 @@ func (s *ModuleService) Create(ctx context.Context, orgID string, mod *Module) (
 	return s.create(ctx, path, mod)
 }
 
+// CreateFields creates a new module within an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *ModuleService) CreateFields(ctx context.Context, orgID string, p Patch) (*Module, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "module")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing module within an organization. The module's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -83,6 +95,21 @@ func (s *ModuleService) Update(ctx context.Context, orgID string, mod *Module) (
 
 	path := s.client.apiPath("organization", orgID, "module", mod.ID)
 	return s.update(ctx, path, mod)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the module
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ModuleService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Module, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("moduleID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "module", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a module by ID within an organization.

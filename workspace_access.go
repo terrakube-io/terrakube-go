@@ -67,6 +67,21 @@ func (s *WorkspaceAccessService) Create(ctx context.Context, orgID, workspaceID 
 	return s.create(ctx, path, access)
 }
 
+// CreateFields creates a new access entry for the given workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *WorkspaceAccessService) CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*WorkspaceAccess, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "access")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing workspace access entry. The access entry's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -84,6 +99,24 @@ func (s *WorkspaceAccessService) Update(ctx context.Context, orgID, workspaceID 
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "access", access.ID)
 	return s.update(ctx, path, access)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the workspace access entry
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *WorkspaceAccessService) UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*WorkspaceAccess, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("accessID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "access", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a workspace access entry by ID.

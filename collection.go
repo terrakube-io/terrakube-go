@@ -62,6 +62,18 @@ func (s *CollectionService) Create(ctx context.Context, orgID string, collection
 	return s.create(ctx, path, collection)
 }
 
+// CreateFields creates a new collection in the given organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *CollectionService) CreateFields(ctx context.Context, orgID string, p Patch) (*Collection, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "collection")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing collection. The collection's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -76,6 +88,21 @@ func (s *CollectionService) Update(ctx context.Context, orgID string, collection
 
 	path := s.client.apiPath("organization", orgID, "collection", collection.ID)
 	return s.update(ctx, path, collection)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the collection
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *CollectionService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Collection, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("collectionID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "collection", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a collection by ID.

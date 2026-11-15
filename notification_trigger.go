@@ -67,6 +67,21 @@ func (s *NotificationTriggerService) Create(ctx context.Context, orgID, configID
 	return s.create(ctx, path, trigger)
 }
 
+// CreateFields creates a new trigger for a notification configuration, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or notificationConfigurationID is empty and a *APIError on server errors.
+func (s *NotificationTriggerService) CreateFields(ctx context.Context, orgID, configID string, p Patch) (*NotificationTrigger, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("notificationConfigurationID", configID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "notificationConfiguration", configID, "triggers")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing notification trigger. The trigger's ID field must be set.
 // It returns a *ValidationError if orgID, configID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -84,6 +99,24 @@ func (s *NotificationTriggerService) Update(ctx context.Context, orgID, configID
 
 	path := s.client.apiPath("organization", orgID, "notificationConfiguration", configID, "triggers", trigger.ID)
 	return s.update(ctx, path, trigger)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the notification trigger
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, notificationConfigurationID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *NotificationTriggerService) UpdateFields(ctx context.Context, orgID, configID, id string, p Patch) (*NotificationTrigger, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("notificationConfigurationID", configID); err != nil {
+		return nil, err
+	}
+	if err := validateID("notificationTriggerID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "notificationConfiguration", configID, "triggers", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a notification trigger by ID.

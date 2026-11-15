@@ -315,3 +315,55 @@ func TestRunTriggerService_Delete_EmptyWorkspaceID(t *testing.T) {
 	err := client.RunTriggers.Delete(context.Background(), "org-1", "", "runtrigger-1")
 	assertValidationError(t, err, "workspaceID")
 }
+
+func TestRunTriggerService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/runTriggers", "runTrigger")
+
+	got, err := newTestClient(t, srv).RunTriggers.CreateFields(context.Background(), "org-1", "workspace-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestRunTriggerService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.RunTriggers.CreateFields(context.Background(), "", "workspace-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.RunTriggers.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "workspaceID")
+}
+
+func TestRunTriggerService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/workspace/workspace-1/runTriggers/id-1", "runTrigger")
+
+	got, err := newTestClient(t, srv).RunTriggers.UpdateFields(context.Background(), "org-1", "workspace-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestRunTriggerService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.RunTriggers.UpdateFields(context.Background(), "", "workspace-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.RunTriggers.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "workspaceID")
+	_, err = client.RunTriggers.UpdateFields(context.Background(), "org-1", "workspace-1", "", testPatch)
+	assertValidationError(t, err, "runTriggerID")
+}

@@ -61,6 +61,18 @@ func (s *WorkspaceScheduleService) Create(ctx context.Context, workspaceID strin
 	return s.create(ctx, path, schedule)
 }
 
+// CreateFields creates a new schedule for the given workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if workspaceID is empty and a *APIError on server errors.
+func (s *WorkspaceScheduleService) CreateFields(ctx context.Context, workspaceID string, p Patch) (*WorkspaceSchedule, error) {
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("workspace", workspaceID, "schedule")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing workspace schedule. The schedule's ID field must be set.
 // It returns a *ValidationError if workspaceID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -75,6 +87,21 @@ func (s *WorkspaceScheduleService) Update(ctx context.Context, workspaceID strin
 
 	path := s.client.apiPath("workspace", workspaceID, "schedule", schedule.ID)
 	return s.update(ctx, path, schedule)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the workspace schedule
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if workspaceID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *WorkspaceScheduleService) UpdateFields(ctx context.Context, workspaceID, id string, p Patch) (*WorkspaceSchedule, error) {
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("scheduleID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("workspace", workspaceID, "schedule", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a workspace schedule by ID.

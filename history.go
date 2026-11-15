@@ -70,6 +70,21 @@ func (s *HistoryService) Create(ctx context.Context, orgID, workspaceID string, 
 	return s.create(ctx, path, h)
 }
 
+// CreateFields creates a new history entry in the given workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *HistoryService) CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*History, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "history")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing history entry in the given workspace. The history entry's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -87,6 +102,24 @@ func (s *HistoryService) Update(ctx context.Context, orgID, workspaceID string, 
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "history", h.ID)
 	return s.update(ctx, path, h)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the history entry
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *HistoryService) UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*History, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("historyID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "history", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a history entry from the given workspace.

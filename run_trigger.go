@@ -69,6 +69,21 @@ func (s *RunTriggerService) Create(ctx context.Context, orgID, workspaceID strin
 	return s.create(ctx, path, entity)
 }
 
+// CreateFields creates a new run trigger, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *RunTriggerService) CreateFields(ctx context.Context, orgID, workspaceID string, p Patch) (*RunTrigger, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "runTriggers")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing run trigger. The run trigger's ID field must be set.
 // It returns a *ValidationError if orgID, workspaceID, or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -86,6 +101,24 @@ func (s *RunTriggerService) Update(ctx context.Context, orgID, workspaceID strin
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "runTriggers", entity.ID)
 	return s.update(ctx, path, entity)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the run trigger
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, workspaceID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *RunTriggerService) UpdateFields(ctx context.Context, orgID, workspaceID, id string, p Patch) (*RunTrigger, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+	if err := validateID("runTriggerID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "runTriggers", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a run trigger.

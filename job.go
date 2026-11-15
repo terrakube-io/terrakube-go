@@ -98,6 +98,18 @@ func (s *JobService) Create(ctx context.Context, orgID string, job *Job) (*Job, 
 	return s.create(ctx, path, job)
 }
 
+// CreateFields creates a new job in the given organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *JobService) CreateFields(ctx context.Context, orgID string, p Patch) (*Job, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing job. The job's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -112,6 +124,21 @@ func (s *JobService) Update(ctx context.Context, orgID string, job *Job) (*Job, 
 
 	path := s.client.apiPath("organization", orgID, "job", job.ID)
 	return s.update(ctx, path, job)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the job
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *JobService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Job, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("jobID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "job", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a job by ID.

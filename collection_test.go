@@ -306,3 +306,51 @@ func TestCollectionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Collections.Get(context.Background(), "org-1", "col-1")
 }
+
+func TestCollectionService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/collection", "collection")
+
+	got, err := newTestClient(t, srv).Collections.CreateFields(context.Background(), "org-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestCollectionService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Collections.CreateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "organizationID")
+}
+
+func TestCollectionService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/collection/id-1", "collection")
+
+	got, err := newTestClient(t, srv).Collections.UpdateFields(context.Background(), "org-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestCollectionService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Collections.UpdateFields(context.Background(), "", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.Collections.UpdateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "collectionID")
+}

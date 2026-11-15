@@ -66,6 +66,21 @@ func (s *ProjectAccessService) Create(ctx context.Context, orgID, projectID stri
 	return s.create(ctx, path, access)
 }
 
+// CreateFields creates a new project access rule for a project within an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or projectID is empty and a *APIError on server errors.
+func (s *ProjectAccessService) CreateFields(ctx context.Context, orgID, projectID string, p Patch) (*ProjectAccess, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("projectID", projectID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "project", projectID, "projectAccess")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing project access rule. The project access ID must be set.
 // It returns a *ValidationError if orgID, projectID, or access ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -83,6 +98,24 @@ func (s *ProjectAccessService) Update(ctx context.Context, orgID, projectID stri
 
 	path := s.client.apiPath("organization", orgID, "project", projectID, "projectAccess", access.ID)
 	return s.update(ctx, path, access)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the project access rule
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID, projectID, or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *ProjectAccessService) UpdateFields(ctx context.Context, orgID, projectID, id string, p Patch) (*ProjectAccess, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("projectID", projectID); err != nil {
+		return nil, err
+	}
+	if err := validateID("projectAccessID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "project", projectID, "projectAccess", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a project access rule by ID.

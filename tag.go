@@ -57,6 +57,18 @@ func (s *TagService) Create(ctx context.Context, orgID string, tag *Tag) (*Tag, 
 	return s.create(ctx, path, tag)
 }
 
+// CreateFields creates a new tag in the given organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *TagService) CreateFields(ctx context.Context, orgID string, p Patch) (*Tag, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "tag")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing tag in the given organization. The tag's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -71,6 +83,21 @@ func (s *TagService) Update(ctx context.Context, orgID string, tag *Tag) (*Tag, 
 
 	path := s.client.apiPath("organization", orgID, "tag", tag.ID)
 	return s.update(ctx, path, tag)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the tag
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *TagService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*Tag, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("tagID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "tag", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a tag from the given organization.

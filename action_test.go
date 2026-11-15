@@ -275,3 +275,41 @@ func TestActionService_AuthHeader(t *testing.T) {
 	client := newTestClient(t, srv)
 	_, _ = client.Actions.Get(context.Background(), "act-1")
 }
+
+func TestActionService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/action", "action")
+
+	got, err := newTestClient(t, srv).Actions.CreateFields(context.Background(), testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestActionService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/action/id-1", "action")
+
+	got, err := newTestClient(t, srv).Actions.UpdateFields(context.Background(), "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestActionService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.Actions.UpdateFields(context.Background(), "", testPatch)
+	assertValidationError(t, err, "actionID")
+}

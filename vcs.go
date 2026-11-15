@@ -70,6 +70,18 @@ func (s *VCSService) Create(ctx context.Context, orgID string, vcs *VCS) (*VCS, 
 	return s.create(ctx, path, vcs)
 }
 
+// CreateFields creates a new VCS connection in an organization, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *VCSService) CreateFields(ctx context.Context, orgID string, p Patch) (*VCS, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "vcs")
+	return s.createFields(ctx, path, p)
+}
+
 // Update modifies an existing VCS connection. The VCS connection's ID field must be set.
 // It returns a *ValidationError if orgID or the ID is empty and a *APIError on server errors.
 // Update sends every attribute of the struct, so start from the result of Get:
@@ -84,6 +96,21 @@ func (s *VCSService) Update(ctx context.Context, orgID string, vcs *VCS) (*VCS, 
 
 	path := s.client.apiPath("organization", orgID, "vcs", vcs.ID)
 	return s.update(ctx, path, vcs)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the VCS connection
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *VCSService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*VCS, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("vcsID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "vcs", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a VCS connection by ID.

@@ -6,6 +6,24 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-15
+
+### Added
+
+- **Sparse writes.** Every service with `Create` and `Update` gains `CreateFields` and `UpdateFields` (with the same parent IDs), which take a `Patch` and send only the attributes and relationships it names. `CreateFields` lets the server apply its defaults to everything else, and `UpdateFields` rejects an empty `Patch` with a `*ValidationError`. `NotificationConfigurations.CreateForWorkspaceFields` is the sparse form of `CreateForWorkspace`. Each method has a matching `<Resource>FieldsCreator` or `<Resource>FieldsUpdater` interface; the existing `<Resource>CRUD` interfaces are unchanged.
+  - A to-one `Relationship` sets `ID`; a nil `ID` clears the link (`{"data": null}`).
+  - A to-many `Relationship` sets `Many` and lists every target in `IDs`, which replaces the set; an empty list clears it (`{"data": []}`).
+- **`State` service** for workspace state: `Current` streams the current raw state, `Download` streams the raw (`StateRaw`) or `terraform show -json` (`StateJSON`) file of a history entry, `Rollback` makes a history entry current, and `StateName` returns a history entry's state file name. An empty response returns `ErrStateNotFound`. `Download` reads a history entry whose `output` has the API's state path (`/tfstate/v1/organization/…/state/{name}.json`) from the configured endpoint, whatever host the server or executor wrote into it (often an in-cluster address).
+- **`Outputs` service.** `List` reads a workspace's outputs, with their real types and `sensitive` flag, from the JSON state of the newest history entry that names a state file, falling back to the current raw state. A workspace without history has no outputs.
+- `ErrForeignHost`: a URL taken from server data that is neither on the configured endpoint nor an API state path is refused before any request, so the token is never sent to another host.
+- `ErrUnsupported`, matched with `errors.Is`, for an error that shows the server lacks a resource type (JSON:API 404 `Unknown collection`) or one of the newer raw endpoints (404 or 405 for a missing route, not for a missing entity). Known limit: on `/tfoutput/v1/…/stream`, Terrakube 2.34.1 answers an unknown job or step with Spring's default error body, which looks like a missing route, so that error also matches `ErrUnsupported`.
+- `ListOptions.Sort` sets the `sort` query parameter (for example `-createdDate`). When a collection is listed page by page, `id` is added as a tie-breaker unless the order already uses it. `ListOptions` gaining a field breaks only unkeyed struct literals (`ListOptions{"x", "", 0, 0}`), which the Go 1 compatibility guidelines do not cover; use field names.
+
+### Changed
+
+- The client no longer follows a redirect off the configured endpoint (another scheme, host, port or path prefix), so a redirect cannot carry the token elsewhere; the request fails with an error that wraps `ErrForeignHost`. An `http` endpoint may still be redirected to `https` on the same host and path. A `CheckRedirect` set on your `http.Client` still applies to redirects that stay on the endpoint, and your client is not modified.
+- IDs passed to service methods must be a single path segment: an ID containing `/`, or equal to `.` or `..`, returns a `*ValidationError` instead of sending a request to another path.
+
 ## [1.0.0] - 2026-11-14
 
 Targets Terrakube API 2.34.1.
@@ -49,5 +67,6 @@ Targets Terrakube API 2.34.1.
 
 - `Update` sends every attribute of the struct, so start from the result of `Get`. This is now stated on every `Update` method, in the package documentation and in the README.
 
-[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/terrakube-io/terrakube-go/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/terrakube-io/terrakube-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/terrakube-io/terrakube-go/compare/v0.5.0...v1.0.0

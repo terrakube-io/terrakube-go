@@ -298,3 +298,55 @@ func TestPolicySetParameterService_Delete_EmptyPolicySetID(t *testing.T) {
 	err := client.PolicySetParameters.Delete(context.Background(), "org-1", "", "policysetparameter-1")
 	assertValidationError(t, err, "policySetID")
 }
+
+func TestPolicySetParameterService_CreateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleCreateFields(t, srv, "/api/v1/organization/org-1/policySet/policyset-1/parameters", "policy_set_parameter")
+
+	got, err := newTestClient(t, srv).PolicySetParameters.CreateFields(context.Background(), "org-1", "policyset-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "new-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "new-1")
+	}
+}
+
+func TestPolicySetParameterService_CreateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicySetParameters.CreateFields(context.Background(), "", "policyset-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicySetParameters.CreateFields(context.Background(), "org-1", "", testPatch)
+	assertValidationError(t, err, "policySetID")
+}
+
+func TestPolicySetParameterService_UpdateFields(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	handleUpdateFields(t, srv, "/api/v1/organization/org-1/policySet/policyset-1/parameters/id-1", "policy_set_parameter")
+
+	got, err := newTestClient(t, srv).PolicySetParameters.UpdateFields(context.Background(), "org-1", "policyset-1", "id-1", testPatch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.ID != "id-1" {
+		t.Errorf("ID = %q, want %q", got.ID, "id-1")
+	}
+}
+
+func TestPolicySetParameterService_UpdateFields_EmptyID(t *testing.T) {
+	t.Parallel()
+
+	client := newTestClient(t, testutil.NewServer(t))
+	_, err := client.PolicySetParameters.UpdateFields(context.Background(), "", "policyset-1", "id-1", testPatch)
+	assertValidationError(t, err, "organizationID")
+	_, err = client.PolicySetParameters.UpdateFields(context.Background(), "org-1", "", "id-1", testPatch)
+	assertValidationError(t, err, "policySetID")
+	_, err = client.PolicySetParameters.UpdateFields(context.Background(), "org-1", "policyset-1", "", testPatch)
+	assertValidationError(t, err, "policySetParameterID")
+}

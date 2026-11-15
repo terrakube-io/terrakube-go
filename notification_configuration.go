@@ -82,6 +82,18 @@ func (s *NotificationConfigurationService) Create(ctx context.Context, orgID str
 	return s.create(ctx, path, config)
 }
 
+// CreateFields creates a new organization-level notification configuration, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID is empty and a *APIError on server errors.
+func (s *NotificationConfigurationService) CreateFields(ctx context.Context, orgID string, p Patch) (*NotificationConfiguration, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "notificationConfiguration")
+	return s.createFields(ctx, path, p)
+}
+
 // CreateForWorkspace creates a new notification configuration for a specific workspace.
 // It returns a *ValidationError if orgID or workspaceID is empty and a *APIError on server errors.
 func (s *NotificationConfigurationService) CreateForWorkspace(ctx context.Context, orgID, workspaceID string, config *NotificationConfiguration) (*NotificationConfiguration, error) {
@@ -94,6 +106,21 @@ func (s *NotificationConfigurationService) CreateForWorkspace(ctx context.Contex
 
 	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "notificationConfiguration")
 	return s.create(ctx, path, config)
+}
+
+// CreateForWorkspaceFields creates a new notification configuration for a specific workspace, sending only the attributes and
+// relationships set in p; the server applies its defaults to everything else.
+// It returns a *ValidationError if organizationID or workspaceID is empty and a *APIError on server errors.
+func (s *NotificationConfigurationService) CreateForWorkspaceFields(ctx context.Context, orgID, workspaceID string, p Patch) (*NotificationConfiguration, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("workspaceID", workspaceID); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "workspace", workspaceID, "notificationConfiguration")
+	return s.createFields(ctx, path, p)
 }
 
 // Update modifies an existing notification configuration. The configuration's ID field must be set.
@@ -110,6 +137,21 @@ func (s *NotificationConfigurationService) Update(ctx context.Context, orgID str
 
 	path := s.client.apiPath("organization", orgID, "notificationConfiguration", config.ID)
 	return s.update(ctx, path, config)
+}
+
+// UpdateFields modifies only the attributes and relationships set in p on the notification configuration
+// with the given id; a Relationship with a nil ID clears that link.
+// It returns a *ValidationError if organizationID or id is empty or p sets nothing, and a *APIError on server errors.
+func (s *NotificationConfigurationService) UpdateFields(ctx context.Context, orgID, id string, p Patch) (*NotificationConfiguration, error) {
+	if err := validateID("organizationID", orgID); err != nil {
+		return nil, err
+	}
+	if err := validateID("notificationConfigurationID", id); err != nil {
+		return nil, err
+	}
+
+	path := s.client.apiPath("organization", orgID, "notificationConfiguration", id)
+	return s.updateFields(ctx, path, id, p)
 }
 
 // Delete removes a notification configuration by ID.
