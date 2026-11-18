@@ -4,14 +4,13 @@ go 1.27
 
 require (
 	github.com/getkin/kin-openapi v0.153.0
-	github.com/oasdiff/oasdiff v1.37.0
+	github.com/oasdiff/oasdiff v1.38.0
 	github.com/terrakube-io/terrakube-go v0.0.0-00010101000000-000000000000
 	mvdan.cc/gofumpt v0.12.0
 )
 
 require (
 	cloud.google.com/go v0.123.0 // indirect
-	github.com/TwiN/go-color v1.4.1 // indirect
 	github.com/go-openapi/jsonpointer v1.0.2 // indirect
 	github.com/google/jsonapi v1.0.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
