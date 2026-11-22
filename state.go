@@ -57,12 +57,13 @@ func (s *StateService) Current(ctx context.Context, orgID, wsID string) (io.Read
 //
 // The file's location comes from h.Output, whose host is whatever URL the
 // server or executor was configured with, often an in-cluster address. When
-// h.Output has the state path of the API
+// h.Output is on the configured endpoint, Download requests it as it is, so a
+// path prefix such as the /api of a single-domain install is kept. When it is
+// not on the endpoint (another host, scheme or port, or outside the endpoint's
+// path) but has the state path of the API
 // (/tfstate/v1/organization/{org}/workspace/{ws}/state/{name}.json), Download
-// requests that path from the configured endpoint, whatever host h.Output
-// names. Otherwise it requests h.Output itself only if it is on the configured
-// endpoint, and returns ErrForeignHost, without sending anything, if it is not:
-// the token never leaves the endpoint.
+// requests that path from the configured endpoint. Otherwise it returns
+// ErrForeignHost without sending anything: the token never leaves the endpoint.
 //
 // It returns a *ValidationError for a missing h.Output or an unknown format,
 // ErrStateNotFound if the server has no such file, and a *APIError on server errors.
@@ -86,7 +87,7 @@ func (s *StateService) Download(ctx context.Context, h *History, format StateFor
 		return nil, err
 	}
 	var resp *http.Response
-	if dir, ok := apiStateDir(u.Path); ok {
+	if dir, ok := apiStateDir(u.Path); ok && !sameOrigin(s.client.baseURL, u) {
 		resp, err = s.client.requestStream(ctx, http.MethodGet, dir+file, nil)
 	} else {
 		target := url.URL{Scheme: u.Scheme, Host: u.Host, Path: path.Join(path.Dir(u.Path), file)}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	terrakube "github.com/terrakube-io/terrakube-go"
@@ -237,5 +238,65 @@ func TestStateService_Download_InClusterHost(t *testing.T) {
 	}
 	if got := readAllClose(t, rc); got != "custom" {
 		t.Errorf("body = %q, want %q", got, "custom")
+	}
+}
+
+func TestStateService_Download_SingleDomain(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	// A single-domain install serves the API under /api and the UI everywhere else.
+	srv.HandleFunc("GET /api"+stateDir+"abc.raw.json", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer test-token" {
+			t.Errorf("Authorization = %q", got)
+		}
+		_, _ = io.WriteString(w, "raw")
+	})
+	srv.HandleFunc("GET "+stateDir+"abc.raw.json", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, "<html>UI</html>")
+	})
+	client := newTestClient(t, srv)
+
+	// The executor writes <public-url>/api/tfstate/...; the endpoint is the bare public URL.
+	h := &terrakube.History{Output: srv.URL + "/api" + stateDir + "abc.json"}
+	rc, err := client.State.Download(context.Background(), h, terrakube.StateRaw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := readAllClose(t, rc); got != "raw" {
+		t.Errorf("body = %q, want %q (the /api prefix must be kept)", got, "raw")
+	}
+}
+
+func TestStateService_Download_RewrittenOntoEndpoint(t *testing.T) {
+	t.Parallel()
+
+	srv := testutil.NewServer(t)
+	srv.HandleFunc("GET /tk"+stateDir+"abc.raw.json", func(w http.ResponseWriter, r *http.Request) {
+		if got := r.Header.Get("Authorization"); got != "Bearer test-token" {
+			t.Errorf("Authorization = %q", got)
+		}
+		_, _ = io.WriteString(w, "raw")
+	})
+	srv.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		t.Errorf("unexpected request to %s", r.URL.Path)
+		w.WriteHeader(http.StatusTeapot)
+	})
+	client := newTestClientFromURL(t, srv.URL+"/tk")
+
+	// None of these is on the endpoint, so only the API state path is taken from them.
+	for name, output := range map[string]string{
+		"outside the endpoint path": srv.URL + stateDir + "abc.json",
+		"other scheme":              strings.Replace(srv.URL, "http://", "https://", 1) + "/tk" + stateDir + "abc.json",
+		"dot segment":               srv.URL + "/tk/x/.." + stateDir + "abc.json",
+	} {
+		rc, err := client.State.Download(context.Background(), &terrakube.History{Output: output}, terrakube.StateRaw)
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", name, err)
+			continue
+		}
+		if got := readAllClose(t, rc); got != "raw" {
+			t.Errorf("%s: body = %q, want %q", name, got, "raw")
+		}
 	}
 }
