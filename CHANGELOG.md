@@ -6,6 +6,10 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+### Added
+
+- `RunTriggers.ListTopLevel` lists run triggers on the top-level `/runTrigger` path, for callers that know the source and destination workspace IDs but not the organization, or cannot read the destination workspace. Filter on the relationships, for example `sourceWorkspace.id=="a";destinationWorkspace.id=="b"`. The interface is `RunTriggerTopLevelLister`.
+
 ## [1.5.0] - 2026-11-22
 
 ### Breaking changes
