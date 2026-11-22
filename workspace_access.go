@@ -4,16 +4,18 @@ import "context"
 
 // WorkspaceAccess represents access control settings for a workspace.
 type WorkspaceAccess struct {
-	ID              string     `jsonapi:"primary,access"`
-	ManageState     bool       `jsonapi:"attr,manageState"`
-	ManageWorkspace bool       `jsonapi:"attr,manageWorkspace"`
-	ManageJob       bool       `jsonapi:"attr,manageJob"`
-	PlanJob         bool       `jsonapi:"attr,planJob"`
-	ApproveJob      bool       `jsonapi:"attr,approveJob"`
-	Role            string     `jsonapi:"attr,role,omitempty"`
-	Name            string     `jsonapi:"attr,name"`
-	DestroyJob      bool       `jsonapi:"attr,destroyJob"`
-	Workspace       *Workspace `jsonapi:"relation,workspace,omitempty"`
+	ID              string `jsonapi:"primary,access"`
+	ManageState     bool   `jsonapi:"attr,manageState"`
+	ManageWorkspace bool   `jsonapi:"attr,manageWorkspace"`
+	ManageJob       bool   `jsonapi:"attr,manageJob"`
+	PlanJob         bool   `jsonapi:"attr,planJob"`
+	ApproveJob      bool   `jsonapi:"attr,approveJob"`
+	Role            string `jsonapi:"attr,role,omitempty"`
+	Name            string `jsonapi:"attr,name"`
+	// DestroyJob is nil when the server does not return it (older Terrakube versions);
+	// a nil value is left out of requests, never sent as null.
+	DestroyJob *bool      `jsonapi:"attr,destroyJob,omitempty"`
+	Workspace  *Workspace `jsonapi:"relation,workspace,omitempty"`
 }
 
 // WorkspaceAccessService handles communication with the workspace access related

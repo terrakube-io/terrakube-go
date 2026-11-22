@@ -6,6 +6,10 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 ## [Unreleased]
 
+### Breaking changes
+
+- **`Team.DestroyJob`, `Team.ManagePolicies`, `ProjectAccess.DestroyJob` and `WorkspaceAccess.DestroyJob` are now `*bool`** (tag `omitempty`). Older Terrakube servers leave these flags out, and as a plain `bool` a missing flag was read as `false`, so callers could not tell "not returned" from "false". A missing flag is now `nil`, and a `nil` flag is left out of requests instead of being sent as `false`, so `Update` leaves it unchanged on the server. This change to the exported API ships in a minor release on purpose: the old type could not report the server's real value, and the Terraform provider is the only user of these fields we know of. To migrate, write `DestroyJob: new(true)` instead of `DestroyJob: true`, and check for `nil` before dereferencing a value you read.
+
 ## [1.4.0] - 2026-11-15
 
 ### Added

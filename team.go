@@ -4,22 +4,24 @@ import "context"
 
 // Team represents a Terrakube team resource.
 type Team struct {
-	ID               string        `jsonapi:"primary,team"`
-	Name             string        `jsonapi:"attr,name"`
-	ManageState      bool          `jsonapi:"attr,manageState"`
-	ManageWorkspace  bool          `jsonapi:"attr,manageWorkspace"`
-	ManageModule     bool          `jsonapi:"attr,manageModule"`
-	ManageProvider   bool          `jsonapi:"attr,manageProvider"`
-	ManageVcs        bool          `jsonapi:"attr,manageVcs"`
-	ManageTemplate   bool          `jsonapi:"attr,manageTemplate"`
-	ManageJob        bool          `jsonapi:"attr,manageJob"`
-	ManageCollection bool          `jsonapi:"attr,manageCollection"`
-	PlanJob          bool          `jsonapi:"attr,planJob"`
-	ApproveJob       bool          `jsonapi:"attr,approveJob"`
-	Role             string        `jsonapi:"attr,role"`
-	DestroyJob       bool          `jsonapi:"attr,destroyJob"`
-	ManagePolicies   bool          `jsonapi:"attr,managePolicies"`
-	Organization     *Organization `jsonapi:"relation,organization,omitempty"`
+	ID               string `jsonapi:"primary,team"`
+	Name             string `jsonapi:"attr,name"`
+	ManageState      bool   `jsonapi:"attr,manageState"`
+	ManageWorkspace  bool   `jsonapi:"attr,manageWorkspace"`
+	ManageModule     bool   `jsonapi:"attr,manageModule"`
+	ManageProvider   bool   `jsonapi:"attr,manageProvider"`
+	ManageVcs        bool   `jsonapi:"attr,manageVcs"`
+	ManageTemplate   bool   `jsonapi:"attr,manageTemplate"`
+	ManageJob        bool   `jsonapi:"attr,manageJob"`
+	ManageCollection bool   `jsonapi:"attr,manageCollection"`
+	PlanJob          bool   `jsonapi:"attr,planJob"`
+	ApproveJob       bool   `jsonapi:"attr,approveJob"`
+	Role             string `jsonapi:"attr,role"`
+	// DestroyJob and ManagePolicies are nil when the server does not return them
+	// (older Terrakube versions); a nil value is left out of requests, never sent as null.
+	DestroyJob     *bool         `jsonapi:"attr,destroyJob,omitempty"`
+	ManagePolicies *bool         `jsonapi:"attr,managePolicies,omitempty"`
+	Organization   *Organization `jsonapi:"relation,organization,omitempty"`
 }
 
 // TeamService handles communication with the team-related endpoints.
