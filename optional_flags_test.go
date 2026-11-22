@@ -11,9 +11,10 @@ import (
 	terrakube "github.com/terrakube-io/terrakube-go"
 )
 
-// The optional permission flags (destroyJob, managePolicies) are *bool: an older
-// server leaves them out, so a missing flag must decode as nil rather than false,
-// and a nil flag must be left out of requests instead of being sent as null.
+// The optional flags (destroyJob, managePolicies, requireApproveToApply,
+// restrictApplyToConfiguredBranch) are *bool: an older server leaves them out, so a
+// missing flag must decode as nil rather than false, and a nil flag must be left out
+// of requests instead of being sent as null.
 
 type optionalFlagCase struct {
 	name     string
@@ -49,9 +50,21 @@ var optionalFlagCases = []optionalFlagCase{
 		field:    func(m any) *bool { return m.(*terrakube.WorkspaceAccess).DestroyJob },
 		set:      func(m any, v *bool) { m.(*terrakube.WorkspaceAccess).DestroyJob = v },
 	},
+	{
+		name: "Workspace.RequireApproveToApply", typ: "workspace", attr: "requireApproveToApply",
+		newModel: func() any { return new(terrakube.Workspace) },
+		field:    func(m any) *bool { return m.(*terrakube.Workspace).RequireApproveToApply },
+		set:      func(m any, v *bool) { m.(*terrakube.Workspace).RequireApproveToApply = v },
+	},
+	{
+		name: "Workspace.RestrictApplyToConfiguredBranch", typ: "workspace", attr: "restrictApplyToConfiguredBranch",
+		newModel: func() any { return new(terrakube.Workspace) },
+		field:    func(m any) *bool { return m.(*terrakube.Workspace).RestrictApplyToConfiguredBranch },
+		set:      func(m any, v *bool) { m.(*terrakube.Workspace).RestrictApplyToConfiguredBranch = v },
+	},
 }
 
-func TestOptionalPermissionFlags_Decode(t *testing.T) {
+func TestOptionalFlags_Decode(t *testing.T) {
 	t.Parallel()
 
 	for _, tc := range optionalFlagCases {
@@ -82,7 +95,7 @@ func TestOptionalPermissionFlags_Decode(t *testing.T) {
 	}
 }
 
-func TestOptionalPermissionFlags_Encode(t *testing.T) {
+func TestOptionalFlags_Encode(t *testing.T) {
 	t.Parallel()
 
 	for _, tc := range optionalFlagCases {

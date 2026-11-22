@@ -6,6 +6,9 @@ import (
 )
 
 // Workspace represents a Terrakube workspace resource.
+//
+// RequireApproveToApply and RestrictApplyToConfiguredBranch are nil when the server does not
+// return them (older Terrakube versions); a nil value is left out of requests, never sent as null.
 type Workspace struct {
 	ID                              string                       `jsonapi:"primary,workspace"`
 	Name                            string                       `jsonapi:"attr,name"`
@@ -31,8 +34,8 @@ type Workspace struct {
 	UpdatedBy                       *string                      `jsonapi:"attr,updatedBy"`
 	UpdatedDate                     *time.Time                   `jsonapi:"attr,updatedDate,rfc3339"`
 	PolicyComplianceStatus          *string                      `jsonapi:"attr,policyComplianceStatus"`
-	RequireApproveToApply           bool                         `jsonapi:"attr,requireApproveToApply"`
-	RestrictApplyToConfiguredBranch bool                         `jsonapi:"attr,restrictApplyToConfiguredBranch"`
+	RequireApproveToApply           *bool                        `jsonapi:"attr,requireApproveToApply,omitempty"`
+	RestrictApplyToConfiguredBranch *bool                        `jsonapi:"attr,restrictApplyToConfiguredBranch,omitempty"`
 	Organization                    *Organization                `jsonapi:"relation,organization,omitempty"`
 	Vcs                             *VCS                         `jsonapi:"relation,vcs,omitempty"`
 	Project                         *Project                     `jsonapi:"relation,project,omitempty"`
