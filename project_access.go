@@ -4,16 +4,18 @@ import "context"
 
 // ProjectAccess represents a Terrakube project access resource.
 type ProjectAccess struct {
-	ID              string   `jsonapi:"primary,project_access"`
-	Name            string   `jsonapi:"attr,name"`
-	ManageState     bool     `jsonapi:"attr,manageState"`
-	ManageJob       bool     `jsonapi:"attr,manageJob"`
-	ManageWorkspace bool     `jsonapi:"attr,manageWorkspace"`
-	PlanJob         bool     `jsonapi:"attr,planJob"`
-	ApproveJob      bool     `jsonapi:"attr,approveJob"`
-	Role            string   `jsonapi:"attr,role"`
-	DestroyJob      bool     `jsonapi:"attr,destroyJob"`
-	Project         *Project `jsonapi:"relation,project,omitempty"`
+	ID              string `jsonapi:"primary,project_access"`
+	Name            string `jsonapi:"attr,name"`
+	ManageState     bool   `jsonapi:"attr,manageState"`
+	ManageJob       bool   `jsonapi:"attr,manageJob"`
+	ManageWorkspace bool   `jsonapi:"attr,manageWorkspace"`
+	PlanJob         bool   `jsonapi:"attr,planJob"`
+	ApproveJob      bool   `jsonapi:"attr,approveJob"`
+	Role            string `jsonapi:"attr,role"`
+	// DestroyJob is nil when the server does not return it (older Terrakube versions);
+	// a nil value is left out of requests, never sent as null.
+	DestroyJob *bool    `jsonapi:"attr,destroyJob,omitempty"`
+	Project    *Project `jsonapi:"relation,project,omitempty"`
 }
 
 // ProjectAccessService handles communication with the project access related methods of the Terrakube API.

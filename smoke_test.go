@@ -98,7 +98,7 @@ func TestSmoke(t *testing.T) {
 	_, err = c.Teams.Create(ctx, org.ID, &terrakube.Team{
 		Name: group, ManageState: true, ManageWorkspace: true, ManageModule: true, ManageProvider: true,
 		ManageVcs: true, ManageTemplate: true, ManageJob: true, ManageCollection: true,
-		PlanJob: true, ApproveJob: true, DestroyJob: true, ManagePolicies: true,
+		PlanJob: true, ApproveJob: true, DestroyJob: new(true), ManagePolicies: new(true),
 	})
 	must("Teams.Create", err)
 
