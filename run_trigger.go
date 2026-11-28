@@ -138,6 +138,14 @@ func (s *RunTriggerService) Delete(ctx context.Context, orgID, workspaceID, runT
 	return s.del(ctx, path)
 }
 
+// ListTopLevel returns run triggers from the top-level /runTrigger path, for callers that do not
+// know the destination workspace's organization or cannot read that workspace. Filter on the
+// relationships, for example sourceWorkspace.id=="a";destinationWorkspace.id=="b".
+// It returns a *APIError on server errors.
+func (s *RunTriggerService) ListTopLevel(ctx context.Context, opts *ListOptions) ([]*RunTrigger, error) {
+	return s.list(ctx, s.client.apiPath("runTrigger"), opts)
+}
+
 // CreateFieldsTopLevel creates a run trigger through the top-level /runTrigger path,
 // sending only the attributes and relationships set in p. Set the sourceWorkspace and
 // destinationWorkspace relationships in p; no organization ID is needed.

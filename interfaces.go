@@ -1966,6 +1966,11 @@ type RunTriggerCRUD interface {
 	RunTriggerDeleter
 }
 
+// RunTriggerTopLevelLister lists run triggers on the top-level path, without the organization or workspace.
+type RunTriggerTopLevelLister interface {
+	ListTopLevel(ctx context.Context, opts *ListOptions) ([]*RunTrigger, error)
+}
+
 // RunTriggerTopLevelFieldsCreator creates run triggers from the given attributes and relationships on the top-level path, without the organization or workspace.
 type RunTriggerTopLevelFieldsCreator interface {
 	CreateFieldsTopLevel(ctx context.Context, p Patch) (*RunTrigger, error)
@@ -2092,6 +2097,7 @@ var (
 
 // Compile-time checks for the methods on top-level paths.
 var (
+	_ RunTriggerTopLevelLister                        = (*RunTriggerService)(nil)
 	_ RunTriggerTopLevelFieldsCreator                 = (*RunTriggerService)(nil)
 	_ RunTriggerByIDGetter                            = (*RunTriggerService)(nil)
 	_ RunTriggerByIDFieldsUpdater                     = (*RunTriggerService)(nil)

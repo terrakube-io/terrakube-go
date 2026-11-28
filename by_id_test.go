@@ -248,6 +248,10 @@ func TestByID_List(t *testing.T) {
 		entities any
 		call     func(*terrakube.Client) (int, error)
 	}{
+		{"RunTriggers.ListTopLevel", "/api/v1/runTrigger", []*terrakube.RunTrigger{{ID: "a"}, {ID: "b"}}, func(c *terrakube.Client) (int, error) {
+			v, err := c.RunTriggers.ListTopLevel(context.Background(), nil)
+			return len(v), err
+		}},
 		{"PolicySetParameters.ListByPolicySet", "/api/v1/policy_set/ps-1/parameters", []*terrakube.PolicySetParameter{{ID: "a"}, {ID: "b"}}, func(c *terrakube.Client) (int, error) {
 			v, err := c.PolicySetParameters.ListByPolicySet(context.Background(), "ps-1", nil)
 			return len(v), err
@@ -383,6 +387,17 @@ func TestByID_List_Options(t *testing.T) {
 
 	if _, err := c.PolicySetParameters.ListByPolicySet(context.Background(), "ps-1", &terrakube.ListOptions{Filter: "key==x"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	srv.HandleFunc("GET /api/v1/runTrigger", func(w http.ResponseWriter, r *http.Request) {
+		want := `sourceWorkspace.id=="s";destinationWorkspace.id=="d"`
+		if got := r.URL.Query().Get("filter[runTrigger]"); got != want {
+			t.Errorf("filter[runTrigger] = %q, want %q", got, want)
+		}
+		testutil.WriteJSONAPIList(t, w, http.StatusOK, []*terrakube.RunTrigger{})
+	})
+	if _, err := c.RunTriggers.ListTopLevel(context.Background(), &terrakube.ListOptions{Filter: `sourceWorkspace.id=="s";destinationWorkspace.id=="d"`}); err != nil {
+		t.Fatalf("ListTopLevel: unexpected error: %v", err)
 	}
 
 	// These collections are not paged, so a page request is refused before it is sent.
