@@ -186,6 +186,8 @@ Changes are listed in [CHANGELOG.md](CHANGELOG.md). To report a security problem
 | `WithInsecureTLS()` | Skip TLS verification | No |
 | `WithUserAgent(ua)` | Custom User-Agent header | No |
 
+`WithEndpoint` takes the API server's URL, the one whose `/api/v1` serves the JSON:API, such as `https://terrakube-api.example.com`. On a single-domain install, where the UI and the API share one host, the API is under `/api`, so use `https://terrakube.example.com/api`. The bare host serves only `/api/v1` from the API, and requests to `/tfstate`, `/tfoutput` or `/pat` would reach the UI.
+
 ## Error Handling
 
 ```go

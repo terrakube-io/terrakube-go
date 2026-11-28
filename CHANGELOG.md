@@ -10,6 +10,14 @@ Releases up to v0.5.0 are described in the [GitHub release notes](https://github
 
 - `RunTriggers.ListTopLevel` lists run triggers on the top-level `/runTrigger` path, for callers that know the source and destination workspace IDs but not the organization, or cannot read the destination workspace. Filter on the relationships, for example `sourceWorkspace.id=="a";destinationWorkspace.id=="b"`. The interface is `RunTriggerTopLevelLister`.
 
+### Fixed
+
+- `State.Download` requests `history.output` as it is when it is on the configured endpoint, and rewrites an API state path onto the endpoint only when `history.output` is not on it (another host such as an in-cluster address, another scheme or port, or outside the endpoint's path). Before, a path prefix in front of `/tfstate/` was dropped even on the endpoint's own host.
+
+### Documentation
+
+- The README says which endpoint to configure on a single-domain install: `https://host/api`, not the bare host.
+
 ## [1.5.0] - 2026-11-22
 
 ### Breaking changes
